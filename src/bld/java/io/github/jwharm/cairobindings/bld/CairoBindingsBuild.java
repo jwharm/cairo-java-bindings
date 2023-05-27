@@ -10,9 +10,9 @@ import static rife.bld.dependencies.Scope.*;
 public class CairoBindingsBuild extends Project {
     public CairoBindingsBuild() {
         pkg = "io.github.jwharm.cairobindings.bld";
-        name = "CairoBindings";
+        name = "cairo";
         mainClass = "io.github.jwharm.cairobindings.bld.CairoBindingsMain";
-        version = version(0,1,0);
+        version = version(1,16,0);
 
         compileOperation().compileOptions()
             .release(20)
