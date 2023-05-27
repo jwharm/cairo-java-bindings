@@ -57,6 +57,17 @@ public class Interop {
     }
     
     /**
+     * Creates a method handle that is used to call the native function at
+     * the provided memory address.
+     * @param symbol Memory address of the native function
+     * @param fdesc Function descriptor of the native function
+     * @return the MethodHandle
+     */
+    public static MethodHandle downcallHandle(MemorySegment symbol, FunctionDescriptor fdesc) {
+        return linker.downcallHandle(symbol, fdesc);
+    }
+
+    /**
      * Allocate a native string using SegmentAllocator.allocateUtf8String(String).
      * @param string the string to allocate as a native string (utf8 char*)
      * @param allocator the segment allocator to use

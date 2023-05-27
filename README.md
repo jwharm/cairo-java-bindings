@@ -75,3 +75,9 @@ public class DrawSpiral {
 ```
 
 The library is primarily meant to be used with [Java-GI](https://github.com/jwharm/java-gi), but can also be used independently.
+
+## Building
+
+The project can be built with [bld](https://rife2.com/bld).
+- Run `./bld download` to initialize `bld`.
+- Run `./bld jar jar-sources jar-javadoc` to build the project. The jar files can be found in the `build/dist/` directory.

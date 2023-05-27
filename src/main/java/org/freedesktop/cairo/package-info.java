@@ -1,4 +1,4 @@
 /**
- * Java bindings for Cairo
+ * Java bindings for cairo
  */
 package org.freedesktop.cairo;
