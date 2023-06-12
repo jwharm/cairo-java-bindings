@@ -1,7 +1,7 @@
 # cairo-java-bindings
 Java language bindings for the Cairo graphics library using the JEP-434 Panama FFI
 
-This is still work in progress and not finished.
+This is still a work in progress and not finished.
 
 A simple usage example, ported from [`spiral.c`](https://gitlab.com/cairo/cairo-demos/-/blob/master/png/spiral.c) in the Cairo demos:
 
