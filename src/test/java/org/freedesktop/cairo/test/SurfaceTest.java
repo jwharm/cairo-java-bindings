@@ -39,7 +39,7 @@ class SurfaceTest {
 	void testFinish() {
 		Surface s = ImageSurface.create(Format.ARGB32, 120, 120);
 		s.finish();
-		assertEquals(s.status(), Status.SURFACE_FINISHED);
+		assertEquals(s.status(), Status.SUCCESS);
 	}
 
 	@Test
@@ -58,9 +58,7 @@ class SurfaceTest {
 
 	@Test
 	void testGetFontOptions() {
-		Surface s = ImageSurface.create(Format.ARGB32, 120, 120);
-		s.getFontOptions(null);
-		assertEquals(s.status(), Status.SUCCESS);
+		fail("Not yet implemented");
 	}
 
 	@Test

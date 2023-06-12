@@ -2,9 +2,10 @@
   <configuration default="false" name="Run Tests" type="JUnit" factoryName="JUnit">
     <module name="app" />
     <option name="PACKAGE_NAME" value="moog" />
-    <option name="MAIN_CLASS_NAME" value="io.github.jwharm.cairobindings.bld" />
+    <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="directory" />
+    <option name="VM_PARAMETERS" value="-ea --enable-preview" />
     <dir value="$PROJECT_DIR$/src/test/java" />
     <method v="2">
       <option name="Make" enabled="true" />

@@ -165,7 +165,7 @@ public class Script extends Device {
 	 */
 	public void setMode(ScriptMode mode) {
 		try {
-			cairo_script_set_mode.invoke(handle(), mode.ordinal());
+			cairo_script_set_mode.invoke(handle(), mode.value());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
@@ -187,7 +187,7 @@ public class Script extends Device {
 	public ScriptSurface createScriptSurface(Content content, double width, double height) {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_script_surface_create.invoke(handle(), content.ordinal(),
+			MemorySegment result = (MemorySegment) cairo_script_surface_create.invoke(handle(), content.value(),
 					width, height);
 			ScriptSurface surface = new ScriptSurface(result);
 			surface.takeOwnership();

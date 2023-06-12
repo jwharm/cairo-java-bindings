@@ -191,6 +191,14 @@ public enum SurfaceType {
 	COGL;
 
 	/**
+	 * Return the value of this enum
+	 * @return the value
+	 */
+	public int value() {
+		return ordinal();
+	}
+
+	/**
 	 * Returns the enum constant for the given ordinal (its position in the enum
 	 * declaration).
 	 * 

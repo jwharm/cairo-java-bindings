@@ -219,7 +219,7 @@ public final class PDFSurface extends Surface {
 	 */
 	public PDFSurface restrictToVersion(PDFVersion version) {
 		try {
-			cairo_pdf_surface_restrict_to_version.invoke(handle(), version.ordinal());
+			cairo_pdf_surface_restrict_to_version.invoke(handle(), version.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -281,7 +281,7 @@ public final class PDFSurface extends Surface {
 				MemorySegment linkAttribsPtr = linkAttribs == null ? MemorySegment.NULL
 						: arena.allocateUtf8String(linkAttribs);
 				return (int) cairo_pdf_surface_add_outline.invoke(handle(), parentId, utf8Ptr, linkAttribsPtr,
-						flags.ordinal());
+						flags.value());
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -316,7 +316,7 @@ public final class PDFSurface extends Surface {
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment utf8Ptr = utf8 == null ? MemorySegment.NULL : arena.allocateUtf8String(utf8);
-				cairo_pdf_surface_set_metadata.invoke(handle(), metadata.ordinal(), utf8Ptr);
+				cairo_pdf_surface_set_metadata.invoke(handle(), metadata.value(), utf8Ptr);
 				return this;
 			}
 		} catch (Throwable e) {

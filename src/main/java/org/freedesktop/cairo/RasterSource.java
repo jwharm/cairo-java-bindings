@@ -54,7 +54,7 @@ public class RasterSource extends Pattern {
 	public static RasterSource createRasterSource(Content content, int width, int height) {
 		try {
 			MemorySegment result = (MemorySegment) cairo_pattern_create_raster_source.invoke(MemorySegment.NULL,
-					content.ordinal(), width, height);
+					content.value(), width, height);
 			RasterSource pattern = new RasterSource(result);
 			pattern.takeOwnership();
 			return pattern;

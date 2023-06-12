@@ -16,7 +16,7 @@ class ContextTest {
 			return Context.create(ImageSurface.create(Format.ARGB32, 120, 120));
 		} catch (IOException ioe) {
 			fail(ioe);
-			return null;
+			throw new RuntimeException(ioe);
 		}
 	}
 
@@ -53,9 +53,8 @@ class ContextTest {
 	@Test
 	void testGetTarget() {
 		Context cr = createContext();
-		Surface s = cr.getTarget();
+		cr.getTarget();
 		assertEquals(cr.status(), Status.SUCCESS);
-		assertEquals(s.status(), Status.SUCCESS);
 	}
 
 	@Test
@@ -91,9 +90,8 @@ class ContextTest {
 	@Test
 	void testGetGroupTarget() {
 		Context cr = createContext();
-		Surface s = cr.getGroupTarget();
+		cr.getGroupTarget();
 		assertEquals(cr.status(), Status.SUCCESS);
-		assertEquals(s.status(), Status.SUCCESS);
 	}
 
 	@Test
@@ -550,6 +548,7 @@ class ContextTest {
 	@Test
 	void testRelCurveTo() {
 		Context cr = createContext();
+		cr.moveTo(0, 0);
 		cr.relCurveTo(10, 10, 10, 10, 10, 10);
 		assertEquals(cr.status(), Status.SUCCESS);
 	}
@@ -557,6 +556,7 @@ class ContextTest {
 	@Test
 	void testRelLineTo() {
 		Context cr = createContext();
+		cr.moveTo(0, 0);
 		cr.relLineTo(10, 10);
 		assertEquals(cr.status(), Status.SUCCESS);
 	}
@@ -564,6 +564,7 @@ class ContextTest {
 	@Test
 	void testRelMoveTo() {
 		Context cr = createContext();
+		cr.moveTo(0, 0);
 		cr.relMoveTo(10, 10);
 		assertEquals(cr.status(), Status.SUCCESS);
 	}

@@ -12,7 +12,7 @@ public enum Format {
 	/**
 	 * no such format exists or is supported.
 	 */
-	INVALID,
+	INVALID(-1),
 
 	/**
 	 * each pixel is a 32-bit quantity, with alpha in the upper 8 bits, then red,
@@ -22,7 +22,7 @@ public enum Format {
 	 * 
 	 * @since 1.0
 	 */
-	ARGB32,
+	ARGB32(0),
 
 	/**
 	 * each pixel is a 32-bit quantity, with the upper 8 bits unused. Red, Green,
@@ -30,14 +30,14 @@ public enum Format {
 	 * 
 	 * @since 1.0
 	 */
-	RGB24,
+	RGB24(1),
 
 	/**
 	 * each pixel is a 8-bit quantity holding an alpha value.
 	 * 
 	 * @since 1.0
 	 */
-	A8,
+	A8(2),
 
 	/**
 	 * each pixel is a 1-bit quantity holding an alpha value. Pixels are packed
@@ -48,7 +48,7 @@ public enum Format {
 	 * 
 	 * @since 1.0
 	 */
-	A1,
+	A1(3),
 
 	/**
 	 * each pixel is a 16-bit quantity with red in the upper 5 bits, then green in
@@ -56,23 +56,52 @@ public enum Format {
 	 * 
 	 * @since 1.2
 	 */
-	RGB16_565,
+	RGB16_565(4),
 
 	/**
 	 * like RGB24 but with 10bpc.
 	 * 
 	 * @since 1.12
 	 */
-	RGB30;
+	RGB30(5);
+
+	private final int value;
+
+	Format(int value) {
+		this.value = value;
+	}
 
 	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
+	 * Return the value of this enum
+	 * @return the value
 	 */
-	public static Format of(int ordinal) {
-		return values()[ordinal];
+	public int value() {
+		return value;
+	}
+
+	/**
+	 * Returns the enum member for the given value.
+	 *
+	 * @param value the value of the enum member
+	 * @return the enum member for the given value
+	 */
+	public static Format of(int value) {
+		if (value == -1) {
+			return INVALID;
+		} else if (value == 0) {
+			return ARGB32;
+		} else if (value == 1) {
+			return RGB24;
+		} else if (value == 2) {
+			return A8;
+		} else if (value == 3) {
+			return A1;
+		} else if (value == 4) {
+			return RGB16_565;
+		} else if (value == 5) {
+			return RGB30;
+		} else {
+			throw new IllegalArgumentException("No Format enum with value " + value);
+		}
 	}
 }

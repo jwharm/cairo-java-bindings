@@ -80,7 +80,7 @@ public abstract class Pattern extends ProxyInstance {
 	 */
 	public void setExtend(Extend extend) {
 		try {
-			cairo_pattern_set_extend.invoke(handle(), extend.ordinal());
+			cairo_pattern_set_extend.invoke(handle(), extend.value());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
@@ -129,7 +129,7 @@ public abstract class Pattern extends ProxyInstance {
 	 */
 	public void setFilter(Filter filter) {
 		try {
-			cairo_pattern_set_filter.invoke(handle(), filter.ordinal());
+			cairo_pattern_set_filter.invoke(handle(), filter.value());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}

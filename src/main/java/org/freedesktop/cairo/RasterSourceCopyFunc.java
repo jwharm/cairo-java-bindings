@@ -46,7 +46,7 @@ public interface RasterSourceCopyFunc {
 		 * The snapshot function must always return a Status enum member; failing to do
 		 * so is a programming error that should fail fast and obvious.
 		 */
-		return result.ordinal();
+		return result.value();
 	}
 
 	/**

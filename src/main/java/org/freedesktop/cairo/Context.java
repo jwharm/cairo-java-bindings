@@ -242,7 +242,7 @@ public final class Context extends ProxyInstance {
 	 */
 	public Context pushGroupWithContent(Content content) {
 		try {
-			cairo_push_group_with_content.invoke(handle(), content.ordinal());
+			cairo_push_group_with_content.invoke(handle(), content.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -499,7 +499,7 @@ public final class Context extends ProxyInstance {
 	 */
 	public Context setAntialias(Antialias antialias) {
 		try {
-			cairo_set_antialias.invoke(handle(), antialias.ordinal());
+			cairo_set_antialias.invoke(handle(), antialias.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -638,7 +638,7 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_get_dash = Interop.downcallHandle("cairo_get_dash",
-			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
 
 	/**
 	 * Set the current fill rule within the cairo context. The fill rule is used to
@@ -655,7 +655,7 @@ public final class Context extends ProxyInstance {
 	 */
 	public Context setFillRule(FillRule fillRule) {
 		try {
-			cairo_set_fill_rule.invoke(handle(), fillRule.ordinal());
+			cairo_set_fill_rule.invoke(handle(), fillRule.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -700,7 +700,7 @@ public final class Context extends ProxyInstance {
 	 */
 	public Context setLineCap(LineCap lineCap) {
 		try {
-			cairo_set_line_cap.invoke(handle(), lineCap.ordinal());
+			cairo_set_line_cap.invoke(handle(), lineCap.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -745,7 +745,7 @@ public final class Context extends ProxyInstance {
 	 */
 	public Context setLineJoin(LineJoin lineJoin) {
 		try {
-			cairo_set_line_join.invoke(handle(), lineJoin.ordinal());
+			cairo_set_line_join.invoke(handle(), lineJoin.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -896,7 +896,7 @@ public final class Context extends ProxyInstance {
 	 */
 	public Context setOperator(Operator op) {
 		try {
-			cairo_set_operator.invoke(handle(), op.ordinal());
+			cairo_set_operator.invoke(handle(), op.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -1056,8 +1056,8 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_clip_extents = Interop.downcallHandle("cairo_clip_extents",
-			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
-					ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE),
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+					ValueLayout.ADDRESS, ValueLayout.ADDRESS),
 			false);
 
 	/**
@@ -1130,7 +1130,7 @@ public final class Context extends ProxyInstance {
 			throw new RuntimeException(e);
 		} finally {
 			if (status != Status.SUCCESS) {
-				throw new IllegalStateException(status.toString());
+				throw new IllegalStateException(status == null ? "Cannot read cairo_rectangle_list_t->status" : status.toString());
 			}
 		}
 	}
@@ -1218,8 +1218,8 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_fill_extents = Interop.downcallHandle("cairo_fill_extents",
-			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
-					ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE),
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+					ValueLayout.ADDRESS, ValueLayout.ADDRESS),
 			false);
 
 	/**
@@ -1290,7 +1290,8 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_mask_surface = Interop.downcallHandle("cairo_mask_surface",
-			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE,
+					ValueLayout.JAVA_DOUBLE), false);
 
 	/**
 	 * A drawing operator that paints the current source everywhere within the
@@ -1331,7 +1332,7 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_paint_with_alpha = Interop.downcallHandle("cairo_paint_with_alpha",
-			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS), false);
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE), false);
 
 	/**
 	 * A drawing operator that strokes the current path according to the current
@@ -1413,10 +1414,10 @@ public final class Context extends ProxyInstance {
 	 * precise inked areas in light of the stroke parameters, so
 	 * cairo_path_extents() may be more desirable for sake of performance if
 	 * non-inked path extents are desired.
-	 * 
+	 *
 	 * @see {@link #stroke()}, {@link #setLineWidth(double)},
 	 *      {@link #setLineJoin(LineJoin)}, {@link #setLineCap(LineCap)},
-	 *      {@link #setDash(Dash)}, and {@link #strokePreserve()}.
+	 *      {@link #setDash(double[], double)}, and {@link #strokePreserve()}.
 	 * @return The resulting extents
 	 * @since 1.0
 	 */
@@ -1437,8 +1438,8 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_stroke_extents = Interop.downcallHandle("cairo_stroke_extents",
-			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
-					ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE),
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+					ValueLayout.ADDRESS, ValueLayout.ADDRESS),
 			false);
 
 	/**
@@ -1536,7 +1537,7 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_copy_path = Interop.downcallHandle("cairo_copy_path",
-			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS), false);
 
 	/**
 	 * Gets a flattened copy of the current path and returns it to the user as a
@@ -1568,7 +1569,7 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_copy_path_flat = Interop.downcallHandle("cairo_copy_path_flat",
-			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS), false);
 
 	/**
 	 * Append the path onto the current path. The path may be either the return
@@ -2139,7 +2140,7 @@ public final class Context extends ProxyInstance {
 				MemorySegment y1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
 				MemorySegment x2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
 				MemorySegment y2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
-				cairo_path_extents.invoke(handle(), x1, y1, x2, y2);
+				cairo_path_extents.invoke(handle(), x1Ptr, y1Ptr, x2Ptr, y2Ptr);
 				return Rectangle.create(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
 						x2Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y2Ptr.get(ValueLayout.JAVA_DOUBLE, 0));
 			}

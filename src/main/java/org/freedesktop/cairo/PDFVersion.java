@@ -30,8 +30,12 @@ public enum PDFVersion {
 	 */
 	VERSION_1_5;
 
-	{
-		Interop.ensureInitialized();
+	/**
+	 * Return the value of this enum
+	 * @return the value
+	 */
+	public int value() {
+		return ordinal();
 	}
 
 	/**
@@ -43,6 +47,10 @@ public enum PDFVersion {
 	 */
 	public static PDFVersion of(int ordinal) {
 		return values()[ordinal];
+	}
+
+	{
+		Interop.ensureInitialized();
 	}
 
 	/**

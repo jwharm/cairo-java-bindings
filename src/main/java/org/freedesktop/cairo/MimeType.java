@@ -104,7 +104,7 @@ public enum MimeType {
 
 	private final String name;
 
-	private MimeType(String name) {
+	MimeType(String name) {
 		this.name = name;
 	}
 

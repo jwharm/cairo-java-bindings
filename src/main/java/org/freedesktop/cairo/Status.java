@@ -311,6 +311,14 @@ public enum Status {
 	}
 
 	/**
+	 * Return the value of this enum
+	 * @return the value
+	 */
+	public int value() {
+		return ordinal();
+	}
+
+	/**
 	 * Provides a human-readable description of a {@link Status}.
 	 * 
 	 * @return a string representation of the status

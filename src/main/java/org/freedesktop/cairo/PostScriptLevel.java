@@ -30,8 +30,12 @@ public enum PostScriptLevel {
 	 */
 	LEVEL_3;
 
-	{
-		Interop.ensureInitialized();
+	/**
+	 * Return the value of this enum
+	 * @return the value
+	 */
+	public int value() {
+		return ordinal();
 	}
 
 	/**
@@ -45,9 +49,13 @@ public enum PostScriptLevel {
 		return values()[ordinal];
 	}
 
+	{
+		Interop.ensureInitialized();
+	}
+
 	/**
 	 * Used to retrieve the list of supported levels. See
-	 * {@link PostScriptSurface#restrictToVersion(PostScriptLevel)}.
+	 * {@link PostScriptSurface#restrictToLevel(PostScriptLevel)}.
 	 * 
 	 * @return supported level list
 	 * @since 1.6

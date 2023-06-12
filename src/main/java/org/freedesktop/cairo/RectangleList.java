@@ -84,7 +84,7 @@ public class RectangleList extends ProxyInstance {
 	 */
 	public RectangleList(Status status, List<Rectangle> rectangles) {
 		super(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
-		STATUS.set(handle(), status.ordinal());
+		STATUS.set(handle(), status.value());
 		NUM_RECTANGLES.set(handle(), rectangles.size());
 		if (rectangles.isEmpty()) {
 			return;

@@ -16,12 +16,17 @@ import static rife.bld.dependencies.Scope.*;
 public class CairoBindingsBuild extends Project {
 	
     public CairoBindingsBuild() {
-        pkg = "io.github.jwharm.cairobindings.bld";
+        pkg = "io.github.jwharm.cairobindings";
         name = "cairo";
         version = version(1,16,0,"-0.1");
         javaRelease = 20;
 
-        compileOperation().compileOptions().enablePreview();
+        compileOperation().compileOptions()
+                .enablePreview();
+
+        testOperation().javaOptions()
+                .enablePreview()
+                .enableNativeAccess(List.of("ALL-UNNAMED"));
 
         repositories = List.of(MAVEN_CENTRAL);
         scope(test)

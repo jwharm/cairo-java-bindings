@@ -30,8 +30,12 @@ public enum SVGVersion {
 	 */
 	VERSION_1_2;
 
-	{
-		Interop.ensureInitialized();
+	/**
+	 * Return the value of this enum
+	 * @return the value
+	 */
+	public int value() {
+		return ordinal();
 	}
 
 	/**
@@ -43,6 +47,10 @@ public enum SVGVersion {
 	 */
 	public static SVGVersion of(int ordinal) {
 		return values()[ordinal];
+	}
+
+	{
+		Interop.ensureInitialized();
 	}
 
 	/**

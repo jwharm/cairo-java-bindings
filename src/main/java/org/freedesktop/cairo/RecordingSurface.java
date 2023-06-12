@@ -80,7 +80,7 @@ public final class RecordingSurface extends Surface {
 	public static RecordingSurface create(Content content, Rectangle extents) {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_recording_surface_create.invoke(content.ordinal(),
+			MemorySegment result = (MemorySegment) cairo_recording_surface_create.invoke(content.value(),
 					extents == null ? MemorySegment.NULL : extents.handle());
 			RecordingSurface surface = new RecordingSurface(result);
 			surface.takeOwnership();

@@ -75,7 +75,7 @@ public sealed class Surface extends ProxyInstance
 	public static <T extends Surface> T createSimilar(T other, Content content, int width, int height) {
 		try {
 			MemorySegment result = (MemorySegment) cairo_surface_create_similar.invoke(other.handle(),
-					content.ordinal(), width, height);
+					content.value(), width, height);
 			Surface surface = new Surface(result);
 			// Try to instantiate the correct class, based on the SurfaceType
 			SurfaceType type = other.getType();
@@ -128,7 +128,7 @@ public sealed class Surface extends ProxyInstance
 	public static ImageSurface createSimilarImage(Surface other, Format format, int width, int height) {
 		try {
 			MemorySegment result = (MemorySegment) cairo_surface_create_similar_image.invoke(other.handle(),
-					format.ordinal(), width, height);
+					format.value(), width, height);
 			ImageSurface surface = new ImageSurface(result);
 			surface.takeOwnership();
 			return surface;
@@ -424,7 +424,7 @@ public sealed class Surface extends ProxyInstance
 
 	private static final MethodHandle cairo_surface_get_device_offset = Interop.downcallHandle(
 			"cairo_surface_get_device_offset",
-			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
 
 	/**
 	 * This function returns the previous device offset set by
@@ -451,7 +451,7 @@ public sealed class Surface extends ProxyInstance
 
 	private static final MethodHandle cairo_surface_get_device_scale = Interop.downcallHandle(
 			"cairo_surface_get_device_scale",
-			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
 
 	/**
 	 * Sets a scale that is multiplied to the device coordinates determined by the
@@ -549,7 +549,7 @@ public sealed class Surface extends ProxyInstance
 
 	private static final MethodHandle cairo_surface_get_fallback_resolution = Interop.downcallHandle(
 			"cairo_surface_get_fallback_resolution",
-			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
 
 	/**
 	 * This function returns the type of the backend used to create a surface. See

@@ -64,7 +64,7 @@ public final class ImageSurface extends Surface {
 		FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
 				ValueLayout.JAVA_INT);
 		try {
-			return (int) Interop.downcallHandle("cairo_format_stride_for_width", fdesc, false).invoke(format.ordinal(),
+			return (int) Interop.downcallHandle("cairo_format_stride_for_width", fdesc, false).invoke(format.value(),
 					width);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -86,7 +86,7 @@ public final class ImageSurface extends Surface {
 	public static ImageSurface create(Format format, int width, int height) {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_image_surface_create.invoke(format.ordinal(), width, height);
+			MemorySegment result = (MemorySegment) cairo_image_surface_create.invoke(format.value(), width, height);
 			ImageSurface surface = new ImageSurface(result);
 			surface.takeOwnership();
 			status = surface.status();
@@ -140,7 +140,7 @@ public final class ImageSurface extends Surface {
 			throws IllegalArgumentException {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_image_surface_create_for_data.invoke(data, format.ordinal(),
+			MemorySegment result = (MemorySegment) cairo_image_surface_create_for_data.invoke(data, format.value(),
 					width, height, stride);
 			ImageSurface surface = new ImageSurface(result);
 			surface.takeOwnership();

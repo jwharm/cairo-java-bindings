@@ -50,9 +50,9 @@ public interface ReadFunc {
 			try {
 				byte[] bytes = read(length);
 				MemorySegment.ofAddress(data.address(), length).asByteBuffer().put(bytes);
-				return Status.SUCCESS.ordinal();
+				return Status.SUCCESS.value();
 			} catch (IOException ioe) {
-				return Status.READ_ERROR.ordinal();
+				return Status.READ_ERROR.value();
 			}
 		}
 	}

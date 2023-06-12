@@ -50,9 +50,9 @@ public interface WriteFunc {
 					.toArray(ValueLayout.JAVA_BYTE);
 			try {
 				write(bytes);
-				return Status.SUCCESS.ordinal();
+				return Status.SUCCESS.value();
 			} catch (IOException ioe) {
-				return Status.WRITE_ERROR.ordinal();
+				return Status.WRITE_ERROR.value();
 			}
 		}
 	}
