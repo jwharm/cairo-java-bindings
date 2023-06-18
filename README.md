@@ -1,75 +1,47 @@
 # cairo-java-bindings
-Java language bindings for the Cairo graphics library using the JEP-434 Panama FFI
+Java language bindings for the [Cairo](https://www.cairographics.org) graphics library using the JEP-434 Panama FFI
 
 This is still a work in progress and not finished.
 
-A simple usage example, ported from [`spiral.c`](https://gitlab.com/cairo/cairo-demos/-/blob/master/png/spiral.c) in the Cairo demos:
+A simple usage example, ported from [the first sample on this page](https://www.cairographics.org/samples/):
 
 ```java
-import org.freedesktop.cairo.drawing.Context;
-import org.freedesktop.cairo.surfaces.Format;
-import org.freedesktop.cairo.surfaces.ImageSurface;
+import org.freedesktop.cairo.*;
+import java.io.IOException;
 
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
+public class CairoExample {
 
-/**
- * Draw an image with a spiral pattern and write it to a PNG file.
- */
-public class DrawSpiral {
+    public static void main(String[] args) throws IOException {
+        // Create surface
+        var surface = ImageSurface.create(Format.ARGB32, 300, 300);
 
-    public static void main(String[] args) {
-        new DrawSpiral();
-    }
+        // Create drawing context
+        var cr = Context.create(surface);
 
-    private static final int WIDTH = 600;
-    private static final int HEIGHT = 600;
-    private static final int STRIDE = WIDTH * 4;
+        double xc = 128.0;
+        double yc = 128.0;
+        double radius = 100.0;
+        double angle1 = 45.0  * (Math.PI/180.0); // angles are specified
+        double angle2 = 180.0 * (Math.PI/180.0); // in radians
 
-    public DrawSpiral() {
+        // Draw shapes
+        cr.setLineWidth(10.0)
+          .arc(xc, yc, radius, angle1, angle2)
+          .stroke();
 
-        // Allocate a memory segment with the expected size.
-        // The memory is released outside the try-block.
-        try (Arena arena = Arena.openConfined()) {
-            MemorySegment image = arena.allocate(STRIDE * HEIGHT);
+        cr.setSourceRGBA(1.0, 0.2, 0.2, 0.6)
+          .setLineWidth(6.0)
+          .arc(xc, yc, 10.0, 0.0, 2 * Math.PI)
+          .fill();
 
-            // Create an image surface
-            var surface = ImageSurface.createForData(image, Format.ARGB32, WIDTH, HEIGHT, STRIDE);
+        cr.arc(xc, yc, radius, angle1, angle1)
+          .lineTo(xc, yc)
+          .arc(xc, yc, radius, angle2, angle2)
+          .lineTo(xc, yc)
+          .stroke();
 
-            // Create a drawing context
-            var cr = Context.create(surface);
-
-            // Set the background
-            cr.rectangle(0, 0, WIDTH, HEIGHT);
-            cr.setSourceRGB(1, 1, 1);
-            cr.fill();
-
-            // Draw spiral
-            drawSpiral(cr, WIDTH, HEIGHT);
-
-            // Write surface to PNG file
-            surface.writeToPNG("spiral.png");
-        }
-    }
-
-    // Draw a spiral
-    private void drawSpiral(Context cr, int w, int h) {
-        double wd = 0.02 * w;
-        double hd = 0.02 * h;
-
-        int width = w - 2;
-        int height = h - 2;
-
-        cr.moveTo(width + 1, 1 - hd);
-        for (int i = 0; i < 9; i++) {
-            cr.relLineTo(0, height - hd * (2 * i - 1));
-            cr.relLineTo(- (width - wd * (2 * i)), 0);
-            cr.relLineTo(0, - (height - hd * (2 * i)));
-            cr.relLineTo(width - wd * (2 * i + 1), 0);
-        }
-
-        cr.setSourceRGB(0, 0, 1);
-        cr.stroke();
+        // Write image to png file
+        surface.writeToPNG("example.png");
     }
 }
 ```
