@@ -26,7 +26,8 @@ public final class ImageSurface extends Surface {
 
 	// Keep a reference to the data during the lifetime of the
 	// Context.
-	MemorySegment data;
+	@SuppressWarnings("unused")
+	private MemorySegment data;
 
 	/**
 	 * Constructor used internally to instantiate a java ImageSurface object for a
@@ -45,13 +46,8 @@ public final class ImageSurface extends Surface {
 	 * usage will be of the form:
 	 * 
 	 * <pre>
-	 * int stride;
-	 * unsigned char *data;
-	 * cairo_surface_t *surface;
-	 * 
-	 * stride = cairo_format_stride_for_width (format, width);
-	 * data = malloc (stride * height);
-	 * surface = cairo_image_surface_create_for_data (data, format, width, height, stride);
+	 * int stride = ImageSurface.formatStrideForWidth(format, width);
+	 * ImageSurface surface = ImageSurface.createForData(data, format, width, height, stride);
 	 * </pre>
 	 * 
 	 * @param format A {@link Format} value
@@ -60,7 +56,7 @@ public final class ImageSurface extends Surface {
 	 *         -1 if either the format is invalid or the width too large.
 	 * @since 1.6
 	 */
-	public int formatStrideForWidth(Format format, int width) {
+	public static int formatStrideForWidth(Format format, int width) {
 		FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_INT,
 				ValueLayout.JAVA_INT);
 		try {
@@ -140,8 +136,8 @@ public final class ImageSurface extends Surface {
 			throws IllegalArgumentException {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_image_surface_create_for_data.invoke(data, format.value(),
-					width, height, stride);
+			MemorySegment result = (MemorySegment) cairo_image_surface_create_for_data
+					.invoke(data == null ? MemorySegment.NULL : data, format.value(), width, height, stride);
 			ImageSurface surface = new ImageSurface(result);
 			surface.takeOwnership();
 			/*
@@ -219,6 +215,9 @@ public final class ImageSurface extends Surface {
 	 * @since 1.0
 	 */
 	public static ImageSurface createFromPNG(InputStream stream) throws IOException {
+		if (stream == null) {
+			return null;
+		}
 		Status status = null;
 		try {
 			try (Arena arena = Arena.openConfined()) {
@@ -294,6 +293,9 @@ public final class ImageSurface extends Surface {
 	 * @since 1.0
 	 */
 	public void writeToPNG(OutputStream stream) throws IOException {
+		if (stream == null) {
+			return null;
+		}
 		Status status = null;
 		try {
 			try (Arena arena = Arena.openConfined()) {

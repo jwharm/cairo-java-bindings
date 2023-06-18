@@ -21,7 +21,7 @@ public class RectangleInt extends ProxyInstance {
 	 * 
 	 * @return the memory layout of the native C struct
 	 */
-	public static MemoryLayout getMemoryLayout() {
+	static MemoryLayout getMemoryLayout() {
 		return MemoryLayout.structLayout(
 				ValueLayout.JAVA_INT.withName("x"), 
 				ValueLayout.JAVA_INT.withName("y"), 
@@ -33,8 +33,7 @@ public class RectangleInt extends ProxyInstance {
 	private static final VarHandle X = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("x"));
 	private static final VarHandle Y = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("y"));
 	private static final VarHandle WIDTH = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("width"));
-	private static final VarHandle HEIGHT = getMemoryLayout()
-			.varHandle(MemoryLayout.PathElement.groupElement("height"));
+	private static final VarHandle HEIGHT = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("height"));
 
 	/**
 	 * Get the x value of the RectangleInt

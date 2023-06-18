@@ -255,6 +255,9 @@ public class Device extends ProxyInstance {
 			false);
 
 	public void observerPrint(OutputStream stream) throws IllegalArgumentException, IOException {
+		if (stream == null) {
+			return;
+		}
 		Status status = null;
 		try {
 			try (Arena arena = Arena.openConfined()) {

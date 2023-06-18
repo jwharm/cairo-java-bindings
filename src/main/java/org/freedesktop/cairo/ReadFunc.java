@@ -46,10 +46,15 @@ public interface ReadFunc {
 	 * @since 1.0
 	 */
 	default int upcall(MemorySegment closure, MemorySegment data, int length) {
+		if (length <= 0) {
+			return Status.SUCCESS.value();
+		}
 		try (Arena arena = Arena.openConfined()) {
 			try {
 				byte[] bytes = read(length);
-				MemorySegment.ofAddress(data.address(), length).asByteBuffer().put(bytes);
+				if (bytes != null) {
+					MemorySegment.ofAddress(data.address(), length).asByteBuffer().put(bytes);
+				}
 				return Status.SUCCESS.value();
 			} catch (IOException ioe) {
 				return Status.READ_ERROR.value();

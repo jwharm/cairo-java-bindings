@@ -27,8 +27,8 @@ public class Script extends Device {
 	}
 
 	/*
-	 * Initialized by {@link #create(OutputStream)} to keep a reference to
-	 * the memory segment for the upcall stub alive during the lifetime of the
+	 * Initialized by {@link #create(OutputStream)} to keep a reference to the
+	 * memory segment for the upcall stub alive during the lifetime of the
 	 * ScriptSurface instance.
 	 */
 	@SuppressWarnings("unused")
@@ -125,7 +125,8 @@ public class Script extends Device {
 	 */
 	public void from(RecordingSurface recordingSurface) {
 		try {
-			cairo_script_from_recording_surface.invoke(handle(), recordingSurface.handle());
+			cairo_script_from_recording_surface.invoke(handle(),
+					recordingSurface == null ? MemorySegment.NULL : recordingSurface.handle());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -187,8 +188,8 @@ public class Script extends Device {
 	public ScriptSurface createScriptSurface(Content content, double width, double height) {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_script_surface_create.invoke(handle(), content.value(),
-					width, height);
+			MemorySegment result = (MemorySegment) cairo_script_surface_create.invoke(handle(), content.value(), width,
+					height);
 			ScriptSurface surface = new ScriptSurface(result);
 			surface.takeOwnership();
 			surface.script = this; // keep the Script instance alive
@@ -220,7 +221,7 @@ public class Script extends Device {
 		Status status = null;
 		try {
 			MemorySegment result = (MemorySegment) cairo_script_surface_create_for_target.invoke(handle(),
-					target.handle());
+					target == null ? MemorySegment.NULL : target.handle());
 			ScriptSurface surface = new ScriptSurface(result);
 			surface.takeOwnership();
 			surface.script = this; // keep the Script instance alive
@@ -250,7 +251,7 @@ public class Script extends Device {
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment commentPtr = Interop.allocateNativeString(comment, arena);
-				cairo_script_write_comment.invoke(handle(), commentPtr, comment.length());
+				cairo_script_write_comment.invoke(handle(), commentPtr, comment == null ? 0 : comment.length());
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);

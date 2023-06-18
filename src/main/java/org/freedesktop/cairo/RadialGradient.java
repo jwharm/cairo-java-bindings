@@ -47,7 +47,7 @@ public class RadialGradient extends Gradient {
 	 * @return the newly created {@link RadialGradient}
 	 * @since 1.0
 	 */
-	public static RadialGradient createRadial(double cx0, double cy0, double radius0, double cx1, double cy1,
+	public static RadialGradient create(double cx0, double cy0, double radius0, double cx1, double cy1,
 			double radius1) {
 		try {
 			MemorySegment result = (MemorySegment) cairo_pattern_create_radial.invoke(cx0, cy0, radius0, cx1, cy1,

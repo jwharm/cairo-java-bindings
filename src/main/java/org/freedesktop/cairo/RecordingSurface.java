@@ -23,12 +23,9 @@ import io.github.jwharm.cairobindings.Interop;
  * target surface, you can use code like this:
  * 
  * <pre>
- * cairo_t *cr;
- * 
- * cr = cairo_create (target);
- * cairo_set_source_surface (cr, recording_surface, 0.0, 0.0);
- * cairo_paint (cr);
- * cairo_destroy (cr);
+ * Context cr = Context.create(target);
+ * cr.setSourceSurface(recordingSurface, 0.0, 0.0);
+ * cr.paint();
  * </pre>
  * 
  * A recording surface is logically unbounded, i.e. it has no implicit

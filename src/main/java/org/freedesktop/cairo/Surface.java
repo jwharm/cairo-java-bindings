@@ -35,7 +35,8 @@ public sealed class Surface extends ProxyInstance
 	}
 
 	// Keep a reference to the target surface during the lifetime of this surface
-	Surface target;
+	@SuppressWarnings("unused")
+	private Surface target;
 
 	/**
 	 * Constructor used internally to instantiate a java Surface object for a native
@@ -73,9 +74,12 @@ public sealed class Surface extends ProxyInstance
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Surface> T createSimilar(T other, Content content, int width, int height) {
+		if (other == null) {
+			return null;
+		}
 		try {
-			MemorySegment result = (MemorySegment) cairo_surface_create_similar.invoke(other.handle(),
-					content.value(), width, height);
+			MemorySegment result = (MemorySegment) cairo_surface_create_similar.invoke(other.handle(), content.value(),
+					width, height);
 			Surface surface = new Surface(result);
 			// Try to instantiate the correct class, based on the SurfaceType
 			SurfaceType type = other.getType();
@@ -127,8 +131,8 @@ public sealed class Surface extends ProxyInstance
 	 */
 	public static ImageSurface createSimilarImage(Surface other, Format format, int width, int height) {
 		try {
-			MemorySegment result = (MemorySegment) cairo_surface_create_similar_image.invoke(other.handle(),
-					format.value(), width, height);
+			MemorySegment result = (MemorySegment) cairo_surface_create_similar_image
+					.invoke(other == null ? MemorySegment.NULL : other.handle(), format.value(), width, height);
 			ImageSurface surface = new ImageSurface(result);
 			surface.takeOwnership();
 			return surface;
@@ -169,8 +173,8 @@ public sealed class Surface extends ProxyInstance
 	 */
 	public static Surface createForRectangle(Surface target, double x, double y, double width, double height) {
 		try {
-			MemorySegment result = (MemorySegment) cairo_surface_create_for_rectangle.invoke(target.handle(), x, y,
-					width, height);
+			MemorySegment result = (MemorySegment) cairo_surface_create_for_rectangle
+					.invoke(target == null ? MemorySegment.NULL : target.handle(), x, y, width, height);
 			Surface surface = new Surface(result);
 			surface.takeOwnership();
 			/*
@@ -283,13 +287,13 @@ public sealed class Surface extends ProxyInstance
 	 * print surfaces to disable hinting of metrics and so forth. The result can
 	 * then be used with cairo_scaled_font_create().
 	 * 
-	 * @param options a cairo_font_options_t object into which to store the
-	 *                retrieved options. All existing values are overwritten
+	 * @param options a FontOptions object into which to store the retrieved
+	 *                options. All existing values are overwritten
 	 * @since 1.0
 	 */
 	public void getFontOptions(FontOptions options) {
 		try {
-			cairo_surface_get_font_options.invoke(handle(), options.handle());
+			cairo_surface_get_font_options.invoke(handle(), options == null ? MemorySegment.NULL : options.handle());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
@@ -303,7 +307,7 @@ public sealed class Surface extends ProxyInstance
 	 * This function returns the content type of surface which indicates whether the
 	 * surface contains color and/or alpha information. See {@link Content}.
 	 * 
-	 * @return The content type of surface .
+	 * @return The content type of ths surface.
 	 * @since 1.2
 	 */
 	public Content getContent() {
@@ -696,7 +700,8 @@ public sealed class Surface extends ProxyInstance
 	 */
 	public ImageSurface mapToImage(RectangleInt extents) {
 		try {
-			MemorySegment result = (MemorySegment) cairo_surface_map_to_image.invoke(handle(), extents.handle());
+			MemorySegment result = (MemorySegment) cairo_surface_map_to_image.invoke(handle(),
+					extents == null ? MemorySegment.NULL : extents.handle());
 			return new ImageSurface(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -720,7 +725,7 @@ public sealed class Surface extends ProxyInstance
 	 */
 	public void unmapImage(ImageSurface image) {
 		try {
-			cairo_surface_unmap_image.invoke(handle(), image.handle());
+			cairo_surface_unmap_image.invoke(handle(), image == null ? MemorySegment.NULL : image.handle());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}

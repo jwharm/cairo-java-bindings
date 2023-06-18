@@ -16,7 +16,7 @@ public class SurfacePattern extends Pattern {
 	{
 		Interop.ensureInitialized();
 	}
-	
+
 	// Keep a reference to the target surface during the lifetime of this pattern
 	Surface surface;
 
@@ -38,9 +38,10 @@ public class SurfacePattern extends Pattern {
 	 * @return the newly created {@link SurfacePattern}
 	 * @since 1.0
 	 */
-	public static SurfacePattern createForSurface(Surface surface) {
+	public static SurfacePattern create(Surface surface) {
 		try {
-			MemorySegment result = (MemorySegment) cairo_pattern_create_for_surface.invoke(surface.handle());
+			MemorySegment result = (MemorySegment) cairo_pattern_create_for_surface
+					.invoke(surface == null ? MemorySegment.NULL : surface.handle());
 			SurfacePattern pattern = new SurfacePattern(result);
 			pattern.takeOwnership();
 			pattern.surface = surface;

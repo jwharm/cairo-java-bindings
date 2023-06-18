@@ -106,31 +106,30 @@ public class Mesh extends Pattern {
 	 * cairo_mesh_pattern_begin_patch()/cairo_mesh_pattern_end_patch().
 	 *
 	 * <pre>
-	 * cairo_pattern_t *pattern = cairo_pattern_create_mesh ();
+	 * Mesh pattern = Mesh.createMesh();
 	 * 
 	 * // Add a Coons patch
-	 * cairo_mesh_pattern_begin_patch (pattern);
-	 * cairo_mesh_pattern_move_to (pattern, 0, 0);
-	 * cairo_mesh_pattern_curve_to (pattern, 30, -30, 60, 30, 100, 0); 
-	 * cairo_mesh_pattern_curve_to (pattern, 60, 30, 130, 60, 100, 100); 
-	 * cairo_mesh_pattern_curve_to (pattern, 60, 70, 30, 130, 0, 100); 
-	 * cairo_mesh_pattern_curve_to (pattern, 30, 70, -30, 30, 0, 0);
-	 * cairo_mesh_pattern_set_corner_color_rgb (pattern, 0, 1, 0, 0);
-	 * cairo_mesh_pattern_set_corner_color_rgb (pattern, 1, 0, 1, 0);
-	 * cairo_mesh_pattern_set_corner_color_rgb (pattern, 2, 0, 0, 1);
-	 * cairo_mesh_pattern_set_corner_color_rgb (pattern, 3, 1, 1, 0);
-	 * cairo_mesh_pattern_end_patch (pattern);
+	 * pattern.beginPatch()
+	 *        .moveTo(0, 0)
+	 *        .curveTo(30, -30, 60, 30, 100, 0)
+	 *        .curveTo(60, 30, 130, 60, 100, 100)
+	 *        .curveTo(60, 70, 30, 130, 0, 100)
+	 *        .curveTo(30, 70, -30, 30, 0, 0)
+	 *        .setCornerColorRGB(0, 1, 0, 0)
+	 *        .setCornerColorRGB(1, 0, 1, 0)
+	 *        .setCornerColorRGB(2, 0, 0, 1)
+	 *        .setCornerColorRGB(3, 1, 1, 0)
+	 *        .endPatch();
 	 * 
 	 * // Add a Gouraud-shaded triangle
-	 * cairo_mesh_pattern_begin_patch (pattern);
-	 * cairo_mesh_pattern_move_to (pattern, 100, 100); 
-	 * cairo_mesh_pattern_line_to (pattern, 130, 130); 
-	 * cairo_mesh_pattern_line_to (pattern, 130, 70);
-	 * cairo_mesh_pattern_set_corner_color_rgb (pattern, 0, 1, 0, 0);
-	 * cairo_mesh_pattern_set_corner_color_rgb (pattern, 1, 0, 1, 0);
-	 * cairo_mesh_pattern_set_corner_color_rgb (pattern, 2, 0, 0, 1);
-	 * cairo_mesh_pattern_end_patch (pattern);
-	 * }
+	 * pattern.beginPatch()
+	 *        .moveTo(100, 100)
+	 *        .lineTo(130, 130)
+	 *        .lineTo(130, 70)
+	 *        .setCornerColorRGB(0, 1, 0, 0)
+	 *        .setCornerColorRGB(1, 0, 1, 0)
+	 *        .setCornerColorRGB(2, 0, 0, 1)
+	 *        .endPatch();
 	 * </pre>
 	 * 
 	 * When two patches overlap, the last one that has been added is drawn over the
@@ -156,7 +155,7 @@ public class Mesh extends Pattern {
 	 * @return the newly created {@link Mesh}
 	 * @since 1.12
 	 */
-	public static Mesh createMesh() {
+	public static Mesh create() {
 		try {
 			MemorySegment result = (MemorySegment) cairo_pattern_create_mesh.invoke();
 			Mesh pattern = new Mesh(result);
@@ -499,7 +498,7 @@ public class Mesh extends Pattern {
 	 * {@link #getPatchCount()}.
 	 * <p>
 	 * Valid values for {@code pointNum} are from 0 to 3 and identify the control
-	 * points as explained in {@link #createMesh()}.
+	 * points as explained in {@link #create()}.
 	 * 
 	 * @param patchNum the patch number to return data for
 	 * @param pointNum the control point number to return data for
@@ -540,7 +539,7 @@ public class Mesh extends Pattern {
 	 * {@link #getPatchCount()}.
 	 * <p>
 	 * Valid values for {@code cornerNum} are from 0 to 3 and identify the corners
-	 * as explained in {@link #createMesh()}.
+	 * as explained in {@link #create()}.
 	 * 
 	 * @param patchNum  the patch number to return data for
 	 * @param cornerNum the corner number to return data for

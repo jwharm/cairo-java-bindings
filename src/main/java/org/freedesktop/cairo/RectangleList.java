@@ -22,7 +22,7 @@ public class RectangleList extends ProxyInstance {
 	 * 
 	 * @return the memory layout of the native C struct
 	 */
-	public static MemoryLayout getMemoryLayout() {
+	static MemoryLayout getMemoryLayout() {
 		return MemoryLayout.structLayout(
 				ValueLayout.JAVA_INT.withName("status"), 
 				MemoryLayout.paddingLayout(32),
@@ -37,7 +37,7 @@ public class RectangleList extends ProxyInstance {
 	private static final VarHandle NUM_RECTANGLES = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("num_rectangles"));
 
 	/**
-	 * Get the status field of the RectangleList
+	 * Read the status field of the RectangleList
 	 * 
 	 * @return the status
 	 */
@@ -47,7 +47,7 @@ public class RectangleList extends ProxyInstance {
 	}
 
 	/**
-	 * Get the rectangles field of the RectangleList. The field is an unmodifiable
+	 * Read the rectangles field of the RectangleList. The field is an unmodifiable
 	 * List.
 	 * 
 	 * @return the list of rectangles
@@ -82,14 +82,14 @@ public class RectangleList extends ProxyInstance {
 	 * @param status     Error status of the rectangle list
 	 * @param rectangles List containing the rectangles
 	 */
-	public RectangleList(Status status, List<Rectangle> rectangles) {
-		super(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
-		STATUS.set(handle(), status.value());
-		NUM_RECTANGLES.set(handle(), rectangles.size());
-		if (rectangles.isEmpty()) {
-			return;
+	public static RectangleList create(Status status, List<Rectangle> rectangles) {
+		RectangleList rectangleList = new RectangleList(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
+		STATUS.set(rectangleList.handle(), status.value());
+		NUM_RECTANGLES.set(rectangleList.handle(), rectangles == null ? MemorySegment.NULL : rectangles.size());
+		if (rectangles == null || rectangles.isEmpty()) {
+			return rectangleList;
 		}
-		MemorySegment array = SegmentAllocator.nativeAllocator(handle().scope())
+		MemorySegment array = SegmentAllocator.nativeAllocator(rectangleList.handle().scope())
 				.allocateArray(Rectangle.getMemoryLayout(), rectangles.size());
 		for (int i = 0; i < rectangles.size(); i++) {
 			MemorySegment rectangle = rectangles.get(i).handle();
@@ -98,5 +98,6 @@ public class RectangleList extends ProxyInstance {
 			MemorySegment dst = array.asSlice(i * Rectangle.getMemoryLayout().byteSize());
 			dst.copyFrom(src);
 		}
+		return rectangleList;
 	}
 }

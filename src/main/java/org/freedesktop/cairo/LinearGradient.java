@@ -46,7 +46,7 @@ public class LinearGradient extends Gradient {
 	 * @return the newly created {@link Pattern}
 	 * @since 1.0
 	 */
-	public static LinearGradient createLinear(double x0, double y0, double x1, double y1) {
+	public static LinearGradient create(double x0, double y0, double x1, double y1) {
 		try {
 			MemorySegment result = (MemorySegment) cairo_pattern_create_linear.invoke(x0, y0, x1, y1);
 			LinearGradient pattern = new LinearGradient(result);

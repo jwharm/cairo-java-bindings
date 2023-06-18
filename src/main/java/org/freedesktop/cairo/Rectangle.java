@@ -21,7 +21,7 @@ public class Rectangle extends ProxyInstance {
 	 * 
 	 * @return the memory layout of the native C struct
 	 */
-	public static MemoryLayout getMemoryLayout() {
+	static MemoryLayout getMemoryLayout() {
 		return MemoryLayout.structLayout(
 				ValueLayout.JAVA_DOUBLE.withName("x"), 
 				ValueLayout.JAVA_DOUBLE.withName("y"),

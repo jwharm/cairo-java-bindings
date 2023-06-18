@@ -7,14 +7,48 @@ import java.lang.invoke.VarHandle;
 
 import io.github.jwharm.cairobindings.ProxyInstance;
 
-public class PathData extends ProxyInstance {
+/**
+ * PathData is used to represent the path data inside a {@link Path}.
+ * <p>
+ * The data structure is designed to try to balance the demands of efficiency
+ * and ease-of-use. A path is represented as an array of {@link PathData}, which
+ * is a union of headers and points.
+ * <p>
+ * Each portion of the path is represented by one or more elements in the array,
+ * (one header followed by 0 or more points). The length value of the header is
+ * the number of array elements for the current portion including the header,
+ * (ie. length == 1 + # of points), and where the number of points for each
+ * element type is as follows:
+ * 
+ * <ul>
+ * <li>CAIRO_PATH_MOVE_TO: 1 point
+ * <li>CAIRO_PATH_LINE_TO: 1 point
+ * <li>CAIRO_PATH_CURVE_TO: 3 points
+ * <li>CAIRO_PATH_CLOSE_PATH: 0 points
+ * </ul>
+ * 
+ * The semantics and ordering of the coordinate values are consistent with
+ * {@link Context#moveTo(double, double)},
+ * {@link Context#lineTo(double, double)},
+ * {@link Context#curveTo(double, double, double, double, double, double)}, and
+ * {@link Context#closePath()}.
+ * <p>
+ * <strong>Note:</strong> PathData is not exposed as a public class. The user is
+ * expected to use the {@link PathElement} instances produced by
+ * {@link Path#iterator()}.
+ * 
+ * @see Path See the Path class documentation for sample code for iterating
+ *      through a Path.
+ * @since 1.0
+ */
+class PathData extends ProxyInstance {
 
 	/**
 	 * The memory layout of the native C struct
 	 * 
 	 * @return the memory layout of the native C struct
 	 */
-	public static MemoryLayout getMemoryLayout() {
+	static MemoryLayout getMemoryLayout() {
 	    return MemoryLayout.unionLayout(
 	            MemoryLayout.structLayout(
 	                ValueLayout.JAVA_INT.withName("type"),

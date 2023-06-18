@@ -21,8 +21,8 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  * given by:
  * 
  * <pre>
- * x_new = xx * x + xy * y + x0;
- * y_new = yx * x + yy * y + y0;
+ * xNew = xx * x + xy * y + x0;
+ * yNew = yx * x + yy * y + y0;
  * </pre>
  * 
  * The current transformation matrix of a {@link Context}, represented as a
@@ -38,18 +38,21 @@ public class Matrix extends ProxyInstance {
 		Interop.ensureInitialized();
 	}
 
-	public static MemoryLayout getMemoryLayout() {
-		return MemoryLayout
-				.structLayout(ValueLayout.JAVA_DOUBLE.withName("xx"), ValueLayout.JAVA_DOUBLE.withName("yx"),
-						ValueLayout.JAVA_DOUBLE.withName("xy"), ValueLayout.JAVA_DOUBLE.withName("yy"),
-						ValueLayout.JAVA_DOUBLE.withName("x0"), ValueLayout.JAVA_DOUBLE.withName("y0"))
-				.withName("cairo_matrix_t");
+	static MemoryLayout getMemoryLayout() {
+		return MemoryLayout.structLayout(
+					ValueLayout.JAVA_DOUBLE.withName("xx"),
+					ValueLayout.JAVA_DOUBLE.withName("yx"),
+					ValueLayout.JAVA_DOUBLE.withName("xy"),
+					ValueLayout.JAVA_DOUBLE.withName("yy"),
+					ValueLayout.JAVA_DOUBLE.withName("x0"),
+					ValueLayout.JAVA_DOUBLE.withName("y0"))
+			.withName("cairo_matrix_t");
 	}
 
 	/**
 	 * Allocate a new {@code caio_matrix_t}
 	 */
-	public static Matrix create() {
+	static Matrix create() {
 		return new Matrix(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
 	}
 
@@ -61,8 +64,8 @@ public class Matrix extends ProxyInstance {
 	 * transformation is given by:
 	 * 
 	 * <pre>
-	 * x_new = xx * x + xy * y + x0;
-	 * y_new = yx * x + yy * y + y0;
+	 * xNew = xx * x + xy * y + x0;
+	 * yNew = yx * x + yy * y + y0;
 	 * </pre>
 	 * 
 	 * @param xx xx component of the affine transformation
@@ -91,8 +94,8 @@ public class Matrix extends ProxyInstance {
 	 * transformation is given by:
 	 * 
 	 * <pre>
-	 * x_new = xx * x + xy * y + x0;
-	 * y_new = yx * x + yy * y + y0;
+	 * xNew = xx * x + xy * y + x0;
+	 * yNew = yx * x + yy * y + y0;
 	 * </pre>
 	 * 
 	 * @param xx xx component of the affine transformation
@@ -328,7 +331,7 @@ public class Matrix extends ProxyInstance {
 	public Matrix multiply(Matrix other) {
 		try {
 			Matrix result = create();
-			cairo_matrix_multiply.invoke(result.handle(), this.handle(), other.handle());
+			cairo_matrix_multiply.invoke(result.handle(), this.handle(), other == null ? MemorySegment.NULL : other.handle());
 			return result;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -359,6 +362,9 @@ public class Matrix extends ProxyInstance {
 	 * @since 1.0
 	 */
 	public Point transformDistance(Point distanceVector) {
+		if (distanceVector == null) {
+			return null;
+		}
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
@@ -385,6 +391,9 @@ public class Matrix extends ProxyInstance {
 	 * @since 1.0
 	 */
 	public Point transformPoint(Point point) {
+		if (point == null) {
+			return null;
+		}
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);

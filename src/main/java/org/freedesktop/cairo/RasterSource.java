@@ -51,10 +51,10 @@ public class RasterSource extends Pattern {
 	 * @return a newly created {@link Pattern} of type {@link RasterSource}
 	 * @since 1.2
 	 */
-	public static RasterSource createRasterSource(Content content, int width, int height) {
+	public static RasterSource create(Content content, int width, int height) {
 		try {
 			MemorySegment result = (MemorySegment) cairo_pattern_create_raster_source.invoke(MemorySegment.NULL,
-					content.value(), width, height);
+					content == null ? MemorySegment.NULL : content.value(), width, height);
 			RasterSource pattern = new RasterSource(result);
 			pattern.takeOwnership();
 			return pattern;
@@ -88,8 +88,9 @@ public class RasterSource extends Pattern {
 	 */
 	public void setAcquire(RasterSourceAcquireFunc acquire, RasterSourceReleaseFunc release) {
 		try {
-			cairo_raster_source_pattern_set_acquire.invoke(handle(), acquire.toCallback(handle().scope()),
-					release.toCallback(handle().scope()));
+			cairo_raster_source_pattern_set_acquire.invoke(handle(),
+					acquire == null ? MemorySegment.NULL : acquire.toCallback(handle().scope()),
+					release == null ? MemorySegment.NULL : release.toCallback(handle().scope()));
 			this.acquire = acquire;
 			this.release = release;
 		} catch (Throwable e) {
@@ -131,7 +132,8 @@ public class RasterSource extends Pattern {
 	 */
 	public void setSnapshot(RasterSourceSnapshotFunc snapshot) {
 		try {
-			cairo_raster_source_pattern_set_snapshot.invoke(handle(), snapshot.toCallback(handle().scope()));
+			cairo_raster_source_pattern_set_snapshot.invoke(handle(),
+					snapshot == null ? MemorySegment.NULL : snapshot.toCallback(handle().scope()));
 			this.snapshot = snapshot;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -161,7 +163,8 @@ public class RasterSource extends Pattern {
 	 */
 	public void setCopy(RasterSourceCopyFunc copy) {
 		try {
-			cairo_raster_source_pattern_set_copy.invoke(handle(), copy.toCallback(handle().scope()));
+			cairo_raster_source_pattern_set_copy.invoke(handle(),
+					copy == null ? MemorySegment.NULL : copy.toCallback(handle().scope()));
 			this.copy = copy;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -191,7 +194,8 @@ public class RasterSource extends Pattern {
 	 */
 	public void setFinish(RasterSourceFinishFunc finish) {
 		try {
-			cairo_raster_source_pattern_set_finish.invoke(handle(), finish.toCallback(handle().scope()));
+			cairo_raster_source_pattern_set_finish.invoke(handle(),
+					finish == null ? MemorySegment.NULL : finish.toCallback(handle().scope()));
 			this.finish = finish;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);

@@ -119,8 +119,8 @@ public abstract class Pattern extends ProxyInstance {
 	 * that cairo creates implicitly. For example:
 	 * 
 	 * <pre>
-	 * cairo_set_source_surface(cr, image, x, y);
-	 * cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_NEAREST);
+	 * cr.setSourceSurface(image, x, y);
+	 * pattern.setFilter(cr.getSource(), Filter.NEAREST);
 	 * </pre>
 	 * 
 	 * @param filter a {@link Filter} describing the filter to use for resizing the
@@ -174,8 +174,8 @@ public abstract class Pattern extends ProxyInstance {
 	 * by default the correct code to use is:
 	 * 
 	 * <pre>
-	 * cairo_matrix_init_scale (&matrix, 0.5, 0.5);
-	 * cairo_pattern_set_matrix (pattern, &matrix);
+	 * Matrix matrix = Matrix.createScale(0.5, 0.5);
+	 * pattern.setMatrix(matrix);
 	 * </pre>
 	 * 
 	 * Meanwhile, using values of 2.0 rather than 0.5 in the code above would cause
@@ -189,7 +189,7 @@ public abstract class Pattern extends ProxyInstance {
 	 */
 	public void setMatrix(Matrix matrix) {
 		try {
-			cairo_pattern_set_matrix.invoke(handle(), matrix.handle());
+			cairo_pattern_set_matrix.invoke(handle(), matrix == null ? MemorySegment.NULL : matrix.handle());
 			this.matrix = matrix;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -207,7 +207,7 @@ public abstract class Pattern extends ProxyInstance {
 	 */
 	public void getMatrix(Matrix matrix) {
 		try {
-			cairo_pattern_get_matrix.invoke(handle(), matrix.handle());
+			cairo_pattern_get_matrix.invoke(handle(), matrix == null ? MemorySegment.NULL : matrix.handle());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}

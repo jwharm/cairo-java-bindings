@@ -74,7 +74,8 @@ public class Region extends ProxyInstance {
 	public static Region create(RectangleInt rectangle) {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_region_create_rectangle.invoke(rectangle.handle());
+			MemorySegment result = (MemorySegment) cairo_region_create_rectangle
+					.invoke(rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			Region region = new Region(result);
 			region.takeOwnership();
 			status = region.status();
@@ -103,8 +104,10 @@ public class Region extends ProxyInstance {
 		Status status = null;
 		try {
 			try (Arena arena = Arena.openConfined()) {
-				MemorySegment rectsPtr = Interop.allocateNativeArray(rects, false, arena);
-				MemorySegment result = (MemorySegment) cairo_region_create_rectangles.invoke(rectsPtr, rects.length);
+				MemorySegment rectsPtr = rects == null ? MemorySegment.NULL
+						: Interop.allocateNativeArray(rects, false, arena);
+				MemorySegment result = (MemorySegment) cairo_region_create_rectangles.invoke(rectsPtr,
+						rects == null ? 0 : rects.length);
 				Region region = new Region(result);
 				region.takeOwnership();
 				status = region.status();
@@ -132,7 +135,8 @@ public class Region extends ProxyInstance {
 	public static Region copy(Region original) {
 		Status status = null;
 		try {
-			MemorySegment result = (MemorySegment) cairo_region_copy.invoke(original.handle());
+			MemorySegment result = (MemorySegment) cairo_region_copy
+					.invoke(original == null ? MemorySegment.NULL : original.handle());
 			Region region = new Region(result);
 			region.takeOwnership();
 			status = region.status();
@@ -277,7 +281,8 @@ public class Region extends ProxyInstance {
 	 */
 	public RegionOverlap containsRectangle(RectangleInt rectangle) {
 		try {
-			int result = (int) cairo_region_contains_rectangle.invoke(handle(), rectangle.handle());
+			int result = (int) cairo_region_contains_rectangle.invoke(handle(),
+					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			return RegionOverlap.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -299,7 +304,7 @@ public class Region extends ProxyInstance {
 	 */
 	public boolean equal(Region other) {
 		try {
-			int result = (int) cairo_region_equal.invoke(handle(), other.handle());
+			int result = (int) cairo_region_equal.invoke(handle(), other == null ? MemorySegment.NULL : other.handle());
 			return result != 0;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -337,7 +342,8 @@ public class Region extends ProxyInstance {
 	public void intersect(Region other) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_intersect.invoke(handle(), other.handle());
+			int result = (int) cairo_region_intersect.invoke(handle(),
+					other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -361,7 +367,8 @@ public class Region extends ProxyInstance {
 	public void intersect(RectangleInt rectangle) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_intersect_rectangle.invoke(handle(), rectangle.handle());
+			int result = (int) cairo_region_intersect_rectangle.invoke(handle(),
+					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -385,7 +392,8 @@ public class Region extends ProxyInstance {
 	public void subtract(Region other) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_subtract.invoke(handle(), other.handle());
+			int result = (int) cairo_region_subtract.invoke(handle(),
+					other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -400,7 +408,8 @@ public class Region extends ProxyInstance {
 			FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
 
 	/**
-	 * Subtracts {@code rectangle} from this region and places the result in this region
+	 * Subtracts {@code rectangle} from this region and places the result in this
+	 * region
 	 * 
 	 * @param rectangle a {@link Rectangle}
 	 * @since 1.10
@@ -408,7 +417,8 @@ public class Region extends ProxyInstance {
 	public void subtract(RectangleInt rectangle) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_subtract_rectangle.invoke(handle(), rectangle.handle());
+			int result = (int) cairo_region_subtract_rectangle.invoke(handle(),
+					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -433,7 +443,7 @@ public class Region extends ProxyInstance {
 	public void union(Region other) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_union.invoke(handle(), other.handle());
+			int result = (int) cairo_region_union.invoke(handle(), other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -448,8 +458,8 @@ public class Region extends ProxyInstance {
 			FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
 
 	/**
-	 * Computes the union of this region with {@code rectangle} and places the result in
-	 * this region
+	 * Computes the union of this region with {@code rectangle} and places the
+	 * result in this region
 	 * 
 	 * @param rectangle a {@link Rectangle}
 	 * @since 1.10
@@ -457,7 +467,8 @@ public class Region extends ProxyInstance {
 	public void union(RectangleInt rectangle) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_union_rectangle.invoke(handle(), rectangle.handle());
+			int result = (int) cairo_region_union_rectangle.invoke(handle(),
+					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -484,7 +495,7 @@ public class Region extends ProxyInstance {
 	public void xor(Region other) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_xor.invoke(handle(), other.handle());
+			int result = (int) cairo_region_xor.invoke(handle(), other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -510,7 +521,8 @@ public class Region extends ProxyInstance {
 	public void xor(RectangleInt rectangle) {
 		Status status = null;
 		try {
-			int result = (int) cairo_region_xor_rectangle.invoke(handle(), rectangle.handle());
+			int result = (int) cairo_region_xor_rectangle.invoke(handle(),
+					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);

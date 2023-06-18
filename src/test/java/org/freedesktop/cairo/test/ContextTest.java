@@ -6,7 +6,22 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 
-import org.freedesktop.cairo.*;
+import org.freedesktop.cairo.Antialias;
+import org.freedesktop.cairo.Content;
+import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.FillRule;
+import org.freedesktop.cairo.Format;
+import org.freedesktop.cairo.ImageSurface;
+import org.freedesktop.cairo.LineCap;
+import org.freedesktop.cairo.LineJoin;
+import org.freedesktop.cairo.Matrix;
+import org.freedesktop.cairo.Operator;
+import org.freedesktop.cairo.Path;
+import org.freedesktop.cairo.Point;
+import org.freedesktop.cairo.Rectangle;
+import org.freedesktop.cairo.SolidPattern;
+import org.freedesktop.cairo.Status;
+import org.freedesktop.cairo.SurfacePattern;
 import org.junit.jupiter.api.Test;
 
 class ContextTest {

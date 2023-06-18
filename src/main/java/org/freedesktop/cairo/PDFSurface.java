@@ -308,15 +308,15 @@ public final class PDFSurface extends Surface {
 	 * </pre>
 	 * 
 	 * @param metadata The metadata item to set.
-	 * @param utf8     metadata value
+	 * @param string     metadata value
 	 * @return the PDF surface
 	 * @since 1.16
 	 */
-	public PDFSurface setMetadata(PDFMetadata metadata, String utf8) {
+	public PDFSurface setMetadata(PDFMetadata metadata, String string) {
 		try {
 			try (Arena arena = Arena.openConfined()) {
-				MemorySegment utf8Ptr = utf8 == null ? MemorySegment.NULL : arena.allocateUtf8String(utf8);
-				cairo_pdf_surface_set_metadata.invoke(handle(), metadata.value(), utf8Ptr);
+				MemorySegment utf8 = Interop.allocateNativeString(string, arena);
+				cairo_pdf_surface_set_metadata.invoke(handle(), metadata.value(), utf8);
 				return this;
 			}
 		} catch (Throwable e) {
@@ -331,15 +331,15 @@ public final class PDFSurface extends Surface {
 	/**
 	 * Set page label for the current page.
 	 * 
-	 * @param utf8 The page label.
+	 * @param string The page label.
 	 * @return the PDF surface
 	 * @since 1.16
 	 */
-	public PDFSurface setPageLabel(String utf8) {
+	public PDFSurface setPageLabel(String string) {
 		try {
 			try (Arena arena = Arena.openConfined()) {
-				MemorySegment utf8Ptr = utf8 == null ? MemorySegment.NULL : arena.allocateUtf8String(utf8);
-				cairo_pdf_surface_set_page_label.invoke(handle(), utf8Ptr);
+				MemorySegment utf8 = Interop.allocateNativeString(string, arena);
+				cairo_pdf_surface_set_page_label.invoke(handle(), utf8);
 				return this;
 			}
 		} catch (Throwable e) {
