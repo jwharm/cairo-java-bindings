@@ -60,7 +60,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  */
 public final class Context extends ProxyInstance {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -125,25 +125,23 @@ public final class Context extends ProxyInstance {
 	 * @since 1.0
 	 */
 	public static Context create(Surface target) throws IOException {
-		Status status = null;
+		Context context;
 		try {
 			MemorySegment result = (MemorySegment) cairo_create
 					.invoke(target == null ? MemorySegment.NULL : target.handle());
-			Context context = new Context(result);
+			context = new Context(result);
 			context.takeOwnership();
 			context.target = target;
-			status = context.status();
-			return context;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.WRITE_ERROR) {
-				throw new IOException(status.toString());
-			}
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (context.status() == Status.WRITE_ERROR) {
+			throw new IOException(context.status().toString());
+		}
+		if (context.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(context.status().toString());
+		}
+		return context;
 	}
 
 	private static final MethodHandle cairo_create = Interop.downcallHandle("cairo_create",
@@ -171,9 +169,9 @@ public final class Context extends ProxyInstance {
 	 * Makes a copy of the current state of the context and saves it on an internal
 	 * stack of saved states for the context. When {@link #restore()} is called, the
 	 * context will be restored to the saved state. Multiple calls to
-	 * {@link #save()} and {@link #restore()} can be nested; each call to
-	 * {@link #restore()} restores the state from the matching paired
-	 * {@link #save()}.
+	 * {@code save()} and {@code restore()} can be nested; each call to
+	 * {@code restore()} restores the state from the matching paired
+	 * {@code save()}.
 	 * <p>
 	 * It isn't necessary to clear all saved states before a context is freed. If
 	 * the reference count of a context drops to zero in response to a call to
@@ -246,10 +244,10 @@ public final class Context extends ProxyInstance {
 	 * translucence onto the destination.
 	 * <p>
 	 * Groups can be nested arbitrarily deep by making balanced calls to
-	 * {@link #pushGroup()} /{@link #popGroup()}. Each call pushes/pops the new
+	 * {@code pushGroup()} /{@code popGroup()}. Each call pushes/pops the new
 	 * target group onto/from a stack.
 	 * <p>
-	 * The {@link #pushGroup()} function calls {@link #save()} so that any changes
+	 * The {@code pushGroup()} function calls {@link #save()} so that any changes
 	 * to the graphics state will not be visible outside the group, (the pop_group
 	 * functions call {@link #restore()}).
 	 * <p>
@@ -262,8 +260,13 @@ public final class Context extends ProxyInstance {
 	 * stroke:
 	 * 
 	 * <pre>
-	 * cr.pushGroup().setSource(fillPattern).fillPreserve().setSource(strokePattern).stroke().popGroupToSource()
-	 * 		.paintWithAlpha(alpha);
+	 * cr.pushGroup()
+	 *   .setSource(fillPattern)
+	 *   .fillPreserve()
+	 *   .setSource(strokePattern)
+	 *   .stroke()
+	 *   .popGroupToSource()
+	 *   .paintWithAlpha(alpha);
 	 * </pre>
 	 * 
 	 * @return the context
@@ -300,7 +303,7 @@ public final class Context extends ProxyInstance {
 	 */
 	public Context pushGroupWithContent(Content content) {
 		try {
-			cairo_push_group_with_content.invoke(handle(), content == null ? MemorySegment.NULL : content.value());
+			cairo_push_group_with_content.invoke(handle(), content.value());
 			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -316,7 +319,7 @@ public final class Context extends ProxyInstance {
 	 * {@link #pushGroupWithContent(Content)} and returns a new pattern containing
 	 * the results of all drawing operations performed to the group.
 	 * <p>
-	 * The {@link #popGroup()} function calls {@link #restore()}, (balancing a call
+	 * The {@code popGroup()} function calls {@link #restore()}, (balancing a call
 	 * to {@link #save()} by the pushGroup function), so that any changes to the
 	 * graphics state will not be visible outside the group.
 	 * 
@@ -622,15 +625,14 @@ public final class Context extends ProxyInstance {
 				MemorySegment dashesPtr = (dash == null || dash.length == 0) ? MemorySegment.NULL
 						: arena.allocateArray(ValueLayout.JAVA_DOUBLE, dash);
 				cairo_set_dash.invoke(handle(), dashesPtr, dash == null ? 0 : dash.length, offset);
-				return this;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_DASH) {
-				throw new IllegalArgumentException(Status.INVALID_DASH.toString());
-			}
 		}
+		if (status() == Status.INVALID_DASH) {
+			throw new IllegalArgumentException(Status.INVALID_DASH.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_set_dash = Interop.downcallHandle("cairo_set_dash", FunctionDescriptor
@@ -873,7 +875,7 @@ public final class Context extends ProxyInstance {
 	 * This function returns the current line width value exactly as set by
 	 * {@link #setLineWidth(double)}. Note that the value is unchanged even if the
 	 * CTM has changed between the calls to {@link #setLineWidth(double)} and
-	 * {@link #getLineWidth()}.
+	 * {@code getLineWidth()}.
 	 * 
 	 * @return the current line width.
 	 * @since 1.0
@@ -1033,15 +1035,15 @@ public final class Context extends ProxyInstance {
 	 * the current path as it would be filled by {@link #fill()} and according to
 	 * the current fill rule (see {@link #setFillRule(FillRule)}).
 	 * <p>
-	 * After {@link #clip()}, the current path will be cleared from the cairo
+	 * After {@code clip()}, the current path will be cleared from the cairo
 	 * context.
 	 * <p>
 	 * The current clip region affects all drawing operations by effectively masking
 	 * out any changes to the surface that are outside the current clip region.
 	 * <p>
-	 * Calling {@link #clip()} can only make the clip region smaller, never larger.
+	 * Calling {@code clip()} can only make the clip region smaller, never larger.
 	 * But the current clip is part of the graphics state, so a temporary
-	 * restriction of the clip region can be achieved by calling {@link #clip()}
+	 * restriction of the clip region can be achieved by calling {@code clip()}
 	 * within a {@link #save()}/{@link #restore()} pair. The only other means of
 	 * increasing the size of the clip region is {@link #resetClip()}.
 	 * 
@@ -1065,16 +1067,16 @@ public final class Context extends ProxyInstance {
 	 * the current path as it would be filled by {@link #fill()} and according to
 	 * the current fill rule (see {@link #setFillRule(FillRule)}).
 	 * <p>
-	 * Unlike {@link #clip()}, {@link #clipPreserve()} preserves the path within the
+	 * Unlike {@link #clip()}, {@code clipPreserve()} preserves the path within the
 	 * cairo context.
 	 * <p>
 	 * The current clip region affects all drawing operations by effectively masking
 	 * out any changes to the surface that are outside the current clip region.
 	 * <p>
-	 * Calling {@link #clipPreserve()} can only make the clip region smaller, never
+	 * Calling {@code clipPreserve()} can only make the clip region smaller, never
 	 * larger. But the current clip is part of the graphics state, so a temporary
 	 * restriction of the clip region can be achieved by calling
-	 * {@link #clipPreserve()} within a {@link #save()}/{@link #restore()} pair. The
+	 * {@code clipPreserve()} within a {@link #save()}/{@link #restore()} pair. The
 	 * only other means of increasing the size of the clip region is
 	 * {@link #resetClip()}.
 	 * 
@@ -1127,10 +1129,11 @@ public final class Context extends ProxyInstance {
 	 * through the current clip, i.e. the area that would be filled by a
 	 * {@link #paint()} operation.
 	 * 
-	 * @see {@link #clip()}, and {@link #clipPreserve()}
 	 * @param x X coordinate of the point to test
 	 * @param y Y coordinate of the point to test
 	 * @return True if the point is inside, false if outside.
+	 * @see #clip()
+	 * @see #clipPreserve()
 	 * @since 1.10
 	 */
 	public boolean inClip(double x, double y) {
@@ -1151,7 +1154,7 @@ public final class Context extends ProxyInstance {
 	 * surface. Equivalently, if infinity is too hard to grasp, one can imagine the
 	 * clip region being reset to the exact bounds of the target surface.
 	 * <p>
-	 * Note that code meant to be reusable should not call {@link #resetClip()} as
+	 * Note that code meant to be reusable should not call {@code resetClip()} as
 	 * it will cause results unexpected by higher-level code which {@link #clip()}.
 	 * Consider using {@link #save()} and {@link #restore()} around {@link #clip()}
 	 * as a more robust means of temporarily restricting the clip region.
@@ -1182,20 +1185,17 @@ public final class Context extends ProxyInstance {
 	 * @since 1.4
 	 */
 	public RectangleList copyClipRectangleList() throws IllegalStateException {
-		Status status = null;
+		RectangleList list;
 		try {
 			MemorySegment result = (MemorySegment) cairo_copy_clip_rectangle_list.invoke(handle());
-			RectangleList list = new RectangleList(result);
-			status = list.status();
-			return list;
+			list = new RectangleList(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status != Status.SUCCESS) {
-				throw new IllegalStateException(
-						status == null ? "Cannot read cairo_rectangle_list_t->status" : status.toString());
-			}
 		}
+		if (list.status() != Status.SUCCESS) {
+			throw new IllegalStateException(list.status().toString());
+		}
+		return list;
 	}
 
 	private static final MethodHandle cairo_copy_clip_rectangle_list = Interop.downcallHandle(
@@ -1204,7 +1204,7 @@ public final class Context extends ProxyInstance {
 	/**
 	 * A drawing operator that fills the current path according to the current fill
 	 * rule, (each sub-path is implicitly closed before being filled). After
-	 * {@link #fill()}, the current path will be cleared from the cairo context. See
+	 * {@code fill()}, the current path will be cleared from the cairo context. See
 	 * {@link #setFillRule(FillRule)} and {@link #fillPreserve()}.
 	 * 
 	 * @return the context
@@ -1225,11 +1225,12 @@ public final class Context extends ProxyInstance {
 	/**
 	 * A drawing operator that fills the current path according to the current fill
 	 * rule, (each sub-path is implicitly closed before being filled). Unlike
-	 * {@link #fill()}, {@link #fillPreserve()} preserves the path within the cairo
+	 * {@link #fill()}, {@code fillPreserve()} preserves the path within the cairo
 	 * context.
 	 * 
-	 * @see {@link #setFillRule(FillRule)} and {@link #fill()}.
 	 * @return the context
+	 * @see #setFillRule(FillRule)
+	 * @see #fill()
 	 * @since 1.0
 	 */
 	public Context fillPreserve() {
@@ -1260,9 +1261,10 @@ public final class Context extends ProxyInstance {
 	 * be more desirable for sake of performance if the non-inked path extents are
 	 * desired.
 	 * 
-	 * @see {@link #fill()}, {@link #setFillRule(FillRule)} and
-	 *      {@link #fillPreserve()}.
 	 * @return The resulting extents
+	 * @see #fill()
+	 * @see #setFillRule(FillRule)
+	 * @see #fillPreserve()
 	 * @since 1.0
 	 */
 	public Rectangle fillExtents() {
@@ -1291,11 +1293,12 @@ public final class Context extends ProxyInstance {
 	 * {@link #fill()} operation given the current path and filling parameters.
 	 * Surface dimensions and clipping are not taken into account.
 	 * 
-	 * @see {@link #fill()}, {@link #setFillRule(FillRule)} and
-	 *      {@link #fillPreserve()}.
-	 * @param x X coordinate of the point to test
+\	 * @param x X coordinate of the point to test
 	 * @param y Y coordinate of the point to test
 	 * @return true if the point is inside, or false if outside.
+	 * @see #fill()
+	 * @see #setFillRule(FillRule)
+	 * @see #fillPreserve()
 	 * @since 1.0
 	 */
 	public boolean inFill(double x, double y) {
@@ -1402,7 +1405,7 @@ public final class Context extends ProxyInstance {
 
 	/**
 	 * A drawing operator that strokes the current path according to the current
-	 * line width, line join, line cap, and dash settings. After {@link #stroke()},
+	 * line width, line join, line cap, and dash settings. After {@code stroke()},
 	 * the current path will be cleared from the cairo context.
 	 * <p>
 	 * Note: Degenerate segments and sub-paths are treated specially and provide a
@@ -1424,10 +1427,12 @@ public final class Context extends ProxyInstance {
 	 * In no case will a cap style of {@link LineCap#BUTT} cause anything to be
 	 * drawn in the case of either degenerate segments or sub-paths.
 	 * 
-	 * @see {@link #setLineWidth(double)}, {@link #setLineJoin(LineJoin)},
-	 *      {@link #setLineCap(LineCap)}, {@link #setDash(Dash)}, and
-	 *      {@link #strokePreserve()}.
 	 * @return the context
+	 * @see #setLineWidth(double)
+	 * @see #setLineJoin(LineJoin)
+	 * @see #setLineCap(LineCap)
+	 * @see #setDash(double[], double)
+	 * @see #strokePreserve()
 	 * @since 1.0
 	 */
 	public Context stroke() {
@@ -1445,12 +1450,14 @@ public final class Context extends ProxyInstance {
 	/**
 	 * A drawing operator that strokes the current path according to the current
 	 * line width, line join, line cap, and dash settings. Unlike {@link #stroke()},
-	 * {@link #strokePreserve()} preserves the path within the cairo context.
+	 * {@code strokePreserve()} preserves the path within the cairo context.
 	 * 
-	 * @see {@link #setLineWidth(double)}, {@link #setLineJoin(LineJoin)},
-	 *      {@link #setLineCap(LineCap)}, {@link #setDash(Dash)}, and
-	 *      {@link #stroke()}.
 	 * @return the context
+	 * @see #setLineWidth(double)
+	 * @see #setLineJoin(LineJoin)
+	 * @see #setLineCap(LineCap)
+	 * @see #setDash(double[], double)
+	 * @see #stroke()
 	 * @since 1.0
 	 */
 	public Context strokePreserve() {
@@ -1473,7 +1480,7 @@ public final class Context extends ProxyInstance {
 	 * not taken into account.
 	 * <p>
 	 * Note that if the line width is set to exactly zero, then
-	 * {@link #strokeExtents()} will return an empty rectangle. Contrast with
+	 * {@code strokeExtents()} will return an empty rectangle. Contrast with
 	 * {@link #pathExtents(double, double, double, double)} which can be used to
 	 * compute the non-empty bounds as the line width approaches zero.
 	 * <p>
@@ -1482,10 +1489,12 @@ public final class Context extends ProxyInstance {
 	 * {@code pathExtents()} may be more desirable for sake of performance if
 	 * non-inked path extents are desired.
 	 *
-	 * @see {@link #stroke()}, {@link #setLineWidth(double)},
-	 *      {@link #setLineJoin(LineJoin)}, {@link #setLineCap(LineCap)},
-	 *      {@link #setDash(double[], double)}, and {@link #strokePreserve()}.
 	 * @return The resulting extents
+	 * @see #stroke()
+	 * @see #setLineWidth(double)
+	 * @see #setLineJoin(LineJoin)
+	 * @see #setLineCap(LineCap)
+	 * @see #setDash(double[], double)
 	 * @since 1.0
 	 */
 	public Rectangle strokeExtents() {
@@ -1514,12 +1523,15 @@ public final class Context extends ProxyInstance {
 	 * {@link #stroke()} operation given the current path and stroking parameters.
 	 * Surface dimensions and clipping are not taken into account.
 	 * 
-	 * @see {@link #stroke()}, {@link #setLineWidth(double)},
-	 *      {@link #setLineJoin(LineJoin)}, {@link #setLineCap(LineCap)},
-	 *      {@link #setDash(Dash)}, and {@link #strokePreserve()}.
 	 * @param x X coordinate of the point to test
 	 * @param y Y coordinate of the point to test
 	 * @return true if the point is inside, or false if outside.
+	 * @see #stroke()
+	 * @see #setLineWidth(double)
+	 * @see #setLineJoin(LineJoin)
+	 * @see #setLineCap(LineCap)
+	 * @see #setDash(double[], double)
+	 * @see #strokePreserve()
 	 * @since 1.0
 	 */
 	public boolean inStroke(double x, double y) {
@@ -1755,7 +1767,7 @@ public final class Context extends ProxyInstance {
 	 * In many cases, this call is not needed since new sub-paths are frequently
 	 * started with {@link #moveTo(double, double)}.
 	 * <p>
-	 * A call to {@link #newSubPath()} is particularly useful when beginning a new
+	 * A call to {@code newSubPath()} is particularly useful when beginning a new
 	 * sub-path with one of the {@code arc()} calls. This makes things easier as it
 	 * is no longer necessary to manually compute the arc's initial coordinates for
 	 * a call to {@link #moveTo(double, double)}.
@@ -1781,16 +1793,16 @@ public final class Context extends ProxyInstance {
 	 * {@link #moveTo(double, double)}), and closes this sub-path. After this call
 	 * the current point will be at the joined endpoint of the sub-path.
 	 * <p>
-	 * The behavior of {@link #closePath()} is distinct from simply calling
+	 * The behavior of {@code closePath()} is distinct from simply calling
 	 * {@link #lineTo(double, double)} with the equivalent coordinate in the case of
 	 * stroking. When a closed sub-path is stroked, there are no caps on the ends of
 	 * the sub-path. Instead, there is a line join connecting the final and initial
 	 * segments of the sub-path.
 	 * <p>
-	 * If there is no current point before the call to {@link #closePath()}, this
+	 * If there is no current point before the call to {@code closePath()}, this
 	 * function will have no effect.
 	 * <p>
-	 * Note: As of cairo version 1.2.4 any call to {@link #closePath()} will place
+	 * Note: As of cairo version 1.2.4 any call to {@code closePath()} will place
 	 * an explicit {@code MOVE_TO} element into the path immediately after the
 	 * {@code CLOSE_PATH} element, (which can be seen in {@link #copyPath()} for
 	 * example). This can simplify path processing in some cases as it may not be
@@ -1982,11 +1994,15 @@ public final class Context extends ProxyInstance {
 	/**
 	 * Adds a closed sub-path rectangle of the given size to the current path at
 	 * position ({@code x}, {@code y}) in user-space coordinates.
-	 * 
+	 * <p>
 	 * This function is logically equivalent to:
 	 * 
 	 * <pre>
-	 * cr.moveTo(x, y).relLineTo(width, 0).relLineTo(0, height).relLineTo(-width, 0).closePath();
+	 * cr.moveTo(x, y)
+	 *   .relLineTo(width, 0)
+	 *   .relLineTo(0, height)
+	 *   .relLineTo(-width, 0)
+	 *   .closePath();
 	 * </pre>
 	 * 
 	 * @param x      the X coordinate of the top left corner of the rectangle
@@ -2049,9 +2065,9 @@ public final class Context extends ProxyInstance {
 	 * the origin of where the next glyph would be placed in this same progression.
 	 * That is, the current point will be at the origin of the final glyph offset by
 	 * its advance values. This allows for chaining multiple calls to to
-	 * {@link #textPath(String)} without having to set current point in between.
+	 * {@code textPath()} without having to set current point in between.
 	 * <p>
-	 * <strong>Note:</strong> The {@link #textPath(String)} function call is part of
+	 * <strong>Note:</strong> The {@code textPath()} function call is part of
 	 * what the cairo designers call the "toy" text API. It is convenient for short
 	 * demos and simple programs, but it is not expected to be adequate for serious
 	 * text-using applications. See {@link #glyphPath(Glyph[])} for the "real" text
@@ -2103,14 +2119,13 @@ public final class Context extends ProxyInstance {
 			throws IllegalStateException {
 		try {
 			cairo_rel_curve_to.invoke(handle(), dx1, dy1, dx2, dy2, dx3, dy3);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.NO_CURRENT_POINT) {
-				throw new IllegalStateException(Status.NO_CURRENT_POINT.toString());
-			}
 		}
+		if (status() == Status.NO_CURRENT_POINT) {
+			throw new IllegalStateException(Status.NO_CURRENT_POINT.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_rel_curve_to = Interop.downcallHandle("cairo_rel_curve_to",
@@ -2136,14 +2151,13 @@ public final class Context extends ProxyInstance {
 	public Context relLineTo(double dx, double dy) throws IllegalStateException {
 		try {
 			cairo_rel_line_to.invoke(handle(), dx, dy);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.NO_CURRENT_POINT) {
-				throw new IllegalStateException(Status.NO_CURRENT_POINT.toString());
-			}
 		}
+		if (status() == Status.NO_CURRENT_POINT) {
+			throw new IllegalStateException(Status.NO_CURRENT_POINT.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_rel_line_to = Interop.downcallHandle("cairo_rel_line_to",
@@ -2165,14 +2179,13 @@ public final class Context extends ProxyInstance {
 	public Context relMoveTo(double dx, double dy) throws IllegalStateException {
 		try {
 			cairo_rel_move_to.invoke(handle(), dx, dy);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.NO_CURRENT_POINT) {
-				throw new IllegalStateException(Status.NO_CURRENT_POINT.toString());
-			}
 		}
+		if (status() == Status.NO_CURRENT_POINT) {
+			throw new IllegalStateException(Status.NO_CURRENT_POINT.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_rel_move_to = Interop.downcallHandle("cairo_rel_move_to",
@@ -2389,8 +2402,7 @@ public final class Context extends ProxyInstance {
 	 * Transform a coordinate from user space to device space by multiplying the
 	 * given point by the current transformation matrix (CTM).
 	 * 
-	 * @param x X value of coordinate
-	 * @param y Y value of coordinate
+	 * @param point X and Y values of coordinates
 	 * @return a Point with the transformed X and Y coordinates
 	 * @since 1.0
 	 */
@@ -2576,12 +2588,12 @@ public final class Context extends ProxyInstance {
 
 	/**
 	 * Sets the current font matrix to a scale by a factor of {@code size},
-	 * replacing any font matrix previously set with {@link #setFontSize(double)} or
+	 * replacing any font matrix previously set with {@code setFontSize()} or
 	 * {@link #setFontMatrix(Matrix)}. This results in a font size of {@code size}
 	 * user space units. (More precisely, this matrix will result in the font's
 	 * em-square being a {@code size} by {@code size} square in user space.)
 	 * <p>
-	 * If text is drawn without a call to {@link #setFontSize(double)}, (nor
+	 * If text is drawn without a call to {@code setFontSize()}, (nor
 	 * {@link #setFontMatrix(Matrix)} nor {@link #setScaledFont(ScaledFont)}), the
 	 * default font size is 10.0.
 	 * 
@@ -2717,22 +2729,20 @@ public final class Context extends ProxyInstance {
 	 * @since 1.0
 	 */
 	public FontFace getFontFace() {
-		Status status = null;
+		FontFace fontFace;
 		try {
 			MemorySegment result = (MemorySegment) cairo_get_font_face.invoke(handle());
-			FontFace fontFace = new FontFace(result);
-			status = fontFace.status();
+			fontFace = new FontFace(result);
 			// Take a reference on the returned fontface
 			fontFace.reference();
 			fontFace.takeOwnership();
-			return fontFace;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (fontFace.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(fontFace.status().toString());
+		}
+		return fontFace;
 	}
 
 	private static final MethodHandle cairo_get_font_face = Interop.downcallHandle("cairo_get_font_face",
@@ -2768,22 +2778,20 @@ public final class Context extends ProxyInstance {
 	 * @since 1.4
 	 */
 	public ScaledFont getScaledFont() {
-		Status status = null;
+		ScaledFont scaledFont;
 		try {
 			MemorySegment result = (MemorySegment) cairo_get_scaled_font.invoke(handle());
-			ScaledFont scaledFont = new ScaledFont(result);
-			status = scaledFont.status();
+			scaledFont = new ScaledFont(result);
 			// Take a reference on the returned fontface
 			scaledFont.reference();
 			scaledFont.takeOwnership();
-			return scaledFont;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (scaledFont.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(scaledFont.status().toString());
+		}
+		return scaledFont;
 	}
 
 	private static final MethodHandle cairo_get_scaled_font = Interop.downcallHandle("cairo_get_scaled_font",
@@ -2803,7 +2811,7 @@ public final class Context extends ProxyInstance {
 	 * glyph would be placed in this same progression. That is, the current point
 	 * will be at the origin of the final glyph offset by its advance values. This
 	 * allows for easy display of a single logical string with multiple calls to
-	 * {@link #showText(String)}.
+	 * {@code showText()}.
 	 * <p>
 	 * <strong>Note:</strong> The {@code showText()} function call is part of what
 	 * the cairo designers call the "toy" text API. It is convenient for short demos
@@ -2891,8 +2899,8 @@ public final class Context extends ProxyInstance {
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment utf8 = Interop.allocateNativeString(string, arena);
-				MemorySegment glyphsPtr = null;
-				MemorySegment clustersPtr = null;
+				MemorySegment glyphsPtr;
+				MemorySegment clustersPtr;
 				if (glyphs == null || glyphs.length == 0) {
 					glyphsPtr = MemorySegment.NULL;
 				} else {
@@ -2904,13 +2912,14 @@ public final class Context extends ProxyInstance {
 				if (clusters == null || clusters.length == 0) {
 					clustersPtr = MemorySegment.NULL;
 				} else {
-					clustersPtr = arena.allocateArray(ValueLayout.ADDRESS, glyphs.length);
-					for (int i = 0; i < glyphs.length; i++) {
-						clustersPtr.setAtIndex(ValueLayout.ADDRESS, i, glyphs[i].handle());
+					clustersPtr = arena.allocateArray(ValueLayout.ADDRESS, clusters.length);
+					for (int i = 0; i < clusters.length; i++) {
+						clustersPtr.setAtIndex(ValueLayout.ADDRESS, i, clusters[i].handle());
 					}
 				}
-				cairo_show_text_glyphs.invoke(handle(), utf8, string == null ? 0 : string.length(), glyphsPtr, glyphs.length, clustersPtr,
-						clusters.length, clusterFlags.value());
+				cairo_show_text_glyphs.invoke(handle(), utf8, string == null ? 0 : string.length(), glyphsPtr,
+						glyphs == null ? 0 : glyphs.length, clustersPtr, clusters == null ? 0 : clusters.length,
+						clusterFlags.value());
 				return this;
 			}
 		} catch (Throwable e) {
@@ -3040,7 +3049,7 @@ public final class Context extends ProxyInstance {
 	 * @return the context
 	 * @throws IllegalArgumentException invalid nesting of tags or invalid
 	 *                                  attributes, see {@link Status#TAG_ERROR}
-	 * @see {@link #tagEnd(String)}
+	 * @see #tagEnd(String)
 	 * @since 1.16
 	 */
 	public Context tagBegin(String tagName, String attributes) throws IllegalArgumentException {
@@ -3049,15 +3058,14 @@ public final class Context extends ProxyInstance {
 				MemorySegment tagNamePtr = Interop.allocateNativeString(tagName, arena);
 				MemorySegment attributesPtr = Interop.allocateNativeString(attributes, arena);
 				cairo_tag_begin.invoke(handle(), tagNamePtr, attributesPtr);
-				return this;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() != Status.SUCCESS) {
-				throw new IllegalArgumentException(status().toString());
-			}
 		}
+		if (status() != Status.SUCCESS) {
+			throw new IllegalArgumentException(status().toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_tag_begin = Interop.downcallHandle("cairo_tag_begin",
@@ -3070,7 +3078,7 @@ public final class Context extends ProxyInstance {
 	 * @return the context
 	 * @throws IllegalArgumentException Invalid nesting of tags, see
 	 *                                  {@link Status#TAG_ERROR}
-	 * @see {@link #tagBegin(String, String)}
+	 * @see #tagBegin(String, String)
 	 * @since 1.16
 	 */
 	public Context tagEnd(String tagName) throws IllegalArgumentException {
@@ -3078,15 +3086,14 @@ public final class Context extends ProxyInstance {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment tagNamePtr = Interop.allocateNativeString(tagName, arena);
 				cairo_tag_end.invoke(handle(), tagNamePtr);
-				return this;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() != Status.SUCCESS) {
-				throw new IllegalArgumentException(status().toString());
-			}
 		}
+		if (status() != Status.SUCCESS) {
+			throw new IllegalArgumentException(status().toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_tag_end = Interop.downcallHandle("cairo_tag_end",

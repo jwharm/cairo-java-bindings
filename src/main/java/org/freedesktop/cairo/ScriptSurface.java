@@ -15,7 +15,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public final class ScriptSurface extends Surface {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

@@ -42,7 +42,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public final class RecordingSurface extends Surface {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -75,21 +75,21 @@ public final class RecordingSurface extends Surface {
 	 * @since 1.10
 	 */
 	public static RecordingSurface create(Content content, Rectangle extents) {
-		Status status = null;
+		Status status;
+		RecordingSurface surface;
 		try {
 			MemorySegment result = (MemorySegment) cairo_recording_surface_create.invoke(content.value(),
 					extents == null ? MemorySegment.NULL : extents.handle());
-			RecordingSurface surface = new RecordingSurface(result);
+			surface = new RecordingSurface(result);
 			surface.takeOwnership();
 			status = surface.status();
-			return surface;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_recording_surface_create = Interop.downcallHandle(
@@ -133,20 +133,17 @@ public final class RecordingSurface extends Surface {
 	 * @since 1.12
 	 */
 	public Rectangle getExtents() throws IllegalStateException {
-		int result = 0;
+		int result;
+		Rectangle rectangle = Rectangle.create(0, 0, 0, 0);
 		try {
-			try (Arena arena = Arena.openConfined()) {
-				Rectangle rectangle = Rectangle.create(0, 0, 0, 0);
-				result = (int) cairo_recording_surface_get_extents.invoke(handle(), rectangle.handle());
-				return rectangle;
-			}
+			result = (int) cairo_recording_surface_get_extents.invoke(handle(), rectangle.handle());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (result == 0) {
-				throw new IllegalStateException();
-			}
 		}
+		if (result == 0) {
+			throw new IllegalStateException();
+		}
+		return rectangle;
 	}
 
 	private static final MethodHandle cairo_recording_surface_get_extents = Interop.downcallHandle(

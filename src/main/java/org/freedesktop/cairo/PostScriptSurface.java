@@ -36,7 +36,7 @@ import io.github.jwharm.cairobindings.Interop;
  * <p>
  * The {@link MimeType#TYPE_EPS} mime type requires the
  * {@link MimeType#EPS_PARAMS} mime data to also be provided in order to specify
- * the embeddding parameters. {@link MimeType#EPS_PARAMS} mime data must contain
+ * the embedding parameters. {@link MimeType#EPS_PARAMS} mime data must contain
  * a string of the form {@code "bbox=[llx lly urx ury]"} that specifies the
  * bounding box (in PS coordinates) of the EPS graphics. The parameters are:
  * lower left x, lower left y, upper right x, upper right y. Normally the bbox
@@ -47,7 +47,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public final class PostScriptSurface extends Surface {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -91,25 +91,23 @@ public final class PostScriptSurface extends Surface {
 	 * @since 1.2
 	 */
 	public static PostScriptSurface create(String filename, int widthInPoints, int heightInPoints) {
-		Status status = null;
+		PostScriptSurface surface;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment filenamePtr = (filename == null) ? MemorySegment.NULL
 						: arena.allocateUtf8String(filename);
 				MemorySegment result = (MemorySegment) cairo_ps_surface_create.invoke(filenamePtr, widthInPoints,
 						heightInPoints);
-				PostScriptSurface surface = new PostScriptSurface(result);
+				surface = new PostScriptSurface(result);
 				surface.takeOwnership();
-				status = surface.status();
-				return surface;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_ps_surface_create = Interop.downcallHandle("cairo_ps_surface_create",
@@ -137,7 +135,7 @@ public final class PostScriptSurface extends Surface {
 	 * @since 1.2
 	 */
 	public static PostScriptSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
-		Status status = null;
+		PostScriptSurface surface;
 		try {
 			MemorySegment writeFuncPtr;
 			if (stream != null) {
@@ -148,20 +146,18 @@ public final class PostScriptSurface extends Surface {
 			}
 			MemorySegment result = (MemorySegment) cairo_ps_surface_create_for_stream.invoke(writeFuncPtr,
 					MemorySegment.NULL, widthInPoints, heightInPoints);
-			PostScriptSurface surface = new PostScriptSurface(result);
+			surface = new PostScriptSurface(result);
 			surface.takeOwnership();
 			if (stream != null) {
 				surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
 			}
-			status = surface.status();
-			return surface;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_ps_surface_create_for_stream = Interop
@@ -409,15 +405,14 @@ public final class PostScriptSurface extends Surface {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment commentPtr = comment == null ? MemorySegment.NULL : arena.allocateUtf8String(comment);
 				cairo_ps_surface_dsc_comment.invoke(handle(), commentPtr);
-				return this;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() != Status.SUCCESS) {
-				throw new IllegalArgumentException(status().toString());
-			}
 		}
+		if (status() != Status.SUCCESS) {
+			throw new IllegalArgumentException(status().toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_ps_surface_dsc_comment = Interop.downcallHandle(

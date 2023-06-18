@@ -107,7 +107,7 @@ public class Path extends ProxyInstance implements Iterable<PathElement> {
 	 */
 	@Override
 	public Iterator<PathElement> iterator() {
-		return new Iterator<PathElement>() {
+		return new Iterator<>() {
 
 			/*
 			 * Iterates through the `data` memory segment. Each element has a PathData

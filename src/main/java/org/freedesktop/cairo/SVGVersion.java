@@ -49,7 +49,7 @@ public enum SVGVersion {
 		return values()[ordinal];
 	}
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

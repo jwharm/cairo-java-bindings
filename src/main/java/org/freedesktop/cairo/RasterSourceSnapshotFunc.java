@@ -29,7 +29,7 @@ public interface RasterSourceSnapshotFunc {
 	 *         codes for failure.
 	 * @since 1.12
 	 */
-	public Status snapshot(RasterSource pattern);
+	Status snapshot(RasterSource pattern);
 
 	/**
 	 * The callback that is executed by native code. This method marshals the

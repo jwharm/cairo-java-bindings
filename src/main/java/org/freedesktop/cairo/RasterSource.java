@@ -26,7 +26,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public class RasterSource extends Pattern {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -53,8 +53,8 @@ public class RasterSource extends Pattern {
 	 */
 	public static RasterSource create(Content content, int width, int height) {
 		try {
-			MemorySegment result = (MemorySegment) cairo_pattern_create_raster_source.invoke(MemorySegment.NULL,
-					content == null ? MemorySegment.NULL : content.value(), width, height);
+			MemorySegment result = (MemorySegment) cairo_pattern_create_raster_source.invoke(
+					MemorySegment.NULL, content.value(), width, height);
 			RasterSource pattern = new RasterSource(result);
 			pattern.takeOwnership();
 			return pattern;
@@ -72,7 +72,7 @@ public class RasterSource extends Pattern {
 	/**
 	 * Specifies the callbacks used to generate the image surface for a rendering
 	 * operation (acquire) and the function used to cleanup that surface afterwards.
-	 * 
+	 * <p>
 	 * The {@code acquire} callback should create a surface (preferably an image
 	 * surface created to match the target using
 	 * {@link Surface#createSimilarImage(Surface, Format, int, int)}) that defines

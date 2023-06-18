@@ -5,7 +5,7 @@ package org.freedesktop.cairo;
  * <p>
  * New entries may be added in future versions.
  * 
- * @see {@link Surface}
+ * @see Surface
  */
 public enum Format {
 

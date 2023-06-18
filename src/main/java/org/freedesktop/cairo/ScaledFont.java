@@ -30,7 +30,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  */
 public class ScaledFont extends ProxyInstance {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -76,7 +76,7 @@ public class ScaledFont extends ProxyInstance {
 	 * @since 1.0
 	 */
 	public static ScaledFont create(FontFace fontFace, Matrix fontMatrix, Matrix ctm, FontOptions options) {
-		Status status = null;
+		ScaledFont font;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
@@ -84,21 +84,19 @@ public class ScaledFont extends ProxyInstance {
 						fontMatrix == null ? MemorySegment.NULL : fontMatrix,
 						ctm == null ? MemorySegment.NULL : ctm,
 						options == null ? MemorySegment.NULL : options);
-				ScaledFont font = new ScaledFont(result);
+				font = new ScaledFont(result);
 				font.takeOwnership();
 				font.fontFace = fontFace;
 				font.fontMatrix = fontMatrix;
 				font.ctm = ctm;
-				status = font.status();
-				return font;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (font.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(font.status().toString());
+		}
+		return font;
 	}
 
 	private static final MethodHandle cairo_scaled_font_create = Interop.downcallHandle("cairo_scaled_font_create",
@@ -264,36 +262,30 @@ public class ScaledFont extends ProxyInstance {
 		if (string == null) {
 			return null;
 		}
-		Status status = null;
+		Glyph[] glyphs;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment utf8 = Interop.allocateNativeString(string, arena);
 				MemorySegment glyphsPtr = arena.allocate(ValueLayout.ADDRESS);
 				MemorySegment numGlyphsPtr = arena.allocate(ValueLayout.ADDRESS);
-				int result = (int) cairo_scaled_font_text_to_glyphs.invoke(handle(), x, y, utf8,
-						string == null ? 0 : string.length(), glyphsPtr, numGlyphsPtr, MemorySegment.NULL,
-						MemorySegment.NULL, MemorySegment.NULL);
-				status = Status.of(result);
+				int result = (int) cairo_scaled_font_text_to_glyphs.invoke(handle(), x, y, utf8, string.length(),
+						glyphsPtr, numGlyphsPtr, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+				Status status = Status.of(result);
 				if (status != Status.SUCCESS) {
 					cairo_glyph_free.invoke(glyphsPtr);
-					return null; // finally block will throw exception
+					throw new IllegalStateException(status.toString());
 				}
 				int numGlyphs = numGlyphsPtr.get(ValueLayout.JAVA_INT, 0);
-				Glyph[] glyphs = new Glyph[numGlyphs];
+				glyphs = new Glyph[numGlyphs];
 				for (int i = 0; i < numGlyphs; i++) {
 					glyphs[i] = new Glyph(glyphsPtr.asSlice(i * ValueLayout.JAVA_BYTE.byteSize()));
 				}
 				cairo_glyph_free.invoke(glyphsPtr);
-				return glyphs;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status != Status.SUCCESS) {
-				throw new IllegalStateException(
-						status == null ? "cairo_scaled_font_text_to_glyphs returned NULL" : status.toString());
-			}
 		}
+		return glyphs;
 	}
 
 	private static final MethodHandle cairo_scaled_font_text_to_glyphs = Interop.downcallHandle(

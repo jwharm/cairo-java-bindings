@@ -16,7 +16,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  * expose any way of converting input text into glyphs, so in order to use the
  * Cairo interfaces that take arrays of glyphs, you must directly access the
  * appropriate underlying font system.
- * 
+ * <p>
  * Note that the offsets given by {@code x} and {@code y} are not cumulative.
  * When drawing or measuring text, each glyph is individually positioned with
  * respect to the overall origin.

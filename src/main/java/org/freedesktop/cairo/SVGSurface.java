@@ -19,7 +19,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public final class SVGSurface extends Surface {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -76,25 +76,23 @@ public final class SVGSurface extends Surface {
 	 * @since 1.2
 	 */
 	public static SVGSurface create(String filename, int widthInPoints, int heightInPoints) {
-		Status status = null;
+		SVGSurface surface;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment filenamePtr = (filename == null) ? MemorySegment.NULL
 						: arena.allocateUtf8String(filename);
 				MemorySegment result = (MemorySegment) cairo_svg_surface_create.invoke(filenamePtr, widthInPoints,
 						heightInPoints);
-				SVGSurface surface = new SVGSurface(result);
+				surface = new SVGSurface(result);
 				surface.takeOwnership();
-				status = surface.status();
-				return surface;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_svg_surface_create = Interop.downcallHandle("cairo_svg_surface_create",
@@ -117,7 +115,7 @@ public final class SVGSurface extends Surface {
 	 * @since 1.2
 	 */
 	public static SVGSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
-		Status status = null;
+		SVGSurface surface;
 		try {
 			MemorySegment writeFuncPtr;
 			if (stream != null) {
@@ -128,20 +126,18 @@ public final class SVGSurface extends Surface {
 			}
 			MemorySegment result = (MemorySegment) cairo_svg_surface_create_for_stream.invoke(writeFuncPtr,
 					MemorySegment.NULL, widthInPoints, heightInPoints);
-			SVGSurface surface = new SVGSurface(result);
+			surface = new SVGSurface(result);
 			surface.takeOwnership();
 			if (stream != null) {
 				surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
 			}
-			status = surface.status();
-			return surface;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_svg_surface_create_for_stream = Interop
@@ -207,7 +203,7 @@ public final class SVGSurface extends Surface {
 	 * Restricts the generated SVG file to version . See
 	 * {@link SVGVersion#getVersions()} for a list of available version values that
 	 * can be used here.
-	 * 
+	 * <p>
 	 * This function should only be called before any drawing operations have been
 	 * performed on the given surface. The simplest way to do this is to call this
 	 * function immediately after creating the surface.

@@ -13,7 +13,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public class SolidPattern extends Pattern {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

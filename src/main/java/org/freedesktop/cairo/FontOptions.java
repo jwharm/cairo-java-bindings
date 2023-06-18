@@ -32,7 +32,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  */
 public class FontOptions extends ProxyInstance {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -77,20 +77,18 @@ public class FontOptions extends ProxyInstance {
 	 * @since 1.0
 	 */
 	public FontOptions copy() {
-		Status status = null;
+		FontOptions copy;
 		try {
 			MemorySegment result = (MemorySegment) cairo_font_options_copy.invoke(handle());
-			FontOptions copy = new FontOptions(result);
-			status = copy.status();
+			copy = new FontOptions(result);
 			copy.takeOwnership();
-			return copy;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (copy.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(copy.status().toString());
+		}
+		return copy;
 	}
 
 	private static final MethodHandle cairo_font_options_copy = Interop.downcallHandle("cairo_font_options_copy",

@@ -22,7 +22,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public class Script extends Device {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -54,24 +54,22 @@ public class Script extends Device {
 	 * @since 1.12
 	 */
 	public static Script create(String filename) {
-		Status status = null;
+		Script script;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment filenamePtr = (filename == null) ? MemorySegment.NULL
 						: arena.allocateUtf8String(filename);
 				MemorySegment result = (MemorySegment) cairo_script_create.invoke(filenamePtr);
-				Script script = new Script(result);
+				script = new Script(result);
 				script.takeOwnership();
-				status = script.status();
-				return script;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (script.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(script.status().toString());
+		}
+		return script;
 	}
 
 	private static final MethodHandle cairo_script_create = Interop.downcallHandle("cairo_script_create",
@@ -86,7 +84,7 @@ public class Script extends Device {
 	 * @since 1.12
 	 */
 	public static Script create(OutputStream stream) {
-		Status status = null;
+		Script script;
 		try {
 			MemorySegment writeFuncPtr;
 			if (stream != null) {
@@ -97,20 +95,18 @@ public class Script extends Device {
 			}
 			MemorySegment result = (MemorySegment) cairo_script_create_for_stream.invoke(writeFuncPtr,
 					MemorySegment.NULL);
-			Script script = new Script(result);
+			script = new Script(result);
 			script.takeOwnership();
 			if (stream != null) {
 				script.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
 			}
-			status = script.status();
-			return script;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (script.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(script.status().toString());
+		}
+		return script;
 	}
 
 	private static final MethodHandle cairo_script_create_for_stream = Interop.downcallHandle(
@@ -129,10 +125,9 @@ public class Script extends Device {
 					recordingSurface == null ? MemorySegment.NULL : recordingSurface.handle());
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.NO_MEMORY) {
-				throw new RuntimeException(status().toString());
-			}
+		}
+		if (status() == Status.NO_MEMORY) {
+			throw new RuntimeException(status().toString());
 		}
 	}
 
@@ -186,22 +181,20 @@ public class Script extends Device {
 	 * @since 1.12
 	 */
 	public ScriptSurface createScriptSurface(Content content, double width, double height) {
-		Status status = null;
+		ScriptSurface surface;
 		try {
 			MemorySegment result = (MemorySegment) cairo_script_surface_create.invoke(handle(), content.value(), width,
 					height);
-			ScriptSurface surface = new ScriptSurface(result);
+			surface = new ScriptSurface(result);
 			surface.takeOwnership();
 			surface.script = this; // keep the Script instance alive
-			status = surface.status();
-			return surface;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_script_surface_create = Interop.downcallHandle(
@@ -218,23 +211,21 @@ public class Script extends Device {
 	 * @since 1.12
 	 */
 	public ScriptSurface createScriptSurfaceForTarget(Surface target) {
-		Status status = null;
+		ScriptSurface surface;
 		try {
 			MemorySegment result = (MemorySegment) cairo_script_surface_create_for_target.invoke(handle(),
 					target == null ? MemorySegment.NULL : target.handle());
-			ScriptSurface surface = new ScriptSurface(result);
+			surface = new ScriptSurface(result);
 			surface.takeOwnership();
 			surface.script = this; // keep the Script instance alive
 			surface.target = target; // keep the target Surface instance alive
-			status = surface.status();
-			return surface;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_script_surface_create_for_target = Interop.downcallHandle(

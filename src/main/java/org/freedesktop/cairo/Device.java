@@ -23,7 +23,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  * An important function that devices fulfill is sharing access to the rendering
  * system between Cairo and your application. If you want to access a device
  * directly that you used to draw to with Cairo, you must first call
- * {@link flush()} to ensure that Cairo finishes all operations on the device
+ * {@link #flush()} to ensure that Cairo finishes all operations on the device
  * and resets it to a clean state.
  * <p>
  * Cairo also provides the functions {@link #acquire()} and {@link #release()}
@@ -38,7 +38,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  */
 public class Device extends ProxyInstance {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -80,7 +80,7 @@ public class Device extends ProxyInstance {
 	 * but will instead trigger a {@link Status#DEVICE_FINISHED} error.
 	 * <p>
 	 * When the last call to {@link #destroy()} decreases the reference count to
-	 * zero, cairo will call {@link #finish()} if it hasn't been called already,
+	 * zero, cairo will call {@code finish()} if it hasn't been called already,
 	 * before freeing the resources associated with the device.
 	 * <p>
 	 * This function may acquire devices.
@@ -153,7 +153,7 @@ public class Device extends ProxyInstance {
 	 * not have a device acquired when calling them. These functions are marked in
 	 * the documentation.</strong>
 	 * <p>
-	 * After a successful call to {@link #acquire()}, a matching call to
+	 * After a successful call to {@code acquire()}, a matching call to
 	 * {@link #release()} is required.
 	 * 
 	 * @throws IllegalStateException if the device is in an error state and could
@@ -161,16 +161,15 @@ public class Device extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void acquire() throws IllegalStateException {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_device_acquire.invoke(handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status != Status.SUCCESS) {
-				throw new IllegalStateException(status.toString());
-			}
+		}
+		if (status != Status.SUCCESS) {
+			throw new IllegalStateException(status.toString());
 		}
 	}
 
@@ -258,7 +257,7 @@ public class Device extends ProxyInstance {
 		if (stream == null) {
 			return;
 		}
-		Status status = null;
+		Status status;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				WriteFunc writeFunc = stream::write;
@@ -268,13 +267,12 @@ public class Device extends ProxyInstance {
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
-			if (status != Status.SUCCESS) {
-				throw new IOException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
+		}
+		if (status != Status.SUCCESS) {
+			throw new IOException(status.toString());
 		}
 	}
 

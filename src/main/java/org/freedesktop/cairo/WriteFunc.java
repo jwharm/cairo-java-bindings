@@ -31,7 +31,7 @@ public interface WriteFunc {
 	 *                     operation
 	 * @since 1.0
 	 */
-	public void write(byte[] data) throws IOException;
+	void write(byte[] data) throws IOException;
 
 	/**
 	 * The callback that is executed by native code. This method marshals the

@@ -13,7 +13,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public class SurfacePattern extends Pattern {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

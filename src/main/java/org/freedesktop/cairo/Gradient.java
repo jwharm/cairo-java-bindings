@@ -13,7 +13,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public abstract class Gradient extends Pattern {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -132,6 +132,7 @@ public abstract class Gradient extends Pattern {
 	 * @since 1.4
 	 */
 	public double[] getColorStopRGBA(int index) throws IndexOutOfBoundsException {
+		double[] values;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment ptrs = arena.allocateArray(ValueLayout.JAVA_DOUBLE, 5);
@@ -141,16 +142,15 @@ public abstract class Gradient extends Pattern {
 				if (result == Status.INVALID_INDEX.value()) {
 					throw new IndexOutOfBoundsException(Status.INVALID_INDEX.toString());
 				}
-				double[] values = ptrs.toArray(ValueLayout.JAVA_DOUBLE);
-				return new double[] { values[0], values[1], values[2], values[3], values[4] };
+				values = ptrs.toArray(ValueLayout.JAVA_DOUBLE);
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_INDEX) {
-				throw new IllegalStateException(Status.INVALID_INDEX.toString());
-			}
 		}
+		if (status() == Status.INVALID_INDEX) {
+			throw new IllegalStateException(Status.INVALID_INDEX.toString());
+		}
+		return values;
 	}
 
 	private static final MethodHandle cairo_pattern_get_color_stop_rgba = Interop

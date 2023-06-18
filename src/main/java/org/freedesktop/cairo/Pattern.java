@@ -28,7 +28,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  */
 public abstract class Pattern extends ProxyInstance {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

@@ -34,7 +34,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  */
 public class FontFace extends ProxyInstance {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

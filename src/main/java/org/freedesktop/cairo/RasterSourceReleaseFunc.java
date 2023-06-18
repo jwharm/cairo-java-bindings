@@ -28,7 +28,7 @@ public interface RasterSourceReleaseFunc {
 	 * @param target  the surface created during acquire
 	 * @since 1.12
 	 */
-	public void release(RasterSource pattern, Surface target);
+	void release(RasterSource pattern, Surface target);
 
 	/**
 	 * The callback that is executed by native code. This method marshals the

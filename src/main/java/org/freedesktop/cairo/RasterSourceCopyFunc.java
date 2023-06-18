@@ -26,7 +26,7 @@ public interface RasterSourceCopyFunc {
 	 *         codes for failure.
 	 * @since 1.12
 	 */
-	public Status copy(RasterSource pattern, RasterSource other);
+	Status copy(RasterSource pattern, RasterSource other);
 
 	/**
 	 * The callback that is executed by native code. This method marshals the

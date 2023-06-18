@@ -27,9 +27,12 @@ import io.github.jwharm.cairobindings.Interop;
  * New entries may be added in future versions. Use {@link #toString()} to get a
  * human-readable representation of an error message.
  * 
- * @see {@link Context#status()}, {@link Surface#status()},
- *      {@link Pattern#status()}, {@link FontFace#status()},
- *      {@link ScaledFont#status()}, {@link Region#status()}
+ * @see Context#status()
+ * @see Surface#status()
+ * @see Pattern#status()
+ * @see FontFace#status()
+ * @see ScaledFont#status()
+ * @see Region#status()
  * @since 1.0
  */
 public enum Status {
@@ -306,7 +309,7 @@ public enum Status {
 	 */
 	LAST_STATUS;
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

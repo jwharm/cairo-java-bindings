@@ -23,7 +23,7 @@ public interface RasterSourceFinishFunc {
 	 * @param pattern the pattern being rendered from
 	 * @since 1.12
 	 */
-	public void finish(RasterSource pattern);
+	void finish(RasterSource pattern);
 
 	/**
 	 * The callback that is executed by native code. This method marshals the

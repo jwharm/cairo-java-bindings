@@ -20,7 +20,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public final class ImageSurface extends Surface {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -80,20 +80,18 @@ public final class ImageSurface extends Surface {
 	 * @since 1.0
 	 */
 	public static ImageSurface create(Format format, int width, int height) {
-		Status status = null;
+		ImageSurface surface;
 		try {
 			MemorySegment result = (MemorySegment) cairo_image_surface_create.invoke(format.value(), width, height);
-			ImageSurface surface = new ImageSurface(result);
+			surface = new ImageSurface(result);
 			surface.takeOwnership();
-			status = surface.status();
-			return surface;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_image_surface_create = Interop.downcallHandle("cairo_image_surface_create",
@@ -134,29 +132,27 @@ public final class ImageSurface extends Surface {
 	 */
 	public static ImageSurface create(MemorySegment data, Format format, int width, int height, int stride)
 			throws IllegalArgumentException {
-		Status status = null;
+		ImageSurface surface;
 		try {
 			MemorySegment result = (MemorySegment) cairo_image_surface_create_for_data
 					.invoke(data == null ? MemorySegment.NULL : data, format.value(), width, height, stride);
-			ImageSurface surface = new ImageSurface(result);
+			surface = new ImageSurface(result);
 			surface.takeOwnership();
 			/*
 			 * Keep a reference to the MemorySegment, in case it is allocated as
 			 * SegmentScope#auto() and the user doesn't keep a reference alive
 			 */
 			surface.data = data;
-			status = surface.status();
-			return surface;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.INVALID_STRIDE) {
-				throw new IllegalArgumentException(status.toString());
-			}
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (surface.status() == Status.INVALID_STRIDE) {
+			throw new IllegalArgumentException(surface.status().toString());
+		}
+		if (surface.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(surface.status().toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_image_surface_create_for_data = Interop.downcallHandle(
@@ -177,26 +173,25 @@ public final class ImageSurface extends Surface {
 	 * @since 1.0
 	 */
 	public static ImageSurface createFromPNG(String filename) throws IOException {
-		Status status = null;
+		ImageSurface surface;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
 				MemorySegment result = (MemorySegment) cairo_image_surface_create_from_png.invoke(filenamePtr);
-				ImageSurface surface = new ImageSurface(result);
+				surface = new ImageSurface(result);
 				surface.takeOwnership();
-				status = surface.status();
-				return surface;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.FILE_NOT_FOUND || status == Status.READ_ERROR || status == Status.PNG_ERROR) {
-				throw new IOException(status.toString());
-			}
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		Status status = surface.status();
+		if (status == Status.FILE_NOT_FOUND || status == Status.READ_ERROR || status == Status.PNG_ERROR) {
+			throw new IOException(status.toString());
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_image_surface_create_from_png = Interop.downcallHandle(
@@ -218,27 +213,26 @@ public final class ImageSurface extends Surface {
 		if (stream == null) {
 			return null;
 		}
-		Status status = null;
+		ImageSurface surface;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				ReadFunc readFunc = stream::readNBytes;
 				MemorySegment result = (MemorySegment) cairo_image_surface_create_from_png_stream
 						.invoke(readFunc.toCallback(arena.scope()), MemorySegment.NULL);
-				ImageSurface surface = new ImageSurface(result);
+				surface = new ImageSurface(result);
 				surface.takeOwnership();
-				status = surface.status();
-				return surface;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.READ_ERROR || status == Status.PNG_ERROR) {
-				throw new IOException(status.toString());
-			}
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		Status status = surface.status();
+		if (status == Status.READ_ERROR || status == Status.PNG_ERROR) {
+			throw new IOException(status.toString());
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
+		}
+		return surface;
 	}
 
 	private static final MethodHandle cairo_image_surface_create_from_png_stream = Interop.downcallHandle(
@@ -268,13 +262,12 @@ public final class ImageSurface extends Surface {
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.SURFACE_TYPE_MISMATCH || status == Status.WRITE_ERROR || status == Status.PNG_ERROR) {
-				throw new IOException(status.toString());
-			}
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.SURFACE_TYPE_MISMATCH || status == Status.WRITE_ERROR || status == Status.PNG_ERROR) {
+			throw new IOException(status.toString());
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -294,9 +287,9 @@ public final class ImageSurface extends Surface {
 	 */
 	public void writeToPNG(OutputStream stream) throws IOException {
 		if (stream == null) {
-			return null;
+			return;
 		}
-		Status status = null;
+		Status status;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				WriteFunc writeFunc = stream::write;
@@ -306,13 +299,12 @@ public final class ImageSurface extends Surface {
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.SURFACE_TYPE_MISMATCH || status == Status.WRITE_ERROR || status == Status.PNG_ERROR) {
-				throw new IOException(status.toString());
-			}
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.SURFACE_TYPE_MISMATCH || status == Status.WRITE_ERROR || status == Status.PNG_ERROR) {
+			throw new IOException(status.toString());
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 

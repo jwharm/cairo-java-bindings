@@ -49,7 +49,7 @@ public enum PDFVersion {
 		return values()[ordinal];
 	}
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

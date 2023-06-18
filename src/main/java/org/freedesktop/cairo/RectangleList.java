@@ -8,6 +8,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.VarHandle;
 import java.util.List;
 
+import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.ProxyInstance;
 
 /**
@@ -16,6 +17,10 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  * @since 1.4
  */
 public class RectangleList extends ProxyInstance {
+
+	static {
+		Interop.ensureInitialized();
+	}
 
 	/**
 	 * The memory layout of the native C struct
@@ -85,7 +90,7 @@ public class RectangleList extends ProxyInstance {
 	public static RectangleList create(Status status, List<Rectangle> rectangles) {
 		RectangleList rectangleList = new RectangleList(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
 		STATUS.set(rectangleList.handle(), status.value());
-		NUM_RECTANGLES.set(rectangleList.handle(), rectangles == null ? MemorySegment.NULL : rectangles.size());
+		NUM_RECTANGLES.set(rectangleList.handle(), rectangles == null ? 0 : rectangles.size());
 		if (rectangles == null || rectangles.isEmpty()) {
 			return rectangleList;
 		}

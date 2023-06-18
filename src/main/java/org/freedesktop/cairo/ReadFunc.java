@@ -27,12 +27,12 @@ public interface ReadFunc {
 	 * stream.
 	 * 
 	 * @param length the amount of data to read
-	 * @returns data the data read from the input stream
+	 * @return data the data read from the input stream
 	 * @throws IOException to be thrown when an error occurs during the read
 	 *                     operation
 	 * @since 1.0
 	 */
-	public byte[] read(int length) throws IOException;
+	byte[] read(int length) throws IOException;
 
 	/**
 	 * The callback that is executed by native code. This method marshals the

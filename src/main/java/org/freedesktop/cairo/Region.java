@@ -23,7 +23,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  */
 public class Region extends ProxyInstance {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -46,20 +46,18 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public static Region create() {
-		Status status = null;
+		Region region;
 		try {
 			MemorySegment result = (MemorySegment) cairo_region_create.invoke();
-			Region region = new Region(result);
+			region = new Region(result);
 			region.takeOwnership();
-			status = region.status();
-			return region;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (region.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(region.status().toString());
+		}
+		return region;
 	}
 
 	private static final MethodHandle cairo_region_create = Interop.downcallHandle("cairo_region_create",
@@ -72,21 +70,19 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public static Region create(RectangleInt rectangle) {
-		Status status = null;
+		Region region;
 		try {
 			MemorySegment result = (MemorySegment) cairo_region_create_rectangle
 					.invoke(rectangle == null ? MemorySegment.NULL : rectangle.handle());
-			Region region = new Region(result);
+			region = new Region(result);
 			region.takeOwnership();
-			status = region.status();
-			return region;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (region.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(region.status().toString());
+		}
+		return region;
 	}
 
 	private static final MethodHandle cairo_region_create_rectangle = Interop.downcallHandle(
@@ -101,25 +97,23 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public static Region create(RectangleInt[] rects) {
-		Status status = null;
+		Region region;
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment rectsPtr = rects == null ? MemorySegment.NULL
 						: Interop.allocateNativeArray(rects, false, arena);
 				MemorySegment result = (MemorySegment) cairo_region_create_rectangles.invoke(rectsPtr,
 						rects == null ? 0 : rects.length);
-				Region region = new Region(result);
+				region = new Region(result);
 				region.takeOwnership();
-				status = region.status();
-				return region;
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (region.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(region.status().toString());
+		}
+		return region;
 	}
 
 	private static final MethodHandle cairo_region_create_rectangles = Interop.downcallHandle(
@@ -133,21 +127,19 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public static Region copy(Region original) {
-		Status status = null;
+		Region region;
 		try {
 			MemorySegment result = (MemorySegment) cairo_region_copy
 					.invoke(original == null ? MemorySegment.NULL : original.handle());
-			Region region = new Region(result);
+			region = new Region(result);
 			region.takeOwnership();
-			status = region.status();
-			return region;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
 		}
+		if (region.status() == Status.NO_MEMORY) {
+			throw new RuntimeException(region.status().toString());
+		}
+		return region;
 	}
 
 	private static final MethodHandle cairo_region_copy = Interop.downcallHandle("cairo_region_copy",
@@ -340,17 +332,16 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void intersect(Region other) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_intersect.invoke(handle(),
 					other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -365,17 +356,16 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void intersect(RectangleInt rectangle) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_intersect_rectangle.invoke(handle(),
 					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -390,17 +380,16 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void subtract(Region other) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_subtract.invoke(handle(),
 					other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -415,17 +404,16 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void subtract(RectangleInt rectangle) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_subtract_rectangle.invoke(handle(),
 					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -441,16 +429,15 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void union(Region other) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_union.invoke(handle(), other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -465,17 +452,16 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void union(RectangleInt rectangle) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_union_rectangle.invoke(handle(),
 					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -493,16 +479,15 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void xor(Region other) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_xor.invoke(handle(), other == null ? MemorySegment.NULL : other.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 
@@ -519,17 +504,16 @@ public class Region extends ProxyInstance {
 	 * @since 1.10
 	 */
 	public void xor(RectangleInt rectangle) {
-		Status status = null;
+		Status status;
 		try {
 			int result = (int) cairo_region_xor_rectangle.invoke(handle(),
 					rectangle == null ? MemorySegment.NULL : rectangle.handle());
 			status = Status.of(result);
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status == Status.NO_MEMORY) {
-				throw new RuntimeException(status.toString());
-			}
+		}
+		if (status == Status.NO_MEMORY) {
+			throw new RuntimeException(status.toString());
 		}
 	}
 

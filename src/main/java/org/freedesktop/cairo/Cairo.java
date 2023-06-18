@@ -13,7 +13,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public final class Cairo {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 	
@@ -24,7 +24,7 @@ public final class Cairo {
 	/**
 	 * Returns the version of the cairo library as a human-readable string of the
 	 * form "X.Y.Z".
-	 * 
+	 * <p>
 	 * Cairo has a three-part version number scheme. In this scheme, we use even vs.
 	 * odd numbers to distinguish fixed points in the software vs. in-progress
 	 * development, (such as from git instead of a tar file, or as a "snapshot" tar

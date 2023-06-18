@@ -49,7 +49,7 @@ public enum PostScriptLevel {
 		return values()[ordinal];
 	}
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

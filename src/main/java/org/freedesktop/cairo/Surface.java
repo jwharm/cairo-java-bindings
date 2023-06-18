@@ -30,7 +30,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
 public sealed class Surface extends ProxyInstance
 		permits ImageSurface, PDFSurface, PostScriptSurface, RecordingSurface, SVGSurface, ScriptSurface {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -659,7 +659,7 @@ public sealed class Surface extends ProxyInstance
 	/**
 	 * Return whether this surface supports {@code mime_type}.
 	 * 
-	 * @param the mime type
+	 * @param mimeType the mime type
 	 * @return mimeType {@code true{ if this surface supports {@code mime_type},
 	 *         {@code false} otherwise @since 1.12
 	 */

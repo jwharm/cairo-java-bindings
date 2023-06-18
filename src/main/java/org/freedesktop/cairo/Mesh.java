@@ -13,7 +13,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public class Mesh extends Pattern {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
@@ -187,14 +187,13 @@ public class Mesh extends Pattern {
 	public Mesh beginPatch() throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_begin_patch.invoke(handle());
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_begin_patch = Interop
@@ -216,14 +215,13 @@ public class Mesh extends Pattern {
 	public Mesh endPatch() throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_end_patch.invoke(handle());
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_end_patch = Interop
@@ -245,14 +243,13 @@ public class Mesh extends Pattern {
 	public Mesh moveTo(double x, double y) throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_move_to.invoke(handle(), x, y);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_move_to = Interop.downcallHandle("cairo_mesh_pattern_move_to",
@@ -278,14 +275,13 @@ public class Mesh extends Pattern {
 	public Mesh lineTo(double x, double y) throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_line_to.invoke(handle(), x, y);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_line_to = Interop.downcallHandle("cairo_mesh_pattern_line_to",
@@ -317,14 +313,13 @@ public class Mesh extends Pattern {
 	public Mesh curveTo(double x1, double y1, double x2, double y2, double x3, double y3) throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_curve_to.invoke(handle(), x1, y1, x2, y2, x3, y3);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_curve_to = Interop.downcallHandle(
@@ -350,14 +345,13 @@ public class Mesh extends Pattern {
 	public Mesh setControlPoint(int pointNum, double x, double y) throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_set_control_point.invoke(handle(), pointNum, x, y);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_set_control_point = Interop
@@ -384,14 +378,13 @@ public class Mesh extends Pattern {
 	public Mesh setCornerColorRGB(int cornerNum, double red, double green, double blue) throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_set_corner_color_rgb.invoke(handle(), cornerNum, red, green, blue);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_set_corner_color_rgb = Interop.downcallHandle(
@@ -421,14 +414,13 @@ public class Mesh extends Pattern {
 			throws IllegalStateException {
 		try {
 			cairo_mesh_pattern_set_corner_color_rgba.invoke(handle(), cornerNum, red, green, blue, alpha);
-			return this;
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (status() == Status.INVALID_MESH_CONSTRUCTION) {
-				throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
-			}
 		}
+		if (status() == Status.INVALID_MESH_CONSTRUCTION) {
+			throw new IllegalStateException(Status.INVALID_MESH_CONSTRUCTION.toString());
+		}
+		return this;
 	}
 
 	private static final MethodHandle cairo_mesh_pattern_set_corner_color_rgba = Interop.downcallHandle(

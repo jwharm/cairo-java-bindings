@@ -13,7 +13,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public class RadialGradient extends Gradient {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 

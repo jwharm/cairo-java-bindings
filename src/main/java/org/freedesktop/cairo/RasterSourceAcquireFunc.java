@@ -46,7 +46,7 @@ public interface RasterSourceAcquireFunc {
 	 * @return a {@link Surface}
 	 * @since 1.12
 	 */
-	public Surface acquire(RasterSource pattern, Surface target, RectangleInt extents);
+	Surface acquire(RasterSource pattern, Surface target, RectangleInt extents);
 
 	/**
 	 * The callback that is executed by native code. This method marshals the

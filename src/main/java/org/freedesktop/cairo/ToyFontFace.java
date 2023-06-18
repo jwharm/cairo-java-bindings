@@ -25,7 +25,7 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public class ToyFontFace extends FontFace {
 
-	{
+	static {
 		Interop.ensureInitialized();
 	}
 
