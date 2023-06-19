@@ -26,7 +26,7 @@ public class CairoBindingsBuild extends Project {
     public CairoBindingsBuild() {
         pkg = "io.github.jwharm.cairobindings";
         name = "cairo";
-        version = version(1,16,0,"-0.1");
+        version = version(1,16,0,"0.1");
         javaRelease = 20;
 
         compileOperation().compileOptions()
