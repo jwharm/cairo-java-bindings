@@ -42,7 +42,8 @@ public interface ReadFunc {
 	 * @param data    the buffer into which to read the data
 	 * @param length  the amount of data to read
 	 * @return {@link Status#SUCCESS} on success, or {@link Status#READ_ERROR} if an
-	 *         IOException occured.
+	 *         IOException occured or 0 bytes (or null) was returned from
+	 *         {@code read()}.
 	 * @since 1.0
 	 */
 	default int upcall(MemorySegment closure, MemorySegment data, int length) {
@@ -52,9 +53,10 @@ public interface ReadFunc {
 		try (Arena arena = Arena.openConfined()) {
 			try {
 				byte[] bytes = read(length);
-				if (bytes != null) {
-					MemorySegment.ofAddress(data.address(), length).asByteBuffer().put(bytes);
+				if (bytes == null || bytes.length == 0) {
+					return Status.READ_ERROR.value();
 				}
+				MemorySegment.ofAddress(data.address(), length).asByteBuffer().put(bytes);
 				return Status.SUCCESS.value();
 			} catch (IOException ioe) {
 				return Status.READ_ERROR.value();
