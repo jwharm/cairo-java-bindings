@@ -17,6 +17,17 @@ import io.github.jwharm.cairobindings.Interop;
  * Image surfaces provide the ability to render to memory buffers either
  * allocated by cairo or by the calling code. The supported image formats are
  * those defined in {@link Format}.
+ * <p>
+ * The PNG functions allow reading PNG images into image surfaces, and writing
+ * any surface to a PNG file. It is a toy API. It only offers very simple
+ * support for reading and writing PNG files, which is sufficient for testing
+ * and demonstration purposes. Applications which need more control over the
+ * generated PNG file should access the pixel data directly, using
+ * {@link #getData()} or a backend-specific access function, and process it
+ * with another library, e.g. gdk-pixbuf or libpng.
+ *
+ * @see Surface
+ * @since 1.0
  */
 public final class ImageSurface extends Surface {
 
@@ -237,7 +248,7 @@ public final class ImageSurface extends Surface {
 
 	private static final MethodHandle cairo_image_surface_create_from_png_stream = Interop.downcallHandle(
 			"cairo_image_surface_create_from_png_stream",
-			FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
+			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS),
 			false);
 
 	/**
