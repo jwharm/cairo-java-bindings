@@ -5,6 +5,7 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.ref.Cleaner;
 
 import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.ProxyInstance;
@@ -27,7 +28,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  * acquire the surface's device first. See {@link Device#acquire()} for a
  * discussion of devices.
  */
-public sealed class Surface extends ProxyInstance
+public sealed class Surface extends ProxyInstance implements AutoCloseable
 		permits ImageSurface, PDFSurface, PostScriptSurface, RecordingSurface, SVGSurface, ScriptSurface {
 
 	static {
@@ -686,11 +687,11 @@ public sealed class Surface extends ProxyInstance
 	 * <p>
 	 * Note, the use of the original surface as a target or source whilst it is
 	 * mapped is undefined. The result of mapping the surface multiple times is
-	 * undefined. Calling {@link #destroy()} or {@link #finish()} on the resulting
-	 * image surface results in undefined behavior. Letting the image surface get
-	 * garbage-collected from Java results in undefined behavior. Changing the
-	 * device transform of the image surface or of the source surface before the
-	 * image surface is unmapped results in undefined behavior.
+	 * undefined. Calling {@link #close()} {@link #destroy()} or {@link #finish()}
+	 * on the resulting image surface results in undefined behavior. Letting the
+	 * image surface get garbage-collected from Java results in undefined behavior.
+	 * Changing the device transform of the image surface or of the source surface
+	 * before the image surface is unmapped results in undefined behavior.
 	 * 
 	 * @param extents limit the extraction to an rectangular region
 	 * @return the newly allocated surface. This function always returns a valid
@@ -733,4 +734,21 @@ public sealed class Surface extends ProxyInstance
 
 	private static final MethodHandle cairo_surface_unmap_image = Interop.downcallHandle("cairo_surface_unmap_image",
 			FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+
+	/**
+	 * Closing a surface will invoke {@link #finish()}, which will flush the
+	 * surface and drop all references to external resources. A closed surface
+	 * cannot be used to perform drawing operations and cannot be reopened.
+	 * <p>
+	 * Although the Java bindings make an effort to properly dispose native
+	 * resources using a {@link Cleaner}, this is not guaranteed to work in
+	 * all situations. Users must therefore always call {@code close()} or
+	 * {@code finish()} on surfaces (either manually or with a
+	 * try-with-resources statement) or risk issues like resource exhaustion
+	 * and data loss.
+	 */
+	@Override
+	public void close() {
+		finish();
+	}
 }
