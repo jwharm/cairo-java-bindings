@@ -1854,8 +1854,11 @@ public final class Context extends ProxyInstance {
 	 * {@code x, y, width, height}:
 	 * 
 	 * <pre>
-	 * cr.save().translate(x + width / 2., y + height / 2.).scale(width / 2., height / 2.)
-	 * 		.arc(0., 0., 1., 0., 2 * Math.PI).restore();
+	 * cr.save()
+	 *   .translate(x + width / 2., y + height / 2.)
+	 *   .scale(width / 2., height / 2.)
+	 * 	 .arc(0., 0., 1., 0., 2 * Math.PI)
+	 *   .restore();
 	 * </pre>
 	 * 
 	 * @param xc     X position of the center of the arc
