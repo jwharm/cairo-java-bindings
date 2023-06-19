@@ -339,6 +339,7 @@ class ContextTest {
 	@Test
 	void testCopyClipRectangleList() {
 		Context cr = createContext();
+		cr.rectangle(10, 10, 20, 20);
 		cr.copyClipRectangleList();
 		assertEquals(cr.status(), Status.SUCCESS);
 	}
