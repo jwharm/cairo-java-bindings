@@ -79,7 +79,7 @@ public final class SVGSurface extends Surface {
 		SVGSurface surface;
 		try {
 			try (Arena arena = Arena.openConfined()) {
-				MemorySegment filenamePtr = (filename == null) ? MemorySegment.NULL
+				MemorySegment filenamePtr = (filename == null || "".equals(filename)) ? MemorySegment.NULL
 						: arena.allocateUtf8String(filename);
 				MemorySegment result = (MemorySegment) cairo_svg_surface_create.invoke(filenamePtr, widthInPoints,
 						heightInPoints);
