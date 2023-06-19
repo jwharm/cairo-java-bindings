@@ -7,6 +7,7 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.ref.Cleaner;
 
 import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.ProxyInstance;
@@ -36,7 +37,7 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  * 
  * @since 1.10
  */
-public class Device extends ProxyInstance {
+public class Device extends ProxyInstance implements AutoCloseable {
 
 	static {
 		Interop.ensureInitialized();
@@ -292,4 +293,21 @@ public class Device extends ProxyInstance {
 	private static final MethodHandle cairo_device_observer_stroke_elapsed = Interop.downcallHandle(
 			"cairo_device_observer_stroke_elapsed", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS),
 			false);
+
+	/**
+	 * Closing a device will invoke {@link #finish()}, which will flush the
+	 * device and drop all references to external resources. A closed device
+	 * cannot be used to perform drawing operations and cannot be reopened.
+	 * <p>
+	 * Although the Java bindings make an effort to properly dispose native
+	 * resources using a {@link Cleaner}, this is not guaranteed to work in
+	 * all situations. Users must therefore always call {@code close()} or
+	 * {@code finish()} on devices (either manually or with a
+	 * try-with-resources statement) or risk issues like resource exhaustion
+	 * and data loss.
+	 */
+	@Override
+	public void close() {
+		finish();
+	}
 }
