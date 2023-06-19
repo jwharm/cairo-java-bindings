@@ -1199,7 +1199,7 @@ public final class Context extends ProxyInstance {
 	}
 
 	private static final MethodHandle cairo_copy_clip_rectangle_list = Interop.downcallHandle(
-			"cairo_copy_clip_rectangle_list", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+			"cairo_copy_clip_rectangle_list", FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS), false);
 
 	/**
 	 * A drawing operator that fills the current path according to the current fill
