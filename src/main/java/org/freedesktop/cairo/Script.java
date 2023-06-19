@@ -59,8 +59,8 @@ public class Script extends Device {
 		Script script;
 		try {
 			try (Arena arena = Arena.openConfined()) {
-				MemorySegment filenamePtr = (filename == null) ? MemorySegment.NULL
-						: arena.allocateUtf8String(filename);
+				MemorySegment filenamePtr = (filename == null || "".equals(filename))
+						? MemorySegment.NULL : arena.allocateUtf8String(filename);
 				MemorySegment result = (MemorySegment) cairo_script_create.invoke(filenamePtr);
 				script = new Script(result);
 				script.takeOwnership();
