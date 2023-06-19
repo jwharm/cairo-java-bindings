@@ -94,7 +94,7 @@ public final class PostScriptSurface extends Surface {
 		PostScriptSurface surface;
 		try {
 			try (Arena arena = Arena.openConfined()) {
-				MemorySegment filenamePtr = (filename == null) ? MemorySegment.NULL
+				MemorySegment filenamePtr = (filename == null || "".equals(filename)) ? MemorySegment.NULL
 						: arena.allocateUtf8String(filename);
 				MemorySegment result = (MemorySegment) cairo_ps_surface_create.invoke(filenamePtr, widthInPoints,
 						heightInPoints);
