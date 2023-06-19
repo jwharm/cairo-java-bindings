@@ -70,6 +70,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
 	 * @param content the content for the new surface
 	 * @param width   width of the new surface, (in device-space units)
 	 * @param height  height of the new surface (in device-space units)
+	 * @param <T>     the type of the created Surface
 	 * @return the newly allocated surface.
 	 * @since 1.0
 	 */
@@ -605,7 +606,8 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
 	 * <p>
 	 * There is a convenience function for this that takes a {@link Context} namely
 	 * {@link Context#showPage()}.
-	 * 
+	 *
+	 * @return the surface
 	 * @since 1.6
 	 */
 	public Surface showPage() {
@@ -661,8 +663,9 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
 	 * Return whether this surface supports {@code mime_type}.
 	 * 
 	 * @param mimeType the mime type
-	 * @return mimeType {@code true{ if this surface supports {@code mime_type},
-	 *         {@code false} otherwise @since 1.12
+	 * @return mimeType {@code true} if this surface supports {@code mime_type},
+	 *         {@code false} otherwise
+	 * @since 1.12
 	 */
 	public boolean supportsMimeType(MimeType mimeType) {
 		try {

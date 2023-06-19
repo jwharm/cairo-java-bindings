@@ -26,6 +26,12 @@ public class LibLoad {
     }
 
     /**
+     * Prevent instantiation
+     */
+    private LibLoad() {
+    }
+
+    /**
      * Load the native library with the provided name
      * @param name the name of the library
      */

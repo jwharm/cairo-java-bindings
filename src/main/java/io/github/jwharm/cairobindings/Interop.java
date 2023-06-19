@@ -38,7 +38,13 @@ public class Interop {
      */
     public static void ensureInitialized() {
     }
-	
+
+    /**
+     * Prevent instantiation
+     */
+    private Interop() {
+    }
+
     /**
      * Creates a method handle that is used to call the native function with 
      * the provided name and function descriptor.

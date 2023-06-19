@@ -17,7 +17,9 @@ import io.github.jwharm.cairobindings.Interop;
  * matches the cairo drawing model. The scripts can be replayed using tools
  * under the util/cairo-script directory, or with cairo-perf-trace.
  * 
- * @see Surface, ScriptSurface, Device
+ * @see Surface
+ * @see ScriptSurface
+ * @see Device
  * @since 1.12
  */
 public class Script extends Device {

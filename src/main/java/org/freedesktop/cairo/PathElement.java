@@ -16,16 +16,29 @@ public sealed interface PathElement permits PathElement.MoveTo, PathElement.Line
 	
 	/**
 	 * A {@link PathDataType#MOVE_TO} path element
+     *
+     * @param x the X coordinate of the new position
+     * @param y the Y coordinate of the new position
 	 */
     record MoveTo(double x, double y) implements PathElement {}
     
     /**
      * A {@link PathDataType#LINE_TO} path element
+     *
+     * @param x the X coordinate of the end of the new line
+     * @param y the Y coordinate of the end of the new line
      */
     record LineTo(double x, double y) implements PathElement {}
     
     /**
      * A {@link PathDataType#CURVE_TO} path element
+     *
+     * @param x1 the X coordinate of the first control point
+     * @param y1 the Y coordinate of the first control point
+     * @param x2 the X coordinate of the second control point
+     * @param y2 the Y coordinate of the second control point
+     * @param x3 the X coordinate of the end of the curve
+     * @param y3 the Y coordinate of the end of the curve
      */
     record CurveTo(double x1, double y1, double x2, double y2, double x3, double y3) implements PathElement {}
     

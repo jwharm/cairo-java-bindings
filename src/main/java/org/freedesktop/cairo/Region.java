@@ -65,7 +65,8 @@ public class Region extends ProxyInstance {
 
 	/**
 	 * Allocates a new region object containing {@code rectangle}.
-	 * 
+	 *
+	 * @param  rectangle a {@link RectangleInt}
 	 * @return A newly allocated Region
 	 * @since 1.10
 	 */
@@ -122,7 +123,8 @@ public class Region extends ProxyInstance {
 
 	/**
 	 * Allocates a new region object copying the area from {@code original}.
-	 * 
+	 *
+	 * @param  original a Region
 	 * @return A newly allocated Region
 	 * @since 1.10
 	 */

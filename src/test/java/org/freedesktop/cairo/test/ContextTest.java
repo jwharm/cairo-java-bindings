@@ -588,7 +588,7 @@ class ContextTest {
 	@Test
 	void testPathExtents() {
 		Context cr = createContext();
-		cr.pathExtents(0, 0, 100, 100);
+		cr.pathExtents();
 		assertEquals(cr.status(), Status.SUCCESS);
 	}
 

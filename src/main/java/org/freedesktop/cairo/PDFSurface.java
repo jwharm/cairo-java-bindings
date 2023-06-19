@@ -46,9 +46,9 @@ import io.github.jwharm.cairobindings.Interop;
  * {@code Rows}: [required] An integer specifying the height of the image in
  * scan lines.
  * <p>
- * {@code K}: [optional] An integer identifying the encoding scheme used. < 0 is
- * 2 dimensional Group 4, = 0 is Group3 1 dimensional, > 0 is mixed 1 and 2
- * dimensional encoding. Default is 0.
+ * {@code K}: [optional] An integer identifying the encoding scheme used. &lt; 0
+ * is 2 dimensional Group 4, = 0 is Group3 1 dimensional, &gt; 0 is mixed 1 and
+ * 2 dimensional encoding. Default is 0.
  * <p>
  * {@code EndOfLine}: [optional] If true end-of-line bit patterns are present.
  * Default is false.

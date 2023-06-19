@@ -1098,8 +1098,7 @@ public final class Context extends ProxyInstance {
 	/**
 	 * Computes a bounding box in user coordinates covering the area inside the
 	 * current clip.
-	 * <p>
-	 * 
+	 *
 	 * @return the resulting extents
 	 * @since 1.4
 	 */
@@ -1252,9 +1251,8 @@ public final class Context extends ProxyInstance {
 	 * empty rectangle ({@code (0,0), (0,0)}). Surface dimensions and clipping are
 	 * not taken into account.
 	 * <p>
-	 * Contrast with {@link #pathExtents(double, double, double, double)}, which is
-	 * similar, but returns non-zero extents for some paths with no inked area,
-	 * (such as a simple line segment).
+	 * Contrast with {@link #pathExtents()}, which is similar, but returns non-zero
+	 * extents for some paths with no inked area, (such as a simple line segment).
 	 * <p>
 	 * Note that {@code fillExtents()} must necessarily do more work to compute the
 	 * precise inked areas in light of the fill rule, so {@code pathExtents()} may
@@ -1293,7 +1291,7 @@ public final class Context extends ProxyInstance {
 	 * {@link #fill()} operation given the current path and filling parameters.
 	 * Surface dimensions and clipping are not taken into account.
 	 * 
-\	 * @param x X coordinate of the point to test
+	 * @param x X coordinate of the point to test
 	 * @param y Y coordinate of the point to test
 	 * @return true if the point is inside, or false if outside.
 	 * @see #fill()
@@ -1481,8 +1479,8 @@ public final class Context extends ProxyInstance {
 	 * <p>
 	 * Note that if the line width is set to exactly zero, then
 	 * {@code strokeExtents()} will return an empty rectangle. Contrast with
-	 * {@link #pathExtents(double, double, double, double)} which can be used to
-	 * compute the non-empty bounds as the line width approaches zero.
+	 * {@link #pathExtents()} which can be used to compute the non-empty bounds as
+	 * the line width approaches zero.
 	 * <p>
 	 * Note that {@code strokeExtents()} must necessarily do more work to compute
 	 * the precise inked areas in light of the stroke parameters, so
@@ -2215,13 +2213,11 @@ public final class Context extends ProxyInstance {
 	 * to the extents. However, a lone {@code moveTo()} will not contribute to the
 	 * results of {@code pathExtents()}.
 	 * 
-	 * @param x1 left of the resulting extents
-	 * @param y1 top of the resulting extents
-	 * @param x2 right of the resulting extents
-	 * @param y2 bottom of the resulting extents
+	 * @return a {@link Rectangle} with the left, top, right and bottom of the
+	 *         resulting extents
 	 * @since 1.6
 	 */
-	public Rectangle pathExtents(double x1, double y1, double x2, double y2) {
+	public Rectangle pathExtents() {
 		try {
 			try (Arena arena = Arena.openConfined()) {
 				MemorySegment x1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);

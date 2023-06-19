@@ -84,8 +84,9 @@ public class RectangleList extends ProxyInstance {
 	/**
 	 * A data structure for holding a dynamically allocated array of rectangles.
 	 * 
-	 * @param status     Error status of the rectangle list
-	 * @param rectangles List containing the rectangles
+	 * @param  status     Error status of the rectangle list
+	 * @param  rectangles List containing the rectangles
+	 * @return the newly created RectangleList
 	 */
 	public static RectangleList create(Status status, List<Rectangle> rectangles) {
 		RectangleList rectangleList = new RectangleList(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
