@@ -74,7 +74,8 @@ Some other features that the language bindings offer:
 ## API Documentation
 
 All API documentation is available as Javadoc, and has been reworked to use Javadoc syntax and 
-cross-reference between Java classes and methods. You can lookup the Javadoc online, or download 
+cross-reference between Java classes and methods. You can 
+[lookup the Javadoc online](https://jwharm.github.io/cairo-java-bindings/javadoc/), or download 
 the javadoc or sources jar to use in your IDE.
 
 ## License
