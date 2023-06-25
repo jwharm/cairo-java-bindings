@@ -55,4 +55,23 @@ class DeviceTest {
             assertEquals(d.status(), Status.SUCCESS);
         }
     }
+
+    @Test
+    void testSetUserData() {
+        try (Device d = Script.create("")) {
+            d.setUserData(Rectangle.create(0, 0, 10, 10));
+            assertEquals(d.status(), Status.SUCCESS);
+        }
+    }
+
+    @Test
+    void testGetUserData() {
+        try (Device d = Script.create("")) {
+            Rectangle input = Rectangle.create(0, 0, 10, 10);
+            UserDataKey key = d.setUserData(input);
+            Rectangle output = (Rectangle) d.getUserData(key);
+            assertEquals(input, output);
+            assertEquals(d.status(), Status.SUCCESS);
+        }
+    }
 }

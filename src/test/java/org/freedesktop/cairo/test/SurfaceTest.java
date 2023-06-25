@@ -7,15 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import org.freedesktop.cairo.Content;
-import org.freedesktop.cairo.Context;
-import org.freedesktop.cairo.FontOptions;
-import org.freedesktop.cairo.Format;
-import org.freedesktop.cairo.ImageSurface;
-import org.freedesktop.cairo.MimeType;
-import org.freedesktop.cairo.RectangleInt;
-import org.freedesktop.cairo.Status;
-import org.freedesktop.cairo.Surface;
+import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
 
 class SurfaceTest {
@@ -251,4 +243,22 @@ class SurfaceTest {
         }
     }
 
+    @Test
+    void testSetUserData() {
+        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
+            s.setUserData("test");
+            assertEquals(s.status(), Status.SUCCESS);
+        }
+    }
+
+    @Test
+    void testGetUserData() {
+        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
+            String input = "test";
+            UserDataKey key = s.setUserData(input);
+            String output = (String) s.getUserData(key);
+            assertEquals(input, output);
+            assertEquals(s.status(), Status.SUCCESS);
+        }
+    }
 }

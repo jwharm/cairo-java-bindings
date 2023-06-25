@@ -6,22 +6,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 
-import org.freedesktop.cairo.Antialias;
-import org.freedesktop.cairo.Content;
-import org.freedesktop.cairo.Context;
-import org.freedesktop.cairo.FillRule;
-import org.freedesktop.cairo.Format;
-import org.freedesktop.cairo.ImageSurface;
-import org.freedesktop.cairo.LineCap;
-import org.freedesktop.cairo.LineJoin;
-import org.freedesktop.cairo.Matrix;
-import org.freedesktop.cairo.Operator;
-import org.freedesktop.cairo.Path;
-import org.freedesktop.cairo.Point;
-import org.freedesktop.cairo.Rectangle;
-import org.freedesktop.cairo.SolidPattern;
-import org.freedesktop.cairo.Status;
-import org.freedesktop.cairo.SurfacePattern;
+import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
 
 class ContextTest {
@@ -666,6 +651,23 @@ class ContextTest {
     void testDeviceToUserDistance() {
         Context cr = createContext();
         cr.deviceToUserDistance(new Point(0, 0));
+        assertEquals(cr.status(), Status.SUCCESS);
+    }
+
+    @Test
+    void testSetUserData() {
+        Context cr = createContext();
+        cr.setUserData(12345);
+        assertEquals(cr.status(), Status.SUCCESS);
+    }
+
+    @Test
+    void testGetUserData() {
+        Context cr = createContext();
+        int input = 12345;
+        UserDataKey key = cr.setUserData(input);
+        int output = (int) cr.getUserData(key);
+        assertEquals(input, output);
         assertEquals(cr.status(), Status.SUCCESS);
     }
 }
