@@ -38,7 +38,7 @@ public interface DestroyFunc {
 
     /**
      * Generates an upcall stub, a C function pointer that will call
-     * {@link #upcall(MemorySegment).
+     * {@link #upcall(MemorySegment)}.
      * 
      * @param scope the scope in which the upcall stub will be allocated
      * @return the function pointer of the upcall stub

@@ -45,11 +45,12 @@ public final class SVGSurface extends Surface {
      * {@code filename}.
      * <p>
      * The SVG surface backend recognizes the following MIME types for the data
-     * attached to a surface (see {@link Surface#setMimeData()}) when it is used as
-     * a source pattern for drawing on this surface: {@link MimeType#JPEG},
-     * {@link MimeType#PNG}, {@link MimeType#URI}. If any of them is specified, the
-     * SVG backend emits a href with the content of MIME data instead of a surface
-     * snapshot (PNG, Base64-encoded) in the corresponding image tag.
+     * attached to a surface (see {@link Surface#setMimeData(MimeType, byte[])})
+     * when it is used as a source pattern for drawing on this surface:
+     * {@link MimeType#JPEG}, {@link MimeType#PNG}, {@link MimeType#URI}. If any
+     * of them is specified, the SVG backend emits a href with the content of MIME
+     * data instead of a surface snapshot (PNG, Base64-encoded) in the
+     * corresponding image tag.
      * <p>
      * The unofficial MIME type {@link MimeType#URI} is examined first. If present,
      * the URI is emitted as is: assuring the correctness of URI is left to the
