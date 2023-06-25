@@ -1,0 +1,44 @@
+name: Publish Pages
+
+on:
+  release:
+    types: [created]
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 20
+          distribution: 'temurin'
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build Project and Publish Artifacts
+        run: ./bld download publish
+      - name: Create Site Artifact
+        run: |
+          mkdir site
+          mv build/javadoc site/
+      - name: Upload Site Artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'site'
+  pages:
+    runs-on: ubuntu-latest
+    needs: publish
+    if: github.event_name == 'push'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
