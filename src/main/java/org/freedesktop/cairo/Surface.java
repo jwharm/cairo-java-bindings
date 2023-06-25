@@ -688,7 +688,8 @@ public sealed class Surface extends Proxy implements AutoCloseable
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment mimeTypePtr = Interop.allocateString(mimeType.toString(), arena);
-                MemorySegment dataPtr = data == null ? MemorySegment.NULL : MemorySegment.ofArray(data);
+                MemorySegment dataPtr = data == null ? MemorySegment.NULL :
+                        arena.allocateArray(ValueLayout.JAVA_BYTE, data);
                 int result = (int) cairo_surface_set_mime_data.invoke(handle(), mimeTypePtr, dataPtr,
                         data == null ? 0 : data.length, MemorySegment.NULL, MemorySegment.NULL);
                 status = Status.of(result);
