@@ -21,58 +21,58 @@ package org.freedesktop.cairo;
  */
 public enum FontType {
 
-	/**
-	 * The font was created using cairo's toy font api
-	 * 
-	 * @since 1.2
-	 */
-	TOY,
+    /**
+     * The font was created using cairo's toy font api
+     * 
+     * @since 1.2
+     */
+    TOY,
 
-	/**
-	 * The font is of type FreeType
-	 * 
-	 * @since 1.2
-	 */
-	FT,
+    /**
+     * The font is of type FreeType
+     * 
+     * @since 1.2
+     */
+    FT,
 
-	/**
-	 * The font is of type Win32
-	 * 
-	 * @since 1.2
-	 */
-	WIN32,
+    /**
+     * The font is of type Win32
+     * 
+     * @since 1.2
+     */
+    WIN32,
 
-	/**
-	 * The font is of type Quartz
-	 * 
-	 * @since 1.6, in 1.2 and 1.4 it was named ATSUI
-	 */
-	QUARTZ,
+    /**
+     * The font is of type Quartz
+     * 
+     * @since 1.6, in 1.2 and 1.4 it was named ATSUI
+     */
+    QUARTZ,
 
-	/**
-	 * The font was create using cairo's user font api
-	 * 
-	 * @since 1.8
-	 */
-	USER;
+    /**
+     * The font was create using cairo's user font api
+     * 
+     * @since 1.8
+     */
+    USER;
 
-	/**
-	 * Return the value of this enum
-	 * 
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * Return the value of this enum
+     * 
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static FontType of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static FontType of(int ordinal) {
+        return values()[ordinal];
+    }
 }

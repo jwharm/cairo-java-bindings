@@ -9,47 +9,45 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
 /**
- * RasterSourceFinishFunc is the type of function which is called when the
- * pattern (or a copy thereof) is no longer required.
+ * DestroyFunc the type of function which is called when a data element is
+ * destroyed. It is passed the pointer to the data element and should free any
+ * memory and resources allocated for it.
  * 
- * @since 1.12
+ * @since 1.0
  */
 @FunctionalInterface
-public interface RasterSourceFinishFunc {
+public interface DestroyFunc {
 
     /**
-     * Called when the pattern (or a copy thereof) is no longer required.
+     * The function to implement as callback in a destroy operation.
      * 
-     * @param pattern the pattern being rendered from
-     * @since 1.12
+     * @since 1.0
      */
-    void finish(RasterSource pattern);
+    void destroy();
 
     /**
      * The callback that is executed by native code. This method marshals the
-     * parameters and calls {@link #finish(RasterSource)}.
+     * parameters and calls {@link #destroy()}.
      * 
-     * @param pattern      the pattern being rendered from
-     * @param callbackData ignored
-     * @since 1.12
+     * @param data the buffer into which to read the data
+     * @since 1.0
      */
-    default void upcall(MemorySegment pattern, MemorySegment callbackData) {
-        finish(new RasterSource(pattern));
+    default void upcall(MemorySegment data) {
+        destroy();
     }
 
     /**
      * Generates an upcall stub, a C function pointer that will call
-     * {@link #upcall(MemorySegment, MemorySegment)}.
+     * {@link #upcall(MemorySegment).
      * 
      * @param scope the scope in which the upcall stub will be allocated
      * @return the function pointer of the upcall stub
-     * @since 1.12
+     * @since 1.0
      */
     default MemorySegment toCallback(SegmentScope scope) {
         try {
-            FunctionDescriptor fdesc = FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS);
-            MethodHandle handle = MethodHandles.lookup().findVirtual(RasterSourceFinishFunc.class, "upcall",
-                    fdesc.toMethodType());
+            FunctionDescriptor fdesc = FunctionDescriptor.ofVoid(ValueLayout.ADDRESS);
+            MethodHandle handle = MethodHandles.lookup().findVirtual(DestroyFunc.class, "upcall", fdesc.toMethodType());
             return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);

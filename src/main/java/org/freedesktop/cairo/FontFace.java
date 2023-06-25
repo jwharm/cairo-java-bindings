@@ -5,9 +5,6 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
-import io.github.jwharm.cairobindings.Interop;
-import io.github.jwharm.cairobindings.ProxyInstance;
-
 /**
  * The base class for font faces.
  * <p>
@@ -32,77 +29,146 @@ import io.github.jwharm.cairobindings.ProxyInstance;
  * @see ScaledFont
  * @since 1.0
  */
-public class FontFace extends ProxyInstance {
+public class FontFace extends Proxy {
 
-	static {
-		Interop.ensureInitialized();
-	}
+    static {
+        Interop.ensureInitialized();
+    }
 
-	/**
-	 * Constructor used internally to instantiate a java FontFace object for a
-	 * native {@code cairo_font_face_t} instance
-	 * 
-	 * @param address the memory address of the native {@code cairo_font_face_t}
-	 *                instance
-	 */
-	public FontFace(MemorySegment address) {
-		super(address);
-		setDestroyFunc("cairo_font_face_destroy");
-	}
+    // Keeps user data keys and values
+    private final UserDataStore userDataStore;
 
-	/**
-	 * Checks whether an error has previously occurred for this font face
-	 * 
-	 * @return {@link Status#SUCCESS} or another error such as
-	 *         {@link Status#NO_MEMORY}.
-	 * @since 1.0
-	 */
-	public Status status() {
-		try {
-			int result = (int) cairo_font_face_status.invoke(handle());
-			return Status.of(result);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
+    /**
+     * Constructor used internally to instantiate a java FontFace object for a
+     * native {@code cairo_font_face_t} instance
+     * 
+     * @param address the memory address of the native {@code cairo_font_face_t}
+     *                instance
+     */
+    public FontFace(MemorySegment address) {
+        super(address);
+        setDestroyFunc("cairo_font_face_destroy");
+        userDataStore = new UserDataStore(address.scope());
+    }
 
-	private static final MethodHandle cairo_font_face_status = Interop.downcallHandle("cairo_font_face_status",
-			FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS), false);
+    /**
+     * Checks whether an error has previously occurred for this font face
+     * 
+     * @return {@link Status#SUCCESS} or another error such as
+     *         {@link Status#NO_MEMORY}.
+     * @since 1.0
+     */
+    public Status status() {
+        try {
+            int result = (int) cairo_font_face_status.invoke(handle());
+            return Status.of(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Returns the type of the backend used to create a font face. See
-	 * {@link FontType} for available types.
-	 * 
-	 * @return The type of the FontFace.
-	 * @since 1.2
-	 */
-	public FontType getType() {
-		try {
-			int result = (int) cairo_font_face_get_type.invoke(handle());
-			return FontType.of(result);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private static final MethodHandle cairo_font_face_status = Interop.downcallHandle("cairo_font_face_status",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-	private static final MethodHandle cairo_font_face_get_type = Interop.downcallHandle("cairo_font_face_get_type",
-			FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS), false);
+    /**
+     * Returns the type of the backend used to create a font face. See
+     * {@link FontType} for available types.
+     * 
+     * @return The type of the FontFace.
+     * @since 1.2
+     */
+    public FontType getType() {
+        try {
+            int result = (int) cairo_font_face_get_type.invoke(handle());
+            return FontType.of(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Increases the reference count on the FontFace by one. This prevents the
-	 * FontFace from being destroyed until a matching call to
-	 * {@code cairo_font_face_destroy()} is made.
-	 * 
-	 * @since 1.0
-	 */
-	void reference() {
-		try {
-			cairo_font_face_reference.invoke(handle());
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private static final MethodHandle cairo_font_face_get_type = Interop.downcallHandle("cairo_font_face_get_type",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
-	private static final MethodHandle cairo_font_face_reference = Interop.downcallHandle("cairo_font_face_reference",
-			FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS), false);
+    /**
+     * Increases the reference count on the FontFace by one. This prevents the
+     * FontFace from being destroyed until a matching call to
+     * {@code cairo_font_face_destroy()} is made.
+     * 
+     * @since 1.0
+     */
+    void reference() {
+        try {
+            cairo_font_face_reference.invoke(handle());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_font_face_reference = Interop.downcallHandle("cairo_font_face_reference",
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    /**
+     * Attach user data to the font face. This method will generate and return a
+     * {@link UserDataKey}. To update the user data for the same key, call
+     * {@link #setUserData(UserDataKey, Object)}. To remove user data from a font
+     * face, call this function with {@code null} for {@code userData}.
+     * 
+     * @param userData the user data to attach to the font face. {@code userData}
+     *                 can be any Java object, but if it is a primitive type, a
+     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 stored as cairo user data in native memory as well.
+     * @return the key that the user data is attached to
+     * @since 1.4
+     */
+    public UserDataKey setUserData(Object userData) {
+        UserDataKey key = UserDataKey.create(this);
+        return setUserData(key, userData);
+    }
+
+    /**
+     * Attach user data to the font face. To remove user data from a font face, call
+     * this function with the key that was used to set it and {@code null} for
+     * {@code userData}.
+     * 
+     * @param key      the key to attach the user data to
+     * @param userData the user data to attach to the font face. {@code userData}
+     *                 can be any Java object, but if it is a primitive type, a
+     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 stored as cairo user data in native memory as well.
+     * @return the key
+     * @throws NullPointerException if {@code key} is {@code null}
+     * @since 1.4
+     */
+    public UserDataKey setUserData(UserDataKey key, Object userData) {
+        Status status;
+        userDataStore.set(key, userData);
+        try {
+            int result = (int) cairo_font_face_set_user_data.invoke(handle(), key.handle(),
+                    userDataStore.dataSegment(userData), MemorySegment.NULL);
+            status = Status.of(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+        if (status == Status.NO_MEMORY) {
+            throw new RuntimeException(status.toString());
+        }
+        return key;
+    }
+
+    private static final MethodHandle cairo_font_face_set_user_data = Interop
+            .downcallHandle("cairo_font_face_set_user_data", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    /**
+     * Return user data previously attached to the font face using the specified
+     * key. If no user data has been attached with the given key this function
+     * returns {@code null}.
+     * 
+     * @param key the UserDataKey the user data was attached to
+     * @return the user data previously attached or {@code null}
+     * @since 1.4
+     */
+    public Object getUserData(UserDataKey key) {
+        return key == null ? null : userDataStore.get(key);
+    }
 }

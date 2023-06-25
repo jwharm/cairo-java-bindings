@@ -7,47 +7,47 @@ package org.freedesktop.cairo;
  * @since 1.0
  */
 public enum PathDataType {
-	
-	/**
-	 * A move-to operation
-	 * @since 1.0
-	 */
-	MOVE_TO,
-	
-	/**
-	 * A line-to operation
-	 * @since 1.0
-	 */
-	LINE_TO,
-	
-	/**
-	 * A curve-to operation
-	 * @since 1.0
-	 */
-	CURVE_TO,
-	
-	/**
-	 * A close-path operation
-	 * @since 1.0
-	 */
-	CLOSE_PATH;
 
-	/**
-	 * Return the value of this enum
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * A move-to operation
+     * @since 1.0
+     */
+    MOVE_TO,
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static PathDataType of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * A line-to operation
+     * @since 1.0
+     */
+    LINE_TO,
+
+    /**
+     * A curve-to operation
+     * @since 1.0
+     */
+    CURVE_TO,
+
+    /**
+     * A close-path operation
+     * @since 1.0
+     */
+    CLOSE_PATH;
+
+    /**
+     * Return the value of this enum
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
+
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static PathDataType of(int ordinal) {
+        return values()[ordinal];
+    }
 }

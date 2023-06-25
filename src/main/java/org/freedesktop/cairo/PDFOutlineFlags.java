@@ -9,43 +9,43 @@ package org.freedesktop.cairo;
  */
 public enum PDFOutlineFlags {
 
-	/**
-	 * The outline item defaults to open in the PDF viewer
-	 * 
-	 * @since 1.16
-	 */
-	OPEN,
+    /**
+     * The outline item defaults to open in the PDF viewer
+     * 
+     * @since 1.16
+     */
+    OPEN,
 
-	/**
-	 * The outline item is displayed by the viewer in bold text
-	 * 
-	 * @since 1.16
-	 */
-	BOLD,
+    /**
+     * The outline item is displayed by the viewer in bold text
+     * 
+     * @since 1.16
+     */
+    BOLD,
 
-	/**
-	 * The outline item is displayed by the viewer in italic text
-	 * 
-	 * @since 1.16
-	 */
-	ITALIC;
+    /**
+     * The outline item is displayed by the viewer in italic text
+     * 
+     * @since 1.16
+     */
+    ITALIC;
 
-	/**
-	 * Return the value of this enum
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * Return the value of this enum
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static PDFOutlineFlags of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static PDFOutlineFlags of(int ordinal) {
+        return values()[ordinal];
+    }
 }

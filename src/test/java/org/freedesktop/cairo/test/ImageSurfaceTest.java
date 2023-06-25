@@ -1,20 +1,22 @@
 package org.freedesktop.cairo.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SegmentAllocator;
+import java.lang.foreign.SegmentScope;
+import java.nio.file.Path;
+
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Format;
 import org.freedesktop.cairo.ImageSurface;
 import org.freedesktop.cairo.Status;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import java.io.*;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
-import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ImageSurfaceTest {
 

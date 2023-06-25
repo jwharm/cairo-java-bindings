@@ -17,41 +17,41 @@ package org.freedesktop.cairo;
  */
 public enum FillRule {
 
-	/**
-	 * If the path crosses the ray from left-to-right, counts +1. If the path
-	 * crosses the ray from right to left, counts -1. (Left and right are determined
-	 * from the perspective of looking along the ray from the starting point.) If
-	 * the total count is non-zero, the point will be filled.
-	 * 
-	 * @since 1.0
-	 */
-	WINDING,
+    /**
+     * If the path crosses the ray from left-to-right, counts +1. If the path
+     * crosses the ray from right to left, counts -1. (Left and right are determined
+     * from the perspective of looking along the ray from the starting point.) If
+     * the total count is non-zero, the point will be filled.
+     * 
+     * @since 1.0
+     */
+    WINDING,
 
-	/**
-	 * Counts the total number of intersections, without regard to the orientation
-	 * of the contour. If the total number of intersections is odd, the point will
-	 * be filled.
-	 * 
-	 * @since 1.0
-	 */
-	EVEN_ODD;
+    /**
+     * Counts the total number of intersections, without regard to the orientation
+     * of the contour. If the total number of intersections is odd, the point will
+     * be filled.
+     * 
+     * @since 1.0
+     */
+    EVEN_ODD;
 
-	/**
-	 * Return the value of this enum
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * Return the value of this enum
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static FillRule of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static FillRule of(int ordinal) {
+        return values()[ordinal];
+    }
 }

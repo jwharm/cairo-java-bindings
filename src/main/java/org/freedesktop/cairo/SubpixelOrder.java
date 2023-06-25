@@ -9,57 +9,57 @@ package org.freedesktop.cairo;
  */
 public enum SubpixelOrder {
 
-	/**
-	 * Use the default subpixel order for for the target device
-	 * 
-	 * @since 1.0
-	 */
-	DEFAULT,
+    /**
+     * Use the default subpixel order for for the target device
+     * 
+     * @since 1.0
+     */
+    DEFAULT,
 
-	/**
-	 * Subpixel elements are arranged horizontally with red at the left
-	 * 
-	 * @since 1.0
-	 */
-	RGB,
+    /**
+     * Subpixel elements are arranged horizontally with red at the left
+     * 
+     * @since 1.0
+     */
+    RGB,
 
-	/**
-	 * Subpixel elements are arranged horizontally with blue at the left
-	 * 
-	 * @since 1.0
-	 */
-	BGR,
+    /**
+     * Subpixel elements are arranged horizontally with blue at the left
+     * 
+     * @since 1.0
+     */
+    BGR,
 
-	/**
-	 * Subpixel elements are arranged vertically with red at the top
-	 * 
-	 * @since 1.0
-	 */
-	VRGB,
+    /**
+     * Subpixel elements are arranged vertically with red at the top
+     * 
+     * @since 1.0
+     */
+    VRGB,
 
-	/**
-	 * Subpixel elements are arranged vertically with blue at the top
-	 * 
-	 * @since 1.0
-	 */
-	VBGR;
+    /**
+     * Subpixel elements are arranged vertically with blue at the top
+     * 
+     * @since 1.0
+     */
+    VBGR;
 
-	/**
-	 * Return the value of this enum
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * Return the value of this enum
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static SubpixelOrder of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static SubpixelOrder of(int ordinal) {
+        return values()[ordinal];
+    }
 }

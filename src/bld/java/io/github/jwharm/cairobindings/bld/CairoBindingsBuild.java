@@ -18,13 +18,13 @@ import rife.bld.publish.PublishLicense;
  * dependencies, compile the project and create a {@code cairo-x.y.z-i.j.jar}
  * file.
  * <p>
- * Version x.y.z is the version of cairo, the -i.j qualifier is the version of
+ * Version x.y.z is the version of cairo, the i.j qualifier is the version of
  * the Java bindings.
  */
 public class CairoBindingsBuild extends Project {
-	
+
     public CairoBindingsBuild() {
-        pkg = "io.github.jwharm.cairobindings";
+        pkg = "org.freedesktop.cairo";
         name = "cairo";
         version = version(1,16,0,"0.1");
         javaRelease = 20;
@@ -37,8 +37,8 @@ public class CairoBindingsBuild extends Project {
             .enableNativeAccess(List.of("ALL-UNNAMED"));
         
         javadocOperation().javadocOptions()
-        	.enablePreview()
-        	.quiet();
+            .enablePreview()
+            .quiet();
 
         repositories = List.of(MAVEN_CENTRAL);
         scope(test)
@@ -46,19 +46,19 @@ public class CairoBindingsBuild extends Project {
             .include(dependency("org.junit.platform", "junit-platform-console-standalone", version(1,9,3)));
         
         publishOperation()
-	        .repository(MAVEN_LOCAL)
+            .repository(MAVEN_LOCAL)
 	        .info(new PublishInfo()
 	            .groupId("io.github.jwharm.cairobindings")
-	            .artifactId("cairo")
-	            .description("Java bindings for cairo")
-	            .url("https://github.com/jwharm/cairo-java-bindings")
-	            .developer(new PublishDeveloper()
-	                .id("jwharm")
-	                .name("Jan-Willem Harmannij")
-	                .url("https://github.com/jwharm"))
-	            .license(new PublishLicense()
-	                .name("GNU Lesser General Public License, version 3")
-	                .url("https://www.gnu.org/licenses/lgpl-3.0.txt")));
+                .artifactId("cairo")
+                .description("Java bindings for cairo")
+                .url("https://github.com/jwharm/cairo-java-bindings")
+                .developer(new PublishDeveloper()
+                    .id("jwharm")
+                    .name("Jan-Willem Harmannij")
+                    .url("https://github.com/jwharm"))
+                .license(new PublishLicense()
+                    .name("GNU Lesser General Public License, version 3")
+                    .url("https://www.gnu.org/licenses/lgpl-3.0.txt")));
     }
 
     public static void main(String[] args) {

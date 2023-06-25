@@ -1,4 +1,4 @@
-package io.github.jwharm.cairobindings;
+package org.freedesktop.cairo;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -36,7 +36,7 @@ public class LibLoad {
      * @param name the name of the library
      */
     public static void loadLibrary(String name) {
-        InteropException fail = new InteropException("Could not load library");
+        RuntimeException fail = new RuntimeException("Could not load library");
         try {
             System.loadLibrary(name);
             return;

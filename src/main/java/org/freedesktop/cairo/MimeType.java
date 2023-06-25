@@ -5,122 +5,122 @@ package org.freedesktop.cairo;
  */
 public enum MimeType {
 
-	/**
-	 * Group 3 or Group 4 CCITT facsimile encoding (International Telecommunication
-	 * Union, Recommendations T.4 and T.6.)
-	 * 
-	 * @since 1.16
-	 */
-	CCITT_FAX("image/g3fax"),
+    /**
+     * Group 3 or Group 4 CCITT facsimile encoding (International Telecommunication
+     * Union, Recommendations T.4 and T.6.)
+     * 
+     * @since 1.16
+     */
+    CCITT_FAX("image/g3fax"),
 
-	/**
-	 * Decode parameters for Group 3 or Group 4 CCITT facsimile encoding. See
-	 * <a href=
-	 * "https://www.cairographics.org/manual/cairo-PDF-Surfaces.html#ccitt">CCITT
-	 * Fax Images</a>.
-	 * 
-	 * @since 1.16
-	 */
-	CCITT_FAX_PARAMS("application/x-cairo.ccitt.params"),
+    /**
+     * Decode parameters for Group 3 or Group 4 CCITT facsimile encoding. See
+     * <a href=
+     * "https://www.cairographics.org/manual/cairo-PDF-Surfaces.html#ccitt">CCITT
+     * Fax Images</a>.
+     * 
+     * @since 1.16
+     */
+    CCITT_FAX_PARAMS("application/x-cairo.ccitt.params"),
 
-	/**
-	 * Encapsulated PostScript file. <a href=
-	 * "http://wwwimages.adobe.com/content/dam/Adobe/endevnet/postscript/pdfs/5002.EPSF_Spec.pdf">Encapsulated
-	 * PostScript File Format Specification</a>
-	 * 
-	 * @since 1.16
-	 */
-	TYPE_EPS("application/postscript"),
+    /**
+     * Encapsulated PostScript file. <a href=
+     * "http://wwwimages.adobe.com/content/dam/Adobe/endevnet/postscript/pdfs/5002.EPSF_Spec.pdf">Encapsulated
+     * PostScript File Format Specification</a>
+     * 
+     * @since 1.16
+     */
+    TYPE_EPS("application/postscript"),
 
-	/**
-	 * Embedding parameters Encapsulated PostScript data. See <a href=
-	 * "https://www.cairographics.org/manual/cairo-PostScript-Surfaces.html#eps">Embedding
-	 * EPS files</a>.
-	 * 
-	 * @since 1.16
-	 */
-	EPS_PARAMS("application/x-cairo.eps.params"),
+    /**
+     * Embedding parameters Encapsulated PostScript data. See <a href=
+     * "https://www.cairographics.org/manual/cairo-PostScript-Surfaces.html#eps">Embedding
+     * EPS files</a>.
+     * 
+     * @since 1.16
+     */
+    EPS_PARAMS("application/x-cairo.eps.params"),
 
-	/**
-	 * Joint Bi-level Image Experts Group image coding standard (ISO/IEC 11544).
-	 * 
-	 * @since 1.14
-	 */
-	JBIG2("application/x-cairo.jbig2"),
+    /**
+     * Joint Bi-level Image Experts Group image coding standard (ISO/IEC 11544).
+     * 
+     * @since 1.14
+     */
+    JBIG2("application/x-cairo.jbig2"),
 
-	/**
-	 * Joint Bi-level Image Experts Group image coding standard (ISO/IEC 11544)
-	 * global segment.
-	 * 
-	 * @since 1.14
-	 */
-	JBIG2_GLOBAL("application/x-cairo.jbig2-global"),
+    /**
+     * Joint Bi-level Image Experts Group image coding standard (ISO/IEC 11544)
+     * global segment.
+     * 
+     * @since 1.14
+     */
+    JBIG2_GLOBAL("application/x-cairo.jbig2-global"),
 
-	/**
-	 * An unique identifier shared by a JBIG2 global segment and all JBIG2 images
-	 * that depend on the global segment.
-	 * 
-	 * @since 1.14
-	 */
-	JBIG2_GLOBAL_ID("application/x-cairo.jbig2-global-id"),
+    /**
+     * An unique identifier shared by a JBIG2 global segment and all JBIG2 images
+     * that depend on the global segment.
+     * 
+     * @since 1.14
+     */
+    JBIG2_GLOBAL_ID("application/x-cairo.jbig2-global-id"),
 
-	/**
-	 * The Joint Photographic Experts Group (JPEG) 2000 image coding standard
-	 * (ISO/IEC 15444-1).
-	 * 
-	 * @since 1.10
-	 */
-	JP2("image/jp2"),
+    /**
+     * The Joint Photographic Experts Group (JPEG) 2000 image coding standard
+     * (ISO/IEC 15444-1).
+     * 
+     * @since 1.10
+     */
+    JP2("image/jp2"),
 
-	/**
-	 * The Joint Photographic Experts Group (JPEG) image coding standard (ISO/IEC
-	 * 10918-1).
-	 * 
-	 * @since 1.10
-	 */
-	JPEG("image/jpeg"),
+    /**
+     * The Joint Photographic Experts Group (JPEG) image coding standard (ISO/IEC
+     * 10918-1).
+     * 
+     * @since 1.10
+     */
+    JPEG("image/jpeg"),
 
-	/**
-	 * The Portable Network Graphics image file format (ISO/IEC 15948).
-	 * 
-	 * @since 1.10
-	 */
-	PNG("image/png"),
+    /**
+     * The Portable Network Graphics image file format (ISO/IEC 15948).
+     * 
+     * @since 1.10
+     */
+    PNG("image/png"),
 
-	/**
-	 * URI for an image file (unofficial MIME type).
-	 * 
-	 * @since 1.10
-	 */
-	URI("text/x-uri"),
+    /**
+     * URI for an image file (unofficial MIME type).
+     * 
+     * @since 1.10
+     */
+    URI("text/x-uri"),
 
-	/**
-	 * Unique identifier for a surface (cairo specific MIME type). All surfaces with
-	 * the same unique identifier will only be embedded once.
-	 * 
-	 * @since 1.12
-	 */
-	UNIQUE_ID("application/x-cairo.uuid");
+    /**
+     * Unique identifier for a surface (cairo specific MIME type). All surfaces with
+     * the same unique identifier will only be embedded once.
+     * 
+     * @since 1.12
+     */
+    UNIQUE_ID("application/x-cairo.uuid");
 
-	private final String name;
+    private final String name;
 
-	MimeType(String name) {
-		this.name = name;
-	}
+    MimeType(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public String toString() {
-		return this.name;
-	}
+    @Override
+    public String toString() {
+        return this.name;
+    }
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static MimeType of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static MimeType of(int ordinal) {
+        return values()[ordinal];
+    }
 }

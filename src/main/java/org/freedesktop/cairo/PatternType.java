@@ -23,58 +23,58 @@ package org.freedesktop.cairo;
  */
 public enum PatternType {
 
-	/**
-	 * The pattern is a solid (uniform) color. It may be opaque or translucent
-	 * @since 1.2
-	 */
-	SOLID,
-	
-	/**
-	 * The pattern is a based on a surface (an image)
-	 * @since 1.2
-	 */
-	SURFACE,
-	
-	/**
-	 * The pattern is a linear gradient
-	 * @since 1.2
-	 */
-	LINEAR,
-	
-	/**
-	 * The pattern is a radial gradient
-	 * @since 1.2
-	 */
-	RADIAL,
-	
-	/**
-	 * The pattern is a mesh
-	 * @since 1.2
-	 */
-	MESH,
-	
-	/**
-	 * The pattern is a user pattern providing raster data
-	 * @since 1.2
-	 */
-	RASTER_SOURCE;
+    /**
+     * The pattern is a solid (uniform) color. It may be opaque or translucent
+     * @since 1.2
+     */
+    SOLID,
 
-	/**
-	 * Return the value of this enum
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * The pattern is a based on a surface (an image)
+     * @since 1.2
+     */
+    SURFACE,
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static PatternType of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * The pattern is a linear gradient
+     * @since 1.2
+     */
+    LINEAR,
+
+    /**
+     * The pattern is a radial gradient
+     * @since 1.2
+     */
+    RADIAL,
+
+    /**
+     * The pattern is a mesh
+     * @since 1.2
+     */
+    MESH,
+
+    /**
+     * The pattern is a user pattern providing raster data
+     * @since 1.2
+     */
+    RASTER_SOURCE;
+
+    /**
+     * Return the value of this enum
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
+
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static PatternType of(int ordinal) {
+        return values()[ordinal];
+    }
 }

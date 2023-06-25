@@ -2,8 +2,6 @@ package org.freedesktop.cairo;
 
 import java.lang.foreign.MemorySegment;
 
-import io.github.jwharm.cairobindings.Interop;
-
 /**
  * The script surface provides the ability to render to a native script that
  * matches the cairo drawing model. The scripts can be replayed using tools
@@ -15,25 +13,25 @@ import io.github.jwharm.cairobindings.Interop;
  */
 public final class ScriptSurface extends Surface {
 
-	static {
-		Interop.ensureInitialized();
-	}
+    static {
+        Interop.ensureInitialized();
+    }
 
-	/*
-	 * Keep a reference to the Script and the wrapped Surface instances during the
-	 * lifetime of the ScriptSurface.
-	 */
-	Script script;
-	Surface target;
+    /*
+     * Keep a reference to the Script and the wrapped Surface instances during the
+     * lifetime of the ScriptSurface.
+     */
+    Script script;
+    Surface target;
 
-	/**
-	 * Constructor used internally to instantiate a java ScriptSurface object for a
-	 * native {@code cairo_surface_t} instance
-	 * 
-	 * @param address the memory address of the native {@code cairo_surface_t}
-	 *                instance
-	 */
-	public ScriptSurface(MemorySegment address) {
-		super(address);
-	}
+    /**
+     * Constructor used internally to instantiate a java ScriptSurface object for a
+     * native {@code cairo_surface_t} instance
+     * 
+     * @param address the memory address of the native {@code cairo_surface_t}
+     *                instance
+     */
+    public ScriptSurface(MemorySegment address) {
+        super(address);
+    }
 }

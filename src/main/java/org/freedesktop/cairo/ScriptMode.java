@@ -7,36 +7,36 @@ package org.freedesktop.cairo;
  */
 public enum ScriptMode {
 
-	/**
-	 * the output will be in readable text (default).
-	 * 
-	 * @since 1.12
-	 */
-	ASCII,
-	
-	/**
-	 * the output will use byte codes.
-	 * 
-	 * @since 1.12
-	 */
-	BINARY;
+    /**
+     * the output will be in readable text (default).
+     * 
+     * @since 1.12
+     */
+    ASCII,
 
-	/**
-	 * Return the value of this enum
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * the output will use byte codes.
+     * 
+     * @since 1.12
+     */
+    BINARY;
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static ScriptMode of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Return the value of this enum
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
+
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static ScriptMode of(int ordinal) {
+        return values()[ordinal];
+    }
 }

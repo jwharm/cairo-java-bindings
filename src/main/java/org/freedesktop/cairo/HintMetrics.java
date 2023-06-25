@@ -10,44 +10,44 @@ package org.freedesktop.cairo;
  */
 public enum HintMetrics {
 
-	/**
-	 * Hint metrics in the default manner for the font backend and target device
-	 * 
-	 * @since 1.0
-	 */
-	DEFAULT,
+    /**
+     * Hint metrics in the default manner for the font backend and target device
+     * 
+     * @since 1.0
+     */
+    DEFAULT,
 
-	/**
-	 * Do not hint font metrics
-	 * 
-	 * @since 1.0
-	 */
-	OFF,
+    /**
+     * Do not hint font metrics
+     * 
+     * @since 1.0
+     */
+    OFF,
 
-	/**
-	 * Hint font metrics
-	 * 
-	 * @since 1.0
-	 */
-	ON;
+    /**
+     * Hint font metrics
+     * 
+     * @since 1.0
+     */
+    ON;
 
-	/**
-	 * Return the value of this enum
-	 * 
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * Return the value of this enum
+     * 
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static HintMetrics of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static HintMetrics of(int ordinal) {
+        return values()[ordinal];
+    }
 }

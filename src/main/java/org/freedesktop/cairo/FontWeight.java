@@ -7,37 +7,37 @@ package org.freedesktop.cairo;
  */
 public enum FontWeight {
 
-	/**
-	 * Normal font weight
-	 * 
-	 * @since 1.0
-	 */
-	NORMAL,
+    /**
+     * Normal font weight
+     * 
+     * @since 1.0
+     */
+    NORMAL,
 
-	/**
-	 * Bold font weight
-	 * 
-	 * @since 1.0
-	 */
-	BOLD;
+    /**
+     * Bold font weight
+     * 
+     * @since 1.0
+     */
+    BOLD;
 
-	/**
-	 * Return the value of this enum
-	 * 
-	 * @return the value
-	 */
-	public int value() {
-		return ordinal();
-	}
+    /**
+     * Return the value of this enum
+     * 
+     * @return the value
+     */
+    public int value() {
+        return ordinal();
+    }
 
-	/**
-	 * Returns the enum constant for the given ordinal (its position in the enum
-	 * declaration).
-	 * 
-	 * @param ordinal the position in the enum declaration, starting from zero
-	 * @return the enum constant for the given ordinal
-	 */
-	public static FontWeight of(int ordinal) {
-		return values()[ordinal];
-	}
+    /**
+     * Returns the enum constant for the given ordinal (its position in the enum
+     * declaration).
+     * 
+     * @param ordinal the position in the enum declaration, starting from zero
+     * @return the enum constant for the given ordinal
+     */
+    public static FontWeight of(int ordinal) {
+        return values()[ordinal];
+    }
 }

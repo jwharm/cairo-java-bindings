@@ -22,60 +22,60 @@ import java.lang.invoke.MethodHandles;
 @FunctionalInterface
 public interface WriteFunc {
 
-	/**
-	 * The function to implement as callback in a write operation to an output
-	 * stream.
-	 * 
-	 * @param data the data to write to the output stream
-	 * @throws IOException to be thrown when an error occurs during the write
-	 *                     operation
-	 * @since 1.0
-	 */
-	void write(byte[] data) throws IOException;
+    /**
+     * The function to implement as callback in a write operation to an output
+     * stream.
+     * 
+     * @param data the data to write to the output stream
+     * @throws IOException to be thrown when an error occurs during the write
+     *                     operation
+     * @since 1.0
+     */
+    void write(byte[] data) throws IOException;
 
-	/**
-	 * The callback that is executed by native code. This method marshals the
-	 * parameters and calls {@link #write(byte[])}.
-	 * 
-	 * @param closure ignored
-	 * @param data    the buffer from which to read the data
-	 * @param length  the amount of data to write
-	 * @return {@link Status#SUCCESS} on success, or {@link Status#WRITE_ERROR} if
-	 *         an IOException occured.
-	 * @since 1.0
-	 */
-	default int upcall(MemorySegment closure, MemorySegment data, int length) {
-		if (length <= 0) {
-			return Status.SUCCESS.value();
-		}
-		try (Arena arena = Arena.openConfined()) {
-			byte[] bytes = MemorySegment.ofAddress(data.address(), length, arena.scope())
-					.toArray(ValueLayout.JAVA_BYTE);
-			try {
-				write(bytes);
-				return Status.SUCCESS.value();
-			} catch (IOException ioe) {
-				return Status.WRITE_ERROR.value();
-			}
-		}
-	}
+    /**
+     * The callback that is executed by native code. This method marshals the
+     * parameters and calls {@link #write(byte[])}.
+     * 
+     * @param closure ignored
+     * @param data    the buffer from which to read the data
+     * @param length  the amount of data to write
+     * @return {@link Status#SUCCESS} on success, or {@link Status#WRITE_ERROR} if
+     *         an IOException occured.
+     * @since 1.0
+     */
+    default int upcall(MemorySegment closure, MemorySegment data, int length) {
+        if (length <= 0) {
+            return Status.SUCCESS.value();
+        }
+        try (Arena arena = Arena.openConfined()) {
+            byte[] bytes = MemorySegment.ofAddress(data.address(), length, arena.scope())
+                    .toArray(ValueLayout.JAVA_BYTE);
+            try {
+                write(bytes);
+                return Status.SUCCESS.value();
+            } catch (IOException ioe) {
+                return Status.WRITE_ERROR.value();
+            }
+        }
+    }
 
-	/**
-	 * Generates an upcall stub, a C function pointer that will call
-	 * {@link #upcall(MemorySegment, MemorySegment, int)}.
-	 * 
-	 * @param scope the scope in which the upcall stub will be allocated
-	 * @return the function pointer of the upcall stub
-	 * @since 1.0
-	 */
-	default MemorySegment toCallback(SegmentScope scope) {
-		try {
-			FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
-					ValueLayout.ADDRESS, ValueLayout.JAVA_INT);
-			MethodHandle handle = MethodHandles.lookup().findVirtual(WriteFunc.class, "upcall", fdesc.toMethodType());
-			return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
-		} catch (NoSuchMethodException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    /**
+     * Generates an upcall stub, a C function pointer that will call
+     * {@link #upcall(MemorySegment, MemorySegment, int)}.
+     * 
+     * @param scope the scope in which the upcall stub will be allocated
+     * @return the function pointer of the upcall stub
+     * @since 1.0
+     */
+    default MemorySegment toCallback(SegmentScope scope) {
+        try {
+            FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT);
+            MethodHandle handle = MethodHandles.lookup().findVirtual(WriteFunc.class, "upcall", fdesc.toMethodType());
+            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
