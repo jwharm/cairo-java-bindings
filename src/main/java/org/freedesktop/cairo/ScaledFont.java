@@ -43,8 +43,8 @@ public class ScaledFont extends Proxy {
     Matrix ctm;
 
     /**
-     * Constructor used internally to instantiate a java Context object for a native
-     * {@code cairo_scaled_font_t} instance
+     * Constructor used internally to instantiate a java ScaledFont object for a
+     * native {@code cairo_scaled_font_t} instance
      * 
      * @param address the memory address of the native {@code cairo_scaled_font_t}
      *                instance
