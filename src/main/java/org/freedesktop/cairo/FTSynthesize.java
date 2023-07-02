@@ -5,8 +5,8 @@ package org.freedesktop.cairo;
  * particular font face.
  * <p>
  * Individual synthesis features of a {@link FTFontFace} can be set using
- * {@link FTFontFace#setSynthesize(int)}, or disabled using
- * {@link FTFontFace#unsetSynthesize(int)}. The currently enabled set of
+ * {@link FTFontFace#setSynthesize(FTSynthesize)}, or disabled using
+ * {@link FTFontFace#unsetSynthesize(FTSynthesize)}. The currently enabled set of
  * synthesis options can be queried with {@link FTFontFace#getSynthesize()}.
  * <p>
  * Note that when synthesizing glyphs, the font metrics returned will only be

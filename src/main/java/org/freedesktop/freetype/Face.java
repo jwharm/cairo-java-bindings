@@ -11,12 +11,22 @@ import java.lang.invoke.MethodHandle;
 import org.freedesktop.cairo.Interop;
 import org.freedesktop.cairo.Proxy;
 
+/**
+ * A handle to a typographic face object. A face object models a given typeface,
+ * in a given style.
+ */
 public class Face extends Proxy {
 
     static {
         Interop.ensureInitialized();
     }
 
+    /**
+     * Constructor used internally to instantiate a java Face object for a native
+     * {@code FT_Face} instance
+     *
+     * @param address the memory address of the native {@code FT_Face} instance
+     */
     public Face(MemorySegment address) {
         super(address);
         setDestroyFunc("FT_Done_Face");

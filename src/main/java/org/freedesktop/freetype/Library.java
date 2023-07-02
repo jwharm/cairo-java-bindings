@@ -23,6 +23,12 @@ public class Library extends Proxy {
         Interop.ensureInitialized();
     }
 
+    /**
+     * Constructor used internally to instantiate a java Library object for a native
+     * {@code FT_Library} instance
+     *
+     * @param address the memory address of the native {@code FT_Library} instance
+     */
     public Library(MemorySegment address) {
         super(address);
         setDestroyFunc("FT_Done_FreeType");
