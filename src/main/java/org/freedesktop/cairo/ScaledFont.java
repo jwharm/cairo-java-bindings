@@ -16,7 +16,7 @@ import java.util.List;
  * ScaledFont is most useful for low-level font usage where a library or
  * application wants to cache a reference to a scaled font to speed up the
  * computation of metrics.
- * 
+ * <p>
  * There are various types of scaled fonts, depending on the font backend they
  * use. The type of a scaled font can be queried using
  * {@link ScaledFont#getType()}.
