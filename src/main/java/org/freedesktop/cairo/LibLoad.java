@@ -9,21 +9,6 @@ import java.util.stream.Stream;
  * The LibLoad class is used internally to load native libraries by name
  */
 public class LibLoad {
-    private static final boolean OS_WINDOWS = System.getProperty("os.name").toLowerCase().contains("win");
-    private static final boolean OS_MACOS = System.getProperty("os.name").toLowerCase().contains("mac");
-    private static final String LIB_SUFFIX;
-    static {
-        if (OS_WINDOWS) LIB_SUFFIX = ".dll";
-        else if (OS_MACOS) LIB_SUFFIX = ".dylib";
-        else LIB_SUFFIX = ".so";
-
-        String javagiPath = System.getProperty("javagi.path");
-        String javaPath = System.getProperty("java.library.path");
-        if (javagiPath != null) {
-            if (javaPath == null) System.setProperty("java.library.path", javagiPath);
-            else System.setProperty("java.library.path", javaPath + File.pathSeparator + javagiPath);
-        }
-    }
 
     /**
      * Prevent instantiation
@@ -32,7 +17,11 @@ public class LibLoad {
     }
 
     /**
-     * Load the native library with the provided name
+     * Load the native library with the provided name. First the library is loaded
+     * with {@link System#loadLibrary(String)}, but if that is unsuccessful, a file
+     * with the provided name is searched in the "java.library.path" and loaded with
+     * {@link System#load(String)}.
+     * 
      * @param name the name of the library
      */
     public static void loadLibrary(String name) {
@@ -54,15 +43,10 @@ public class LibLoad {
                 fail.addSuppressed(t);
                 continue;
             }
-            String libName = System.mapLibraryName(name);
             for (Path path : paths) {
                 try {
                     String fn = path.getFileName().toString();
-                    if (fn.equals(libName)) {
-                        System.load(path.toString());
-                        return;
-                    }
-                    if (OS_WINDOWS && (fn.startsWith("lib" + name + "-") || fn.startsWith(name + "-")) && fn.endsWith(LIB_SUFFIX)) {
+                    if (fn.equals(name)) {
                         System.load(path.toString());
                         return;
                     }

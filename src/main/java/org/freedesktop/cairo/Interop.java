@@ -23,7 +23,17 @@ public class Interop {
         SymbolLookup loaderLookup = SymbolLookup.loaderLookup();
         symbolLookup = name -> loaderLookup.find(name).or(() -> linker.defaultLookup().find(name));
 
-        LibLoad.loadLibrary("cairo");
+        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win");
+        boolean isMac = System.getProperty("os.name").toLowerCase().contains("mac");
+        String libName = isWindows ? "cairo-2.dll" : isMac ? "libcairo.2.dylib" : "libcairo.so.2";
+        LibLoad.loadLibrary(libName);
+        
+        try {
+            libName = isWindows ? "freetype-6.dll" : isMac ? "libfreetype.6.dylib" : "libfreetype.so.6";
+            LibLoad.loadLibrary(libName);
+        } catch (Throwable t) {
+            System.err.println("Cannot load library " + libName + ", FreeType (FTFontFace) not available");
+        }
     }
 
     /**

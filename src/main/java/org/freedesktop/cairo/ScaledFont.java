@@ -34,18 +34,13 @@ public class ScaledFont extends Proxy {
 
     // Keeps user data keys and values
     private final UserDataStore userDataStore;
-    
+
     // Keep a reference to natively allocated resources that are passed to the
     // ScaledFont during its lifetime.
 
-    @SuppressWarnings("unused")
-    private FontFace fontFace;
-
-    @SuppressWarnings("unused")
-    private Matrix fontMatrix;
-
-    @SuppressWarnings("unused")
-    private Matrix ctm;
+    FontFace fontFace;
+    Matrix fontMatrix;
+    Matrix ctm;
 
     /**
      * Constructor used internally to instantiate a java Context object for a native
@@ -83,9 +78,9 @@ public class ScaledFont extends Proxy {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
                         fontFace == null ? MemorySegment.NULL : fontFace,
-                                fontMatrix == null ? MemorySegment.NULL : fontMatrix,
-                                        ctm == null ? MemorySegment.NULL : ctm,
-                                                options == null ? MemorySegment.NULL : options);
+                        fontMatrix == null ? MemorySegment.NULL : fontMatrix, 
+                        ctm == null ? MemorySegment.NULL : ctm,
+                        options == null ? MemorySegment.NULL : options);
                 font = new ScaledFont(result);
                 font.takeOwnership();
                 font.fontFace = fontFace;
@@ -101,9 +96,9 @@ public class ScaledFont extends Proxy {
         return font;
     }
 
-    private static final MethodHandle cairo_scaled_font_create = Interop.downcallHandle("cairo_scaled_font_create",
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                    ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_create = Interop.downcallHandle(
+            "cairo_scaled_font_create", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Increases the reference count on the ScaledFont by one. This prevents the
@@ -139,8 +134,8 @@ public class ScaledFont extends Proxy {
         }
     }
 
-    private static final MethodHandle cairo_scaled_font_status = Interop.downcallHandle("cairo_scaled_font_status",
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_status = Interop.downcallHandle(
+            "cairo_scaled_font_status", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
     /**
      * Gets the metrics for a ScaledFont.
@@ -159,8 +154,8 @@ public class ScaledFont extends Proxy {
         }
     }
 
-    private static final MethodHandle cairo_scaled_font_extents = Interop.downcallHandle("cairo_scaled_font_extents",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_extents = Interop.downcallHandle(
+            "cairo_scaled_font_extents", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Gets the extents for a string of text. The extents describe a user-space
@@ -239,9 +234,9 @@ public class ScaledFont extends Proxy {
         }
     }
 
-    private static final MethodHandle cairo_scaled_font_glyph_extents = Interop
-            .downcallHandle("cairo_scaled_font_glyph_extents", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_glyph_extents = Interop.downcallHandle(
+            "cairo_scaled_font_glyph_extents", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
+            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
     /**
      * Converts UTF-8 text to an array of glyphs, optionally with cluster mapping,
@@ -257,7 +252,6 @@ public class ScaledFont extends Proxy {
      * is needed. In code:
      * 
      * <pre>{@code
-     * 
      * List<Glyph> glyphs = new ArrayList<>();
      * scaledFont.textToGlyphs(x, y, string, glyphs, null);
      * }</pre>
@@ -265,7 +259,6 @@ public class ScaledFont extends Proxy {
      * If cluster mapping is to be computed:
      * 
      * <pre>{@code
-     * 
      * List<Glyph> glyphs = new ArrayList<>();
      * List<TextCluster> clusters = new ArrayList<>();
      * var clusterFlags = scaledFont.textToGlyphs(x, y, string, glyphs, clusters);
@@ -303,10 +296,8 @@ public class ScaledFont extends Proxy {
                 MemorySegment glyphsPtr = arena.allocate(ValueLayout.ADDRESS);
                 MemorySegment numGlyphsPtr = arena.allocate(ValueLayout.ADDRESS);
                 MemorySegment clustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS);
-                MemorySegment numClustersPtr = clusters == null ? MemorySegment.NULL
-                        : arena.allocate(ValueLayout.ADDRESS);
-                MemorySegment clusterFlagsPtr = clusters == null ? MemorySegment.NULL
-                        : arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment numClustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment clusterFlagsPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS);
 
                 int result = (int) cairo_scaled_font_text_to_glyphs.invoke(handle(), x, y, utf8, string.length(),
                         glyphsPtr, numGlyphsPtr, clustersPtr, numClustersPtr, clusterFlagsPtr);
@@ -359,11 +350,11 @@ public class ScaledFont extends Proxy {
                     ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded(),
                     ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded()));
 
-    private static final MethodHandle cairo_glyph_free = Interop.downcallHandle("cairo_glyph_free",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_glyph_free = Interop.downcallHandle(
+            "cairo_glyph_free", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
-    private static final MethodHandle cairo_text_cluster_free = Interop.downcallHandle("cairo_text_cluster_free",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_text_cluster_free = Interop.downcallHandle(
+            "cairo_text_cluster_free", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     /**
      * Gets the font face that this scaled font uses. This might be the font face
@@ -397,8 +388,7 @@ public class ScaledFont extends Proxy {
      */
     public void getFontOptions(FontOptions options) {
         try {
-            cairo_scaled_font_get_font_options.invoke(handle(),
-                    options == null ? MemorySegment.NULL : options.handle());
+            cairo_scaled_font_get_font_options.invoke(handle(), options == null ? MemorySegment.NULL : options.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -445,8 +435,8 @@ public class ScaledFont extends Proxy {
         }
     }
 
-    private static final MethodHandle cairo_scaled_font_get_ctm = Interop.downcallHandle("cairo_scaled_font_get_ctm",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_get_ctm = Interop.downcallHandle(
+            "cairo_scaled_font_get_ctm", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Returns the scale matrix of the ScaledFont. The scale matrix is product of
@@ -486,8 +476,8 @@ public class ScaledFont extends Proxy {
         }
     }
 
-    private static final MethodHandle cairo_scaled_font_get_type = Interop.downcallHandle("cairo_scaled_font_get_type",
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_get_type = Interop.downcallHandle(
+            "cairo_scaled_font_get_type", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
     /**
      * Attach user data to the scaled font. This method will generate and return a
@@ -525,8 +515,8 @@ public class ScaledFont extends Proxy {
         Status status;
         userDataStore.set(key, userData);
         try {
-            int result = (int) cairo_scaled_font_set_user_data.invoke(handle(), key.handle(),
-                    userDataStore.dataSegment(userData), MemorySegment.NULL);
+            int result = (int) cairo_scaled_font_set_user_data.invoke(
+                    handle(), key.handle(), userDataStore.dataSegment(userData), MemorySegment.NULL);
             status = Status.of(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -537,9 +527,9 @@ public class ScaledFont extends Proxy {
         return key;
     }
 
-    private static final MethodHandle cairo_scaled_font_set_user_data = Interop
-            .downcallHandle("cairo_scaled_font_set_user_data", FunctionDescriptor.of(ValueLayout.JAVA_INT,
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_set_user_data = Interop.downcallHandle(
+            "cairo_scaled_font_set_user_data", FunctionDescriptor.of(ValueLayout.JAVA_INT,
+            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Return user data previously attached to the scaled font using the specified
