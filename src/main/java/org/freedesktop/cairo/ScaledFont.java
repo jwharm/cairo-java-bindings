@@ -98,7 +98,7 @@ public class ScaledFont extends Proxy {
 
     private static final MethodHandle cairo_scaled_font_create = Interop.downcallHandle(
             "cairo_scaled_font_create", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
-            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Increases the reference count on the ScaledFont by one. This prevents the
@@ -235,8 +235,8 @@ public class ScaledFont extends Proxy {
     }
 
     private static final MethodHandle cairo_scaled_font_glyph_extents = Interop.downcallHandle(
-            "cairo_scaled_font_glyph_extents", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
-            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            "cairo_scaled_font_glyph_extents", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, 
+                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
     /**
      * Converts UTF-8 text to an array of glyphs, optionally with cluster mapping,
@@ -528,8 +528,8 @@ public class ScaledFont extends Proxy {
     }
 
     private static final MethodHandle cairo_scaled_font_set_user_data = Interop.downcallHandle(
-            "cairo_scaled_font_set_user_data", FunctionDescriptor.of(ValueLayout.JAVA_INT,
-            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            "cairo_scaled_font_set_user_data", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Return user data previously attached to the scaled font using the specified

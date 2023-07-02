@@ -13,6 +13,10 @@ import org.freedesktop.cairo.Proxy;
 
 public class Face extends Proxy {
 
+    static {
+        Interop.ensureInitialized();
+    }
+
     public Face(MemorySegment address) {
         super(address);
         setDestroyFunc("FT_Done_Face");

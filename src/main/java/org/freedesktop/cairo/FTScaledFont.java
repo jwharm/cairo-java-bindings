@@ -74,9 +74,9 @@ public class FTScaledFont extends ScaledFont {
         return font;
     }
 
-    private static final MethodHandle cairo_scaled_font_create = Interop.downcallHandle("cairo_scaled_font_create",
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                    ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_create = Interop.downcallHandle(
+            "cairo_scaled_font_create", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Gets the FT_Face object from a FreeType backend font and scales it
@@ -125,6 +125,6 @@ public class FTScaledFont extends ScaledFont {
         }
     }
 
-    private static final MethodHandle cairo_ft_scaled_font_unlock_face = Interop
-            .downcallHandle("cairo_ft_scaled_font_unlock_face", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_ft_scaled_font_unlock_face = Interop.downcallHandle(
+            "cairo_ft_scaled_font_unlock_face", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 }

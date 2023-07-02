@@ -19,6 +19,10 @@ import org.freedesktop.cairo.Proxy;
  */
 public class Library extends Proxy {
 
+    static {
+        Interop.ensureInitialized();
+    }
+
     public Library(MemorySegment address) {
         super(address);
         setDestroyFunc("FT_Done_FreeType");
@@ -48,8 +52,8 @@ public class Library extends Proxy {
         }
     }
 
-    private static final MethodHandle FT_Init_FreeType = Interop.downcallHandle("FT_Init_FreeType",
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+    private static final MethodHandle FT_Init_FreeType = Interop.downcallHandle(
+            "FT_Init_FreeType", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
     /**
      * Return the version of the FreeType library being used.
@@ -74,7 +78,7 @@ public class Library extends Proxy {
         }
     }
 
-    private static final MethodHandle FT_Library_Version = Interop.downcallHandle("FT_Library_Version",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                    ValueLayout.ADDRESS));
+    private static final MethodHandle FT_Library_Version = Interop.downcallHandle(
+            "FT_Library_Version", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 }

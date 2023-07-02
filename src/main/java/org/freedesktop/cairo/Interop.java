@@ -16,7 +16,7 @@ public class Interop {
     private final static SymbolLookup symbolLookup;
     private final static Linker linker = Linker.nativeLinker();
 
-    // Load the cairo library during class initialization.
+    // Load the cairo and freetype library during class initialization.
     // This is triggered by calling Interop.ensureInitialized(), and will run only
     // once.
     static {
@@ -28,6 +28,7 @@ public class Interop {
         String libName = isWindows ? "cairo-2.dll" : isMac ? "libcairo.2.dylib" : "libcairo.so.2";
         LibLoad.loadLibrary(libName);
         
+        // Try to load the freetype library, but don't throw an exception if it fails
         try {
             libName = isWindows ? "freetype-6.dll" : isMac ? "libfreetype.6.dylib" : "libfreetype.so.6";
             LibLoad.loadLibrary(libName);
