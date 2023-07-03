@@ -183,7 +183,7 @@ public final class SVGSurface extends Surface {
      */
     public SVGSurface setDocumentUnit(SVGUnit unit) {
         try {
-            cairo_svg_surface_set_document_unit.invoke(handle(), unit.value());
+            cairo_svg_surface_set_document_unit.invoke(handle(), unit.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -208,7 +208,7 @@ public final class SVGSurface extends Surface {
      */
     public SVGSurface restrictToVersion(SVGVersion version) {
         try {
-            cairo_svg_surface_restrict_to_version.invoke(handle(), version.value());
+            cairo_svg_surface_restrict_to_version.invoke(handle(), version.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);

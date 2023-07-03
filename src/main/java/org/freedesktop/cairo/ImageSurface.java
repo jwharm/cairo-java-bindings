@@ -67,7 +67,7 @@ public final class ImageSurface extends Surface {
      */
     public static int formatStrideForWidth(Format format, int width) {
         try {
-            return (int) cairo_format_stride_for_width.invoke(format.value(), width);
+            return (int) cairo_format_stride_for_width.invoke(format.getValue(), width);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -92,7 +92,7 @@ public final class ImageSurface extends Surface {
     public static ImageSurface create(Format format, int width, int height) {
         ImageSurface surface;
         try {
-            MemorySegment result = (MemorySegment) cairo_image_surface_create.invoke(format.value(), width, height);
+            MemorySegment result = (MemorySegment) cairo_image_surface_create.invoke(format.getValue(), width, height);
             surface = new ImageSurface(result);
             surface.takeOwnership();
         } catch (Throwable e) {
@@ -144,7 +144,7 @@ public final class ImageSurface extends Surface {
         ImageSurface surface;
         try {
             MemorySegment result = (MemorySegment) cairo_image_surface_create_for_data
-                    .invoke(data == null ? MemorySegment.NULL : data, format.value(), width, height, stride);
+                    .invoke(data == null ? MemorySegment.NULL : data, format.getValue(), width, height, stride);
             surface = new ImageSurface(result);
             surface.takeOwnership();
             /*

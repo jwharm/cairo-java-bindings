@@ -61,7 +61,7 @@ public enum FontType {
      * 
      * @return the value
      */
-    public int value() {
+    public int getValue() {
         return ordinal();
     }
 

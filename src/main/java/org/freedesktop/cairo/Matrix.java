@@ -29,7 +29,7 @@ import java.lang.invoke.MethodHandle;
  * 
  * @since 1.0
  */
-public class Matrix extends Proxy {
+public class Matrix extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();

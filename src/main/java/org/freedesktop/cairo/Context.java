@@ -55,7 +55,7 @@ import java.lang.invoke.MethodHandle;
  * 
  * @since 1.0
  */
-public final class Context extends Proxy {
+public final class Context extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();
@@ -84,13 +84,13 @@ public final class Context extends Proxy {
     // Context during its lifetime.
 
     @SuppressWarnings("unused")
-    private Proxy source;
+    private ProxyInstance source;
 
     @SuppressWarnings("unused")
-    private Proxy target;
+    private ProxyInstance target;
 
     @SuppressWarnings("unused")
-    private Proxy mask;
+    private ProxyInstance mask;
 
     @SuppressWarnings("unused")
     private Matrix matrix;
@@ -304,7 +304,7 @@ public final class Context extends Proxy {
      */
     public Context pushGroupWithContent(Content content) {
         try {
-            cairo_push_group_with_content.invoke(handle(), content.value());
+            cairo_push_group_with_content.invoke(handle(), content.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -558,7 +558,7 @@ public final class Context extends Proxy {
      */
     public Context setAntialias(Antialias antialias) {
         try {
-            cairo_set_antialias.invoke(handle(), antialias.value());
+            cairo_set_antialias.invoke(handle(), antialias.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -715,7 +715,7 @@ public final class Context extends Proxy {
      */
     public Context setFillRule(FillRule fillRule) {
         try {
-            cairo_set_fill_rule.invoke(handle(), fillRule.value());
+            cairo_set_fill_rule.invoke(handle(), fillRule.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -759,7 +759,7 @@ public final class Context extends Proxy {
      */
     public Context setLineCap(LineCap lineCap) {
         try {
-            cairo_set_line_cap.invoke(handle(), lineCap.value());
+            cairo_set_line_cap.invoke(handle(), lineCap.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -804,7 +804,7 @@ public final class Context extends Proxy {
      */
     public Context setLineJoin(LineJoin lineJoin) {
         try {
-            cairo_set_line_join.invoke(handle(), lineJoin.value());
+            cairo_set_line_join.invoke(handle(), lineJoin.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -955,7 +955,7 @@ public final class Context extends Proxy {
      */
     public Context setOperator(Operator op) {
         try {
-            cairo_set_operator.invoke(handle(), op.value());
+            cairo_set_operator.invoke(handle(), op.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -2559,7 +2559,7 @@ public final class Context extends Proxy {
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment utf8 = Interop.allocateString(family, arena);
-                cairo_select_font_face.invoke(handle(), utf8, slant.value(), weight.value());
+                cairo_select_font_face.invoke(handle(), utf8, slant.getValue(), weight.getValue());
                 return this;
             }
         } catch (Throwable e) {
@@ -2904,7 +2904,7 @@ public final class Context extends Proxy {
                 }
                 cairo_show_text_glyphs.invoke(handle(), utf8, string == null ? 0 : string.length(), glyphsPtr,
                         glyphs == null ? 0 : glyphs.length, clustersPtr, clusters == null ? 0 : clusters.length,
-                                clusterFlags.value());
+                                clusterFlags.getValue());
                 return this;
             }
         } catch (Throwable e) {
@@ -3091,7 +3091,7 @@ public final class Context extends Proxy {
      * 
      * @param userData the user data to attach to the context. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key that the user data is attached to
      * @since 1.4
@@ -3109,7 +3109,7 @@ public final class Context extends Proxy {
      * @param key      the key to attach the user data to
      * @param userData the user data to attach to the context. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}

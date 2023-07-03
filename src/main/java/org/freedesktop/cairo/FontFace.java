@@ -29,7 +29,7 @@ import java.lang.invoke.MethodHandle;
  * @see ScaledFont
  * @since 1.0
  */
-public class FontFace extends Proxy {
+public class FontFace extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();
@@ -115,7 +115,7 @@ public class FontFace extends Proxy {
      * 
      * @param userData the user data to attach to the font face. {@code userData}
      *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key that the user data is attached to
      * @since 1.4
@@ -133,7 +133,7 @@ public class FontFace extends Proxy {
      * @param key      the key to attach the user data to
      * @param userData the user data to attach to the font face. {@code userData}
      *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}

@@ -34,7 +34,7 @@ import java.lang.ref.Cleaner;
  * 
  * @since 1.10
  */
-public class Device extends Proxy implements AutoCloseable {
+public class Device extends ProxyInstance implements AutoCloseable {
 
     static {
         Interop.ensureInitialized();
@@ -296,7 +296,7 @@ public class Device extends Proxy implements AutoCloseable {
      * 
      * @param userData the user data to attach to the device. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key that the user data is attached to
      * @since 1.10
@@ -314,7 +314,7 @@ public class Device extends Proxy implements AutoCloseable {
      * @param key      the key to attach the user data to
      * @param userData the user data to attach to the device. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}

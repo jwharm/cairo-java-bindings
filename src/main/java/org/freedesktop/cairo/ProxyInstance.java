@@ -1,5 +1,7 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.Proxy;
+
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -15,9 +17,9 @@ import java.lang.ref.Cleaner;
  * <p>
  * Instances of Proxy are immutable.
  */
-public abstract class Proxy {
+public abstract class ProxyInstance implements Proxy {
 
-    {
+    static {
         Interop.ensureInitialized();
     }
 
@@ -32,7 +34,7 @@ public abstract class Proxy {
      * 
      * @param address the memory address of the instance
      */
-    public Proxy(MemorySegment address) {
+    public ProxyInstance(MemorySegment address) {
         this.address = address;
         this.destroyRunner = new DestroyRunner(address);
         this.cleanable = CLEANER.register(this, destroyRunner);
@@ -51,7 +53,7 @@ public abstract class Proxy {
      * Private constructor to prevent instantiation without a memory address.
      */
     @SuppressWarnings("unused")
-    private Proxy() {
+    private ProxyInstance() {
         this(MemorySegment.NULL);
     }
 
@@ -90,11 +92,11 @@ public abstract class Proxy {
      * Under normal circumstances, there is no need to free native resources
      * manually; this is automatically invoked during garbage collection. However,
      * if waiting for the GC causes problems with excessive resource consumption,
-     * {@link #destroy()} will allow you to free specific instances immediately.
+     * {@code destroy()} will allow you to free specific instances immediately.
      * <p>
      * You cannot use the Java object instance anymore after running
-     * {@link #destroy()}. To prevent use-after-free bugs, it is recommended to
-     * assign {@code null} immediately after {@link #destroy()}:
+     * {@code destroy()}. To prevent use-after-free bugs, it is recommended to
+     * assign {@code null} immediately after {@code destroy()}:
      * 
      * <pre>
      * surface.destroy();

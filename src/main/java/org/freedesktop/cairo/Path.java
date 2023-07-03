@@ -32,7 +32,7 @@ import java.util.stream.Stream;
  * 
  * @since 1.0
  */
-public class Path extends Proxy implements Iterable<PathElement> {
+public class Path extends ProxyInstance implements Iterable<PathElement> {
 
     static MemoryLayout getMemoryLayout() {
         return MemoryLayout.structLayout(

@@ -135,7 +135,7 @@ public abstract class Gradient extends Pattern {
                 long size = ValueLayout.JAVA_DOUBLE.byteSize();
                 int result = (int) cairo_pattern_get_color_stop_rgba.invoke(handle(), index, ptrs, ptrs.asSlice(size),
                         ptrs.asSlice(2 * size), ptrs.asSlice(3 * size), ptrs.asSlice(4 * size));
-                if (result == Status.INVALID_INDEX.value()) {
+                if (result == Status.INVALID_INDEX.getValue()) {
                     throw new IndexOutOfBoundsException(Status.INVALID_INDEX.toString());
                 }
                 values = ptrs.toArray(ValueLayout.JAVA_DOUBLE);

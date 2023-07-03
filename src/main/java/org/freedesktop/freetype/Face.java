@@ -9,13 +9,13 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
 import org.freedesktop.cairo.Interop;
-import org.freedesktop.cairo.Proxy;
+import org.freedesktop.cairo.ProxyInstance;
 
 /**
  * A handle to a typographic face object. A face object models a given typeface,
  * in a given style.
  */
-public class Face extends Proxy {
+public class Face extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();

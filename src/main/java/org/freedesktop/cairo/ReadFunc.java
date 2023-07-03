@@ -48,18 +48,18 @@ public interface ReadFunc {
      */
     default int upcall(MemorySegment closure, MemorySegment data, int length) {
         if (length <= 0) {
-            return Status.SUCCESS.value();
+            return Status.SUCCESS.getValue();
         }
         try (Arena arena = Arena.openConfined()) {
             try {
                 byte[] bytes = read(length);
                 if (bytes == null || bytes.length == 0) {
-                    return Status.READ_ERROR.value();
+                    return Status.READ_ERROR.getValue();
                 }
                 MemorySegment.ofAddress(data.address(), length).asByteBuffer().put(bytes);
-                return Status.SUCCESS.value();
+                return Status.SUCCESS.getValue();
             } catch (IOException ioe) {
-                return Status.READ_ERROR.value();
+                return Status.READ_ERROR.getValue();
             }
         }
     }

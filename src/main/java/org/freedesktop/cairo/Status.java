@@ -315,7 +315,7 @@ public enum Status {
      * Return the value of this enum
      * @return the value
      */
-    public int value() {
+    public int getValue() {
         return ordinal();
     }
 
@@ -328,7 +328,7 @@ public enum Status {
     @Override
     public String toString() {
         try {
-            MemorySegment result = (MemorySegment) cairo_status_to_string.invoke(value());
+            MemorySegment result = (MemorySegment) cairo_status_to_string.invoke(getValue());
             if (MemorySegment.NULL.equals(result)) {
                 return null;
             }

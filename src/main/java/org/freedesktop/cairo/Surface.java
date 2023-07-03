@@ -25,7 +25,7 @@ import java.lang.ref.Cleaner;
  * acquire the surface's device first. See {@link Device#acquire()} for a
  * discussion of devices.
  */
-public sealed class Surface extends Proxy implements AutoCloseable
+public sealed class Surface extends ProxyInstance implements AutoCloseable
         permits ImageSurface, PDFSurface, PostScriptSurface, RecordingSurface, SVGSurface, ScriptSurface {
 
     static {
@@ -81,7 +81,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
             return null;
         }
         try {
-            MemorySegment result = (MemorySegment) cairo_surface_create_similar.invoke(other.handle(), content.value(),
+            MemorySegment result = (MemorySegment) cairo_surface_create_similar.invoke(other.handle(), content.getValue(),
                     width, height);
             Surface surface = new Surface(result);
             // Try to instantiate the correct class, based on the SurfaceType
@@ -135,7 +135,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
     public static ImageSurface createSimilarImage(Surface other, Format format, int width, int height) {
         try {
             MemorySegment result = (MemorySegment) cairo_surface_create_similar_image
-                    .invoke(other == null ? MemorySegment.NULL : other.handle(), format.value(), width, height);
+                    .invoke(other == null ? MemorySegment.NULL : other.handle(), format.getValue(), width, height);
             ImageSurface surface = new ImageSurface(result);
             surface.takeOwnership();
             return surface;
@@ -851,7 +851,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * 
      * @param userData the user data to attach to the surface. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key that the user data is attached to
      * @since 1.0
@@ -869,7 +869,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * @param key      the key to attach the user data to
      * @param userData the user data to attach to the surface. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}

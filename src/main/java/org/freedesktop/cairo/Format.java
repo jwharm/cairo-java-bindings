@@ -75,7 +75,7 @@ public enum Format {
      * Return the value of this enum
      * @return the value
      */
-    public int value() {
+    public int getValue() {
         return value;
     }
 

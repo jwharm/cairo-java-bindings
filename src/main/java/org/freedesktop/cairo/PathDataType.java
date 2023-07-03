@@ -36,7 +36,7 @@ public enum PathDataType {
      * Return the value of this enum
      * @return the value
      */
-    public int value() {
+    public int getValue() {
         return ordinal();
     }
 

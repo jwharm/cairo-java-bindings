@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @since 1.4
  */
-public class RectangleList extends Proxy {
+public class RectangleList extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();
@@ -87,7 +87,7 @@ public class RectangleList extends Proxy {
      */
     public static RectangleList create(Status status, List<Rectangle> rectangles) {
         RectangleList rectangleList = new RectangleList(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
-        STATUS.set(rectangleList.handle(), status.value());
+        STATUS.set(rectangleList.handle(), status.getValue());
         NUM_RECTANGLES.set(rectangleList.handle(), rectangles == null ? 0 : rectangles.size());
         if (rectangles == null || rectangles.isEmpty()) {
             return rectangleList;

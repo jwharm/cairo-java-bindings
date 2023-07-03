@@ -55,7 +55,7 @@ public enum HintStyle {
      * 
      * @return the value
      */
-    public int value() {
+    public int getValue() {
         return ordinal();
     }
 

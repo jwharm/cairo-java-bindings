@@ -32,7 +32,7 @@ public enum PostScriptLevel {
      * Return the value of this enum
      * @return the value
      */
-    public int value() {
+    public int getValue() {
         return ordinal();
     }
 
@@ -92,7 +92,7 @@ public enum PostScriptLevel {
     @Override
     public String toString() {
         try {
-            MemorySegment result = (MemorySegment) cairo_ps_level_to_string.invoke(value());
+            MemorySegment result = (MemorySegment) cairo_ps_level_to_string.invoke(getValue());
             if (MemorySegment.NULL.equals(result)) {
                 return null;
             }

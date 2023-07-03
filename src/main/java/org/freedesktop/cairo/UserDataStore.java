@@ -49,7 +49,7 @@ class UserDataStore {
     
     /**
      * Allocate a native memory segment that contains the value of this key. This
-     * will work for primitive types, {@link MemorySemgent} and {@link Proxy}
+     * will work for primitive types, {@link MemorySegment} and {@link ProxyInstance}
      * instances. For all other classes, this will return
      * {@link MemorySegment#NULL}.
      * 
@@ -59,45 +59,44 @@ class UserDataStore {
     MemorySegment dataSegment(Object value) {
         MemorySegment data;
         switch (value) {
-        case MemorySegment m -> data = m;
-        case Proxy p -> data = p.handle();
-        case Boolean b -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_BOOLEAN);
-            data.set(ValueLayout.JAVA_BOOLEAN, 0, b);
+            case MemorySegment m -> data = m;
+            case ProxyInstance p -> data = p.handle();
+            case Boolean b -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_BOOLEAN);
+                data.set(ValueLayout.JAVA_BOOLEAN, 0, b);
+            }
+            case Byte b -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_BYTE);
+                data.set(ValueLayout.JAVA_BYTE, 0, b);
+            }
+            case Character c -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_CHAR);
+                data.set(ValueLayout.JAVA_CHAR, 0, c);
+            }
+            case Double d -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_DOUBLE);
+                data.set(ValueLayout.JAVA_DOUBLE, 0, d);
+            }
+            case Float f -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_FLOAT);
+                data.set(ValueLayout.JAVA_FLOAT, 0, f);
+            }
+            case Integer i -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_INT);
+                data.set(ValueLayout.JAVA_INT, 0, i);
+            }
+            case Long l -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_LONG);
+                data.set(ValueLayout.JAVA_LONG, 0, l);
+            }
+            case Short s -> {
+                data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_SHORT);
+                data.set(ValueLayout.JAVA_SHORT, 0, s);
+            }
+            default -> {
+                data = MemorySegment.NULL;
+            }
         }
-        case Byte b -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_BYTE);
-            data.set(ValueLayout.JAVA_BYTE, 0, b);
-        }
-        case Character c -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_CHAR);
-            data.set(ValueLayout.JAVA_CHAR, 0, c);
-        }
-        case Double d -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_DOUBLE);
-            data.set(ValueLayout.JAVA_DOUBLE, 0, d);
-        }
-        case Float f -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_FLOAT);
-            data.set(ValueLayout.JAVA_FLOAT, 0, f);
-        }
-        case Integer i -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_INT);
-            data.set(ValueLayout.JAVA_INT, 0, i);
-        }
-        case Long l -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_LONG);
-            data.set(ValueLayout.JAVA_LONG, 0, l);
-        }
-        case Short s -> {
-            data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_SHORT);
-            data.set(ValueLayout.JAVA_SHORT, 0, s);
-        }
-        default -> {
-            data = MemorySegment.NULL;
-        }
-        }
-        ;
         return data;
     }
 }

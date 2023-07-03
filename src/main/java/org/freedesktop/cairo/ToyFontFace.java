@@ -71,8 +71,8 @@ public class ToyFontFace extends FontFace {
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment familyPtr = Interop.allocateString(family, arena);
-                MemorySegment result = (MemorySegment) cairo_toy_font_face_create.invoke(familyPtr, slant.value(),
-                        weight.value());
+                MemorySegment result = (MemorySegment) cairo_toy_font_face_create.invoke(familyPtr, slant.getValue(),
+                        weight.getValue());
                 ToyFontFace fontFace = new ToyFontFace(result);
                 fontFace.takeOwnership();
                 return fontFace;

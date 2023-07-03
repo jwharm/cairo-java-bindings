@@ -76,7 +76,7 @@ public final class RecordingSurface extends Surface {
         Status status;
         RecordingSurface surface;
         try {
-            MemorySegment result = (MemorySegment) cairo_recording_surface_create.invoke(content.value(),
+            MemorySegment result = (MemorySegment) cairo_recording_surface_create.invoke(content.getValue(),
                     extents == null ? MemorySegment.NULL : extents.handle());
             surface = new RecordingSurface(result);
             surface.takeOwnership();

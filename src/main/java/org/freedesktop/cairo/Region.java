@@ -18,7 +18,7 @@ import java.lang.invoke.MethodHandle;
  * 
  * @since 1.10
  */
-public class Region extends Proxy {
+public class Region extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();

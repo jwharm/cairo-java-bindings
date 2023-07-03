@@ -26,7 +26,7 @@ import java.util.List;
  * @see FontOptions
  * @since 1.0
  */
-public class ScaledFont extends Proxy {
+public class ScaledFont extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();
@@ -487,7 +487,7 @@ public class ScaledFont extends Proxy {
      * 
      * @param userData the user data to attach to the scaled font. {@code userData}
      *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key that the user data is attached to
      * @since 1.4
@@ -505,7 +505,7 @@ public class ScaledFont extends Proxy {
      * @param key      the key to attach the user data to
      * @param userData the user data to attach to the scaled font. {@code userData}
      *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}

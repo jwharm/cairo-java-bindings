@@ -176,7 +176,7 @@ public final class PostScriptSurface extends Surface {
      */
     public PostScriptSurface restrictToLevel(PostScriptLevel level) {
         try {
-            cairo_ps_surface_restrict_to_level.invoke(handle(), level.value());
+            cairo_ps_surface_restrict_to_level.invoke(handle(), level.getValue());
             return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);

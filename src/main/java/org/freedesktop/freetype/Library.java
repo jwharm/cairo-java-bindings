@@ -9,7 +9,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
 import org.freedesktop.cairo.Interop;
-import org.freedesktop.cairo.Proxy;
+import org.freedesktop.cairo.ProxyInstance;
 
 /**
  * Functions to start and end the usage of the FreeType library.
@@ -17,7 +17,7 @@ import org.freedesktop.cairo.Proxy;
  * Note that {@link #version()} is of limited use because even a new release of
  * FreeType with only documentation changes increases the version number.
  */
-public class Library extends Proxy {
+public class Library extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();

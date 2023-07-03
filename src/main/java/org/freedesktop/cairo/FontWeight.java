@@ -26,7 +26,7 @@ public enum FontWeight {
      * 
      * @return the value
      */
-    public int value() {
+    public int getValue() {
         return ordinal();
     }
 

@@ -39,7 +39,7 @@ import java.lang.invoke.VarHandle;
  *      through a Path.
  * @since 1.0
  */
-class PathData extends Proxy {
+class PathData extends ProxyInstance {
 
     /**
      * The memory layout of the native C struct

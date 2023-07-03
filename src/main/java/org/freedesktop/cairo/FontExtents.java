@@ -20,7 +20,7 @@ import java.lang.invoke.VarHandle;
  * 
  * @since 1.0
  */
-public class FontExtents extends Proxy {
+public class FontExtents extends ProxyInstance {
 
     /**
      * The memory layout of the native C struct

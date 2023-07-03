@@ -12,7 +12,7 @@ import java.lang.invoke.VarHandle;
  * 
  * @since 1.4
  */
-public class Rectangle extends Proxy {
+public class Rectangle extends ProxyInstance {
 
     /**
      * The memory layout of the native C struct

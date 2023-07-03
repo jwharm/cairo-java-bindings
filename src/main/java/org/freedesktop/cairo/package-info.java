@@ -10,7 +10,7 @@
  * <h2>Overview</h2>
  * <h3>Java API</h3>
  * In general, the Java bindings match the cairo C API, but with a Java "coding style". C structs like
- * {@code cairo_t}, {@code cairo_surface_t} and {@code cairo_matrix_t} are modeled with Java {@link Proxy}
+ * {@code cairo_t}, {@code cairo_surface_t} and {@code cairo_matrix_t} are modeled with Java {@link ProxyInstance}
  * classes like {@link Context}, {@link Surface} and {@link Matrix}, and all flags and enumerations are
  * available as Java enums. The proxy classes inherit when applicable: {@link RadialGradient} extends
  * {@link Gradient}, which extends {@link Pattern}, and {@link ImageSurface} extends {@link Surface}. Types,
@@ -47,8 +47,8 @@
  *     custom data to a cairo struct) are available in Java, with a twist. You can call
  *     {@code setUserData()} to attach any Java object instance, and {@code getUserData()} to get it
  *     back. Objects that can be marshaled to a native memory segment (primitive types, memory segments,
- *     and other {@link Proxy} objects) will be attached to the native cairo struct. Other types will only
- *     be attached to the Java object and will not be passed to cairo itself.
+ *     and other {@link ProxyInstance} objects) will be attached to the native cairo struct. Other types will
+ *     only be attached to the Java object and will not be passed to cairo itself.
  *
  * <li>I/O operations in cairo that are designed to work with streams accept Java {@link java.io.InputStream}
  *     and {@link java.io.OutputStream} parameters.

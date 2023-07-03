@@ -46,16 +46,16 @@ public interface WriteFunc {
      */
     default int upcall(MemorySegment closure, MemorySegment data, int length) {
         if (length <= 0) {
-            return Status.SUCCESS.value();
+            return Status.SUCCESS.getValue();
         }
         try (Arena arena = Arena.openConfined()) {
             byte[] bytes = MemorySegment.ofAddress(data.address(), length, arena.scope())
                     .toArray(ValueLayout.JAVA_BYTE);
             try {
                 write(bytes);
-                return Status.SUCCESS.value();
+                return Status.SUCCESS.getValue();
             } catch (IOException ioe) {
-                return Status.WRITE_ERROR.value();
+                return Status.WRITE_ERROR.getValue();
             }
         }
     }

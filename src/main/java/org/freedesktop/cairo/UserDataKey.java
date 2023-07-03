@@ -9,11 +9,11 @@ import java.lang.foreign.ValueLayout;
  * UserDataKey is used for attaching user data to cairo data structures.
  * <p>
  * The lifetime of a UserDataKey is connected to the lifetime of the Proxy object 
- * that is passed in the {@link #create(Proxy)} method.
+ * that is passed in the {@link #create(ProxyInstance)} method.
  * 
  * @since 1.0
  */
-public final class UserDataKey extends Proxy {
+public final class UserDataKey extends ProxyInstance {
 
     static MemoryLayout getMemoryLayout() {
         return MemoryLayout.structLayout(
@@ -34,11 +34,11 @@ public final class UserDataKey extends Proxy {
     /**
      * Create a new UserDataKey
      * 
-     * @param the Proxy object whose memory scope (lifetime) will be associated with
-     *            the returned UserDataKey
+     * @param proxy the ProxyInstace object whose memory scope (lifetime) will be
+     *              associated with the returned UserDataKey
      * @return the newly created UserDataKey
      */
-    static UserDataKey create(Proxy proxy) {
+    static UserDataKey create(ProxyInstance proxy) {
         return new UserDataKey(SegmentAllocator.nativeAllocator(proxy.handle().scope()).allocate(getMemoryLayout()));
     }
 }

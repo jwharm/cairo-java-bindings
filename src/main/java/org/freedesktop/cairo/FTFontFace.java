@@ -108,7 +108,7 @@ public class FTFontFace extends FontFace {
      */
     public void setSynthesize(FTSynthesize synthFlags) {
         try {
-            cairo_ft_font_face_set_synthesize.invoke(handle(), synthFlags.value());
+            cairo_ft_font_face_set_synthesize.invoke(handle(), synthFlags.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -125,7 +125,7 @@ public class FTFontFace extends FontFace {
      */
     public void unsetSynthesize(FTSynthesize synthFlags) {
         try {
-            cairo_ft_font_face_unset_synthesize.invoke(handle(), synthFlags.value());
+            cairo_ft_font_face_unset_synthesize.invoke(handle(), synthFlags.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

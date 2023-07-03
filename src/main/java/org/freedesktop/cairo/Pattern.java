@@ -23,7 +23,7 @@ import java.lang.invoke.MethodHandle;
  * 
  * @since 1.0
  */
-public abstract class Pattern extends Proxy {
+public abstract class Pattern extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();
@@ -81,7 +81,7 @@ public abstract class Pattern extends Proxy {
      */
     public void setExtend(Extend extend) {
         try {
-            cairo_pattern_set_extend.invoke(handle(), extend.value());
+            cairo_pattern_set_extend.invoke(handle(), extend.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -130,7 +130,7 @@ public abstract class Pattern extends Proxy {
      */
     public void setFilter(Filter filter) {
         try {
-            cairo_pattern_set_filter.invoke(handle(), filter.value());
+            cairo_pattern_set_filter.invoke(handle(), filter.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -243,7 +243,7 @@ public abstract class Pattern extends Proxy {
      * 
      * @param userData the user data to attach to the pattern. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key that the user data is attached to
      * @since 1.4
@@ -261,7 +261,7 @@ public abstract class Pattern extends Proxy {
      * @param key      the key to attach the user data to
      * @param userData the user data to attach to the pattern. {@code userData} can
      *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
+     *                 {@link MemorySegment} or a {@link ProxyInstance} instance, it will be
      *                 stored as cairo user data in native memory as well.
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}

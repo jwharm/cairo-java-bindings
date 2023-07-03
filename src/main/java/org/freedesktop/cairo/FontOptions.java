@@ -27,7 +27,7 @@ import java.lang.invoke.MethodHandle;
  * @see ScaledFont
  * @since 1.0
  */
-public class FontOptions extends Proxy {
+public class FontOptions extends ProxyInstance {
 
     static {
         Interop.ensureInitialized();
@@ -195,7 +195,7 @@ public class FontOptions extends Proxy {
      */
     public void setAntialias(Antialias antialias) {
         try {
-            cairo_font_options_set_antialias.invoke(handle(), antialias.value());
+            cairo_font_options_set_antialias.invoke(handle(), antialias.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -233,7 +233,7 @@ public class FontOptions extends Proxy {
      */
     public void setSubpixelOrder(SubpixelOrder subpixelOrder) {
         try {
-            cairo_font_options_set_subpixel_order.invoke(handle(), subpixelOrder.value());
+            cairo_font_options_set_subpixel_order.invoke(handle(), subpixelOrder.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -273,7 +273,7 @@ public class FontOptions extends Proxy {
      */
     public void setHintStyle(HintStyle hintStyle) {
         try {
-            cairo_font_options_set_hint_style.invoke(handle(), hintStyle.value());
+            cairo_font_options_set_hint_style.invoke(handle(), hintStyle.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -311,7 +311,7 @@ public class FontOptions extends Proxy {
      */
     public void setHintMetrics(HintMetrics hintMetrics) {
         try {
-            cairo_font_options_set_hint_metrics.invoke(handle(), hintMetrics.value());
+            cairo_font_options_set_hint_metrics.invoke(handle(), hintMetrics.getValue());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
