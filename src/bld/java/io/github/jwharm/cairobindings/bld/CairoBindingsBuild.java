@@ -2,6 +2,7 @@ package io.github.jwharm.cairobindings.bld;
 
 import static rife.bld.dependencies.Repository.MAVEN_CENTRAL;
 import static rife.bld.dependencies.Repository.MAVEN_LOCAL;
+import static rife.bld.dependencies.Scope.compile;
 import static rife.bld.dependencies.Scope.test;
 
 import java.util.List;
@@ -26,10 +27,11 @@ public class CairoBindingsBuild extends Project {
     public CairoBindingsBuild() {
         pkg = "org.freedesktop.cairo";
         name = "cairo";
-        version = version(1,16,0,"0.1");
+        version = version(1,16).withQualifier("0.1");
         javaRelease = 20;
 
         compileOperation().compileOptions()
+            .modulePath(libCompileDirectory())
             .enablePreview();
 
         testOperation().javaOptions()
@@ -37,10 +39,15 @@ public class CairoBindingsBuild extends Project {
             .enableNativeAccess(List.of("ALL-UNNAMED"));
         
         javadocOperation().javadocOptions()
+            .modulePath(libCompileDirectory())
             .enablePreview()
             .quiet();
 
-        repositories = List.of(MAVEN_CENTRAL);
+        repositories = List.of(MAVEN_CENTRAL, MAVEN_LOCAL);
+
+        scope(compile)
+            .include(dependency("io.github.jwharm.javagi", "glib", version("2.76-0.6")));
+
         scope(test)
             .include(dependency("org.junit.jupiter", "junit-jupiter", version(5,9,3)))
             .include(dependency("org.junit.platform", "junit-platform-console-standalone", version(1,9,3)));
