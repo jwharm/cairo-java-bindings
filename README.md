@@ -4,8 +4,8 @@ JEP-434 Panama FFI. The bindings are based on **cairo 1.16** and work with **JDK
 features enabled). 
 
 I created these language bindings primarily as a companion to the GObject-based language bindings 
-for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi), but they can 
-also be used independently. There are no external dependencies.
+for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi). The bindings 
+depend on the `glib` module from Java-GI for a few common base classes and interfaces.
 
 ## Overview
 
