@@ -5,7 +5,7 @@
     <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="directory" />
-    <option name="VM_PARAMETERS" value="-ea --enable-preview" />
+    <option name="VM_PARAMETERS" value="-ea --enable-preview --enable-native-access=org.freedesktop.cairo" />
     <dir value="$PROJECT_DIR$/src/test/java" />
     <method v="2">
       <option name="Make" enabled="true" />

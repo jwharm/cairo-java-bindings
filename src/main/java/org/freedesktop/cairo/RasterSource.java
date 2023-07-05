@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -25,7 +28,7 @@ import java.lang.invoke.MethodHandle;
 public class RasterSource extends Pattern {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Callback functions
@@ -54,17 +57,16 @@ public class RasterSource extends Pattern {
             MemorySegment result = (MemorySegment) cairo_pattern_create_raster_source.invoke(
                     MemorySegment.NULL, content.getValue(), width, height);
             RasterSource pattern = new RasterSource(result);
-            pattern.takeOwnership();
+            MemoryCleaner.takeOwnership(pattern.handle());
             return pattern;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static final MethodHandle cairo_pattern_create_raster_source = Interop
-            .downcallHandle(
-                    "cairo_pattern_create_raster_source", FunctionDescriptor.of(ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+    private static final MethodHandle cairo_pattern_create_raster_source = Interop.downcallHandle(
+        "cairo_pattern_create_raster_source", FunctionDescriptor.of(ValueLayout.ADDRESS,
+                ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
 
     /**
      * Specifies the callbacks used to generate the image surface for a rendering

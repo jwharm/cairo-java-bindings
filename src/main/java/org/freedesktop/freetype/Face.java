@@ -1,5 +1,9 @@
 package org.freedesktop.freetype;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -8,9 +12,6 @@ import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
-import org.freedesktop.cairo.Interop;
-import org.freedesktop.cairo.ProxyInstance;
-
 /**
  * A handle to a typographic face object. A face object models a given typeface,
  * in a given style.
@@ -18,7 +19,7 @@ import org.freedesktop.cairo.ProxyInstance;
 public class Face extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        FreeType2.ensureInitialized();
     }
 
     /**
@@ -29,7 +30,16 @@ public class Face extends ProxyInstance {
      */
     public Face(MemorySegment address) {
         super(address);
-        setDestroyFunc("FT_Done_Face");
+        MemoryCleaner.setFreeFunc(handle(), "FT_Done_Face");
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**
@@ -43,7 +53,7 @@ public class Face extends ProxyInstance {
      */
     public Face(Library library, String filepathname, long faceIndex) {
         super(constructNew(library, filepathname, faceIndex));
-        takeOwnership();
+        MemoryCleaner.takeOwnership(handle());
     }
 
     /*
@@ -54,7 +64,7 @@ public class Face extends ProxyInstance {
             MemorySegment pointer = SegmentAllocator.nativeAllocator(SegmentScope.auto())
                     .allocate(ValueLayout.ADDRESS.asUnbounded());
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(filepathname, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(filepathname, arena);
                 int result = (int) FT_New_Face.invoke(library.handle(), utf8, faceIndex, pointer);
                 if (result != 0) {
                     throw new UnsupportedOperationException(

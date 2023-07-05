@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,7 +33,7 @@ import java.lang.invoke.MethodHandle;
 public final class ImageSurface extends Surface {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Keep a reference to the data during the lifetime of the
@@ -94,7 +97,7 @@ public final class ImageSurface extends Surface {
         try {
             MemorySegment result = (MemorySegment) cairo_image_surface_create.invoke(format.getValue(), width, height);
             surface = new ImageSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -146,7 +149,7 @@ public final class ImageSurface extends Surface {
             MemorySegment result = (MemorySegment) cairo_image_surface_create_for_data
                     .invoke(data == null ? MemorySegment.NULL : data, format.getValue(), width, height, stride);
             surface = new ImageSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             /*
              * Keep a reference to the MemorySegment, in case it is allocated as
              * SegmentScope#auto() and the user doesn't keep a reference alive
@@ -184,10 +187,10 @@ public final class ImageSurface extends Surface {
         ImageSurface surface;
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment filenamePtr = Interop.allocateString(filename, arena);
+                MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_image_surface_create_from_png.invoke(filenamePtr);
                 surface = new ImageSurface(result);
-                surface.takeOwnership();
+                MemoryCleaner.takeOwnership(surface.handle());
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -227,7 +230,7 @@ public final class ImageSurface extends Surface {
                 MemorySegment result = (MemorySegment) cairo_image_surface_create_from_png_stream
                         .invoke(readFunc.toCallback(arena.scope()), MemorySegment.NULL);
                 surface = new ImageSurface(result);
-                surface.takeOwnership();
+                MemoryCleaner.takeOwnership(surface.handle());
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -262,7 +265,7 @@ public final class ImageSurface extends Surface {
         Status status = null;
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment filenamePtr = Interop.allocateString(filename, arena);
+                MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 int result = (int) cairo_surface_write_to_png.invoke(handle(), filenamePtr);
                 status = Status.of(result);
             }

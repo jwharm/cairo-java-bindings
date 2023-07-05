@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -29,7 +33,7 @@ import java.util.List;
 public class ScaledFont extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Keeps user data keys and values
@@ -51,8 +55,17 @@ public class ScaledFont extends ProxyInstance {
      */
     public ScaledFont(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_scaled_font_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_scaled_font_destroy");
         userDataStore = new UserDataStore(address.scope());
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**
@@ -82,7 +95,7 @@ public class ScaledFont extends ProxyInstance {
                         ctm == null ? MemorySegment.NULL : ctm,
                         options == null ? MemorySegment.NULL : options);
                 font = new ScaledFont(result);
-                font.takeOwnership();
+                MemoryCleaner.takeOwnership(font.handle());
                 font.fontFace = fontFace;
                 font.fontMatrix = fontMatrix;
                 font.ctm = ctm;
@@ -183,7 +196,7 @@ public class ScaledFont extends ProxyInstance {
         }
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 TextExtents extents = new TextExtents(
                         SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(TextExtents.getMemoryLayout()));
                 cairo_scaled_font_text_extents.invoke(handle(), utf8, extents.handle());
@@ -292,7 +305,7 @@ public class ScaledFont extends ProxyInstance {
         }
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 MemorySegment glyphsPtr = arena.allocate(ValueLayout.ADDRESS);
                 MemorySegment numGlyphsPtr = arena.allocate(ValueLayout.ADDRESS);
                 MemorySegment clustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS);
@@ -369,7 +382,7 @@ public class ScaledFont extends ProxyInstance {
             FontFace fontFace = new FontFace(result);
             // Take a reference on the returned fontface
             fontFace.reference();
-            fontFace.takeOwnership();
+            MemoryCleaner.takeOwnership(fontFace.handle());
             return fontFace;
         } catch (Throwable e) {
             throw new RuntimeException(e);

@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -12,7 +15,7 @@ import java.lang.invoke.MethodHandle;
 public class SurfacePattern extends Pattern {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Keep a reference to the target surface during the lifetime of this pattern
@@ -41,7 +44,7 @@ public class SurfacePattern extends Pattern {
             MemorySegment result = (MemorySegment) cairo_pattern_create_for_surface
                     .invoke(surface == null ? MemorySegment.NULL : surface.handle());
             SurfacePattern pattern = new SurfacePattern(result);
-            pattern.takeOwnership();
+            MemoryCleaner.takeOwnership(pattern.handle());
             pattern.surface = surface;
             return pattern;
         } catch (Throwable e) {

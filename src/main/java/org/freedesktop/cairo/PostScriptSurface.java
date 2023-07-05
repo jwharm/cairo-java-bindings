@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.io.OutputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
@@ -46,7 +49,7 @@ import java.lang.invoke.MethodHandle;
 public final class PostScriptSurface extends Surface {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /*
@@ -92,11 +95,11 @@ public final class PostScriptSurface extends Surface {
         PostScriptSurface surface;
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment filenamePtr = Interop.allocateString(filename, arena);
+                MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_ps_surface_create.invoke(filenamePtr, widthInPoints,
                         heightInPoints);
                 surface = new PostScriptSurface(result);
-                surface.takeOwnership();
+                MemoryCleaner.takeOwnership(surface.handle());
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -143,7 +146,7 @@ public final class PostScriptSurface extends Surface {
             MemorySegment result = (MemorySegment) cairo_ps_surface_create_for_stream.invoke(writeFuncPtr,
                     MemorySegment.NULL, widthInPoints, heightInPoints);
             surface = new PostScriptSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             if (stream != null) {
                 surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
             }
@@ -397,7 +400,7 @@ public final class PostScriptSurface extends Surface {
     public PostScriptSurface dscComment(String comment) throws IllegalArgumentException {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment commentPtr = Interop.allocateString(comment, arena);
+                MemorySegment commentPtr = Interop.allocateNativeString(comment, arena);
                 cairo_ps_surface_dsc_comment.invoke(handle(), commentPtr);
             }
         } catch (Throwable e) {

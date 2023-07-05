@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -29,7 +33,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
         permits ImageSurface, PDFSurface, PostScriptSurface, RecordingSurface, SVGSurface, ScriptSurface {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Keeps user data keys and values
@@ -48,8 +52,17 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
      */
     public Surface(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_surface_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_surface_destroy");
         userDataStore = new UserDataStore(address.scope());
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**
@@ -99,7 +112,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
             } else if (type == SurfaceType.SCRIPT) {
                 surface = new ScriptSurface(result);
             }
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             // Cast to T is safe, because all possible Surface types are instantiated above
             return (T) surface;
         } catch (Throwable e) {
@@ -107,8 +120,8 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
         }
     }
 
-    private static final MethodHandle cairo_surface_create_similar = Interop
-            .downcallHandle("cairo_surface_create_similar", FunctionDescriptor.of(ValueLayout.ADDRESS,
+    private static final MethodHandle cairo_surface_create_similar = Interop.downcallHandle(
+            "cairo_surface_create_similar", FunctionDescriptor.of(ValueLayout.ADDRESS,
                     ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
 
     /**
@@ -137,7 +150,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
             MemorySegment result = (MemorySegment) cairo_surface_create_similar_image
                     .invoke(other == null ? MemorySegment.NULL : other.handle(), format.getValue(), width, height);
             ImageSurface surface = new ImageSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             return surface;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -178,7 +191,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
             MemorySegment result = (MemorySegment) cairo_surface_create_for_rectangle
                     .invoke(target == null ? MemorySegment.NULL : target.handle(), x, y, width, height);
             Surface surface = new Surface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             /*
              * The subsurface will keep a reference to the target, to keep it alive during
              * its lifetime
@@ -687,7 +700,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
         Status status;
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment mimeTypePtr = Interop.allocateString(mimeType.toString(), arena);
+                MemorySegment mimeTypePtr = Interop.allocateNativeString(mimeType.toString(), arena);
                 MemorySegment dataPtr = data == null ? MemorySegment.NULL :
                         arena.allocateArray(ValueLayout.JAVA_BYTE, data);
                 int result = (int) cairo_surface_set_mime_data.invoke(handle(), mimeTypePtr, dataPtr,
@@ -723,7 +736,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
     public byte[] getMimeData(MimeType mimeType) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment mimeTypePtr = Interop.allocateString(mimeType.toString(), arena);
+                MemorySegment mimeTypePtr = Interop.allocateNativeString(mimeType.toString(), arena);
                 MemorySegment dataPtr = arena.allocate(ValueLayout.ADDRESS);
                 MemorySegment lengthPtr = arena.allocate(ValueLayout.ADDRESS);
                 cairo_surface_get_mime_data.invoke(handle(), mimeTypePtr, dataPtr, lengthPtr);
@@ -758,7 +771,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
     public boolean supportsMimeType(MimeType mimeType) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment mimeTypePtr = Interop.allocateString(mimeType.toString(), arena);
+                MemorySegment mimeTypePtr = Interop.allocateNativeString(mimeType.toString(), arena);
                 int result = (int) cairo_surface_supports_mime_type.invoke(handle(), mimeTypePtr);
                 return result != 0;
             }

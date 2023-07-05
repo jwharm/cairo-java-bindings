@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -32,7 +36,7 @@ import java.lang.invoke.MethodHandle;
 public class FontFace extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Keeps user data keys and values
@@ -47,8 +51,17 @@ public class FontFace extends ProxyInstance {
      */
     public FontFace(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_font_face_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_font_face_destroy");
         userDataStore = new UserDataStore(address.scope());
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**

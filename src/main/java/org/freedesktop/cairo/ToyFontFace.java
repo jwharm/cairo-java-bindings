@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -24,7 +27,7 @@ import java.lang.invoke.MethodHandle;
 public class ToyFontFace extends FontFace {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -70,11 +73,11 @@ public class ToyFontFace extends FontFace {
     public static ToyFontFace create(String family, FontSlant slant, FontWeight weight) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment familyPtr = Interop.allocateString(family, arena);
+                MemorySegment familyPtr = Interop.allocateNativeString(family, arena);
                 MemorySegment result = (MemorySegment) cairo_toy_font_face_create.invoke(familyPtr, slant.getValue(),
                         weight.getValue());
                 ToyFontFace fontFace = new ToyFontFace(result);
-                fontFace.takeOwnership();
+                MemoryCleaner.takeOwnership(fontFace.handle());
                 return fontFace;
             }
         } catch (Throwable e) {

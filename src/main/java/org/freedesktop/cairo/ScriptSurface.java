@@ -14,7 +14,7 @@ import java.lang.foreign.MemorySegment;
 public final class ScriptSurface extends Surface {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /*

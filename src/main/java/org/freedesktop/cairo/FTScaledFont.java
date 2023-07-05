@@ -6,6 +6,8 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
 import org.freedesktop.freetype.Face;
 
 /**
@@ -19,7 +21,7 @@ import org.freedesktop.freetype.Face;
 public class FTScaledFont extends ScaledFont {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -60,7 +62,7 @@ public class FTScaledFont extends ScaledFont {
                         ctm == null ? MemorySegment.NULL : ctm,
                         options == null ? MemorySegment.NULL : options);
                 font = new FTScaledFont(result);
-                font.takeOwnership();
+                MemoryCleaner.takeOwnership(font.handle());
                 font.fontFace = fontFace;
                 font.fontMatrix = fontMatrix;
                 font.ctm = ctm;

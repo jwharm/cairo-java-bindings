@@ -1,5 +1,9 @@
 package org.freedesktop.freetype;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -7,9 +11,6 @@ import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
-
-import org.freedesktop.cairo.Interop;
-import org.freedesktop.cairo.ProxyInstance;
 
 /**
  * Functions to start and end the usage of the FreeType library.
@@ -20,7 +21,7 @@ import org.freedesktop.cairo.ProxyInstance;
 public class Library extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        FreeType2.ensureInitialized();
     }
 
     /**
@@ -31,7 +32,16 @@ public class Library extends ProxyInstance {
      */
     public Library(MemorySegment address) {
         super(address);
-        setDestroyFunc("FT_Done_FreeType");
+        MemoryCleaner.setFreeFunc(handle(), "FT_Done_FreeType");
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**
@@ -51,7 +61,7 @@ public class Library extends ProxyInstance {
                         "Error " + result + " occurred during FreeType library initialization");
             }
             Library library = new Library(pointer.get(ValueLayout.ADDRESS, 0));
-            library.takeOwnership();
+            MemoryCleaner.takeOwnership(library.handle());
             return library;
         } catch (Throwable e) {
             throw new RuntimeException(e);

@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.io.IOException;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
@@ -58,7 +62,7 @@ import java.lang.invoke.MethodHandle;
 public final class Context extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -109,8 +113,17 @@ public final class Context extends ProxyInstance {
      */
     public Context(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_destroy");
         userDataStore = new UserDataStore(address.scope());
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**
@@ -131,7 +144,7 @@ public final class Context extends ProxyInstance {
             MemorySegment result = (MemorySegment) cairo_create
                     .invoke(target == null ? MemorySegment.NULL : target.handle());
             context = new Context(result);
-            context.takeOwnership();
+            MemoryCleaner.takeOwnership(context.handle());
             context.target = target;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -331,7 +344,7 @@ public final class Context extends ProxyInstance {
         try {
             MemorySegment result = (MemorySegment) cairo_pop_group.invoke(handle());
             SurfacePattern pattern = new SurfacePattern(result);
-            pattern.takeOwnership();
+            MemoryCleaner.takeOwnership(pattern.handle());
             return pattern;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -1596,7 +1609,7 @@ public final class Context extends ProxyInstance {
         try {
             MemorySegment result = (MemorySegment) cairo_copy_path.invoke(handle());
             Path path = new Path(result);
-            path.takeOwnership();
+            MemoryCleaner.takeOwnership(path.handle());
             if (path.status() != Status.SUCCESS) {
                 return null;
             }
@@ -1628,7 +1641,7 @@ public final class Context extends ProxyInstance {
         try {
             MemorySegment result = (MemorySegment) cairo_copy_path_flat.invoke(handle());
             Path path = new Path(result);
-            path.takeOwnership();
+            MemoryCleaner.takeOwnership(path.handle());
             if (path.status() != Status.SUCCESS) {
                 return null;
             }
@@ -2070,7 +2083,7 @@ public final class Context extends ProxyInstance {
     public Context textPath(String string) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_text_path.invoke(handle(), utf8);
                 return this;
             }
@@ -2558,7 +2571,7 @@ public final class Context extends ProxyInstance {
     public Context selectFontFace(String family, FontSlant slant, FontWeight weight) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(family, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(family, arena);
                 cairo_select_font_face.invoke(handle(), utf8, slant.getValue(), weight.getValue());
                 return this;
             }
@@ -2720,7 +2733,7 @@ public final class Context extends ProxyInstance {
             fontFace = new FontFace(result);
             // Take a reference on the returned fontface
             fontFace.reference();
-            fontFace.takeOwnership();
+            MemoryCleaner.takeOwnership(fontFace.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2769,7 +2782,7 @@ public final class Context extends ProxyInstance {
             scaledFont = new ScaledFont(result);
             // Take a reference on the returned fontface
             scaledFont.reference();
-            scaledFont.takeOwnership();
+            MemoryCleaner.takeOwnership(scaledFont.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2811,7 +2824,7 @@ public final class Context extends ProxyInstance {
     public Context showText(String string) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_show_text.invoke(handle(), utf8);
                 return this;
             }
@@ -2883,7 +2896,7 @@ public final class Context extends ProxyInstance {
             TextClusterFlags clusterFlags) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 MemorySegment glyphsPtr;
                 MemorySegment clustersPtr;
                 if (glyphs == null || glyphs.length == 0) {
@@ -2958,7 +2971,7 @@ public final class Context extends ProxyInstance {
         try {
             try (Arena arena = Arena.openConfined()) {
                 TextExtents extents = TextExtents.create();
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_text_extents.invoke(handle(), utf8, extents.handle());
                 return extents;
             }
@@ -3039,8 +3052,8 @@ public final class Context extends ProxyInstance {
     public Context tagBegin(String tagName, String attributes) throws IllegalArgumentException {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment tagNamePtr = Interop.allocateString(tagName, arena);
-                MemorySegment attributesPtr = Interop.allocateString(attributes, arena);
+                MemorySegment tagNamePtr = Interop.allocateNativeString(tagName, arena);
+                MemorySegment attributesPtr = Interop.allocateNativeString(attributes, arena);
                 cairo_tag_begin.invoke(handle(), tagNamePtr, attributesPtr);
             }
         } catch (Throwable e) {
@@ -3068,7 +3081,7 @@ public final class Context extends ProxyInstance {
     public Context tagEnd(String tagName) throws IllegalArgumentException {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment tagNamePtr = Interop.allocateString(tagName, arena);
+                MemorySegment tagNamePtr = Interop.allocateNativeString(tagName, arena);
                 cairo_tag_end.invoke(handle(), tagNamePtr);
             }
         } catch (Throwable e) {

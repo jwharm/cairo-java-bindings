@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -12,7 +15,7 @@ import java.lang.invoke.MethodHandle;
 public class SolidPattern extends Pattern {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -41,7 +44,7 @@ public class SolidPattern extends Pattern {
         try {
             MemorySegment result = (MemorySegment) cairo_pattern_create_rgb.invoke(red, green, blue);
             SolidPattern pattern = new SolidPattern(result);
-            pattern.takeOwnership();
+            MemoryCleaner.takeOwnership(pattern.handle());
             return pattern;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -68,7 +71,7 @@ public class SolidPattern extends Pattern {
         try {
             MemorySegment result = (MemorySegment) cairo_pattern_create_rgba.invoke(red, green, blue, alpha);
             SolidPattern pattern = new SolidPattern(result);
-            pattern.takeOwnership();
+            MemoryCleaner.takeOwnership(pattern.handle());
             return pattern;
         } catch (Throwable e) {
             throw new RuntimeException(e);

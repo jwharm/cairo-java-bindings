@@ -1,5 +1,7 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;

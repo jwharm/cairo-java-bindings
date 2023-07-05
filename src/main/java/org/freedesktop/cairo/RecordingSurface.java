@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -41,7 +44,7 @@ import java.lang.invoke.MethodHandle;
 public final class RecordingSurface extends Surface {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -79,7 +82,7 @@ public final class RecordingSurface extends Surface {
             MemorySegment result = (MemorySegment) cairo_recording_surface_create.invoke(content.getValue(),
                     extents == null ? MemorySegment.NULL : extents.handle());
             surface = new RecordingSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             status = surface.status();
         } catch (Throwable e) {
             throw new RuntimeException(e);

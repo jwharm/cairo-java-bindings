@@ -1,5 +1,7 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.Proxy;
+
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SegmentScope;
@@ -49,7 +51,7 @@ class UserDataStore {
     
     /**
      * Allocate a native memory segment that contains the value of this key. This
-     * will work for primitive types, {@link MemorySegment} and {@link ProxyInstance}
+     * will work for primitive types, {@link MemorySegment} and {@link Proxy}
      * instances. For all other classes, this will return
      * {@link MemorySegment#NULL}.
      * 
@@ -60,7 +62,7 @@ class UserDataStore {
         MemorySegment data;
         switch (value) {
             case MemorySegment m -> data = m;
-            case ProxyInstance p -> data = p.handle();
+            case Proxy p -> data = p.handle();
             case Boolean b -> {
                 data = SegmentAllocator.nativeAllocator(scope).allocate(ValueLayout.JAVA_BOOLEAN);
                 data.set(ValueLayout.JAVA_BOOLEAN, 0, b);

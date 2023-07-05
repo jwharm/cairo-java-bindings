@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.foreign.Arena;
@@ -37,7 +41,7 @@ import java.lang.ref.Cleaner;
 public class Device extends ProxyInstance implements AutoCloseable {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Keeps user data keys and values
@@ -52,8 +56,17 @@ public class Device extends ProxyInstance implements AutoCloseable {
      */
     public Device(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_device_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_device_destroy");
         userDataStore = new UserDataStore(address.scope());
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**

@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -12,7 +15,7 @@ import java.lang.invoke.MethodHandle;
 public class Mesh extends Pattern {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -157,7 +160,7 @@ public class Mesh extends Pattern {
         try {
             MemorySegment result = (MemorySegment) cairo_pattern_create_mesh.invoke();
             Mesh pattern = new Mesh(result);
-            pattern.takeOwnership();
+            MemoryCleaner.takeOwnership(pattern.handle());
             return pattern;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -463,7 +466,7 @@ public class Mesh extends Pattern {
         try {
             MemorySegment result = (MemorySegment) cairo_mesh_pattern_get_path.invoke(handle(), patchNum);
             Path path = new Path(result);
-            path.takeOwnership();
+            MemoryCleaner.takeOwnership(path.handle());
             if (path.status() == Status.INVALID_INDEX) {
                 throw new IllegalStateException(Status.INVALID_INDEX.toString());
             }

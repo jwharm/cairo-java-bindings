@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.LibLoad;
+import io.github.jwharm.javagi.interop.Platform;
+
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -12,7 +16,17 @@ import java.lang.invoke.MethodHandle;
 public final class Cairo {
 
     static {
-        Interop.ensureInitialized();
+        switch (Platform.getRuntimePlatform()) {
+            case "linux" -> io.github.jwharm.javagi.interop.LibLoad.loadLibrary("libcairo.so.2");
+            case "windows" -> io.github.jwharm.javagi.interop.LibLoad.loadLibrary("cairo-2.dll");
+            case "macos" -> LibLoad.loadLibrary("libcairo.2.dylib");
+        }
+    }
+
+    /**
+     * Ensures the class initializer has loaded the cairo library.
+     */
+    public static void ensureInitialized() {
     }
 
     // Prohibit instantiation
@@ -32,7 +46,7 @@ public final class Cairo {
      * @since 1.0
      */
     public static int versionEncode(int major, int minor, int micro) {
-        return ((major) * 10000) + ((minor) * 100) + ((micro) * 1);
+        return (major * 10000) + (minor * 100) + micro;
     }
 
     /**
@@ -46,7 +60,7 @@ public final class Cairo {
      * @since 1.8
      */
     public static String versionStringize(int major, int minor, int micro) {
-        return "" + major + "." + minor + "." + micro;
+        return major + "." + minor + "." + micro;
     }
 
     /**

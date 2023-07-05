@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -21,7 +25,7 @@ import java.lang.invoke.MethodHandle;
 public class Region extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -33,7 +37,16 @@ public class Region extends ProxyInstance {
      */
     public Region(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_region_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_region_destroy");
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**
@@ -47,7 +60,7 @@ public class Region extends ProxyInstance {
         try {
             MemorySegment result = (MemorySegment) cairo_region_create.invoke();
             region = new Region(result);
-            region.takeOwnership();
+            MemoryCleaner.takeOwnership(region.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -73,7 +86,7 @@ public class Region extends ProxyInstance {
             MemorySegment result = (MemorySegment) cairo_region_create_rectangle
                     .invoke(rectangle == null ? MemorySegment.NULL : rectangle.handle());
             region = new Region(result);
-            region.takeOwnership();
+            MemoryCleaner.takeOwnership(region.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -109,7 +122,7 @@ public class Region extends ProxyInstance {
                 MemorySegment result = (MemorySegment) cairo_region_create_rectangles.invoke(rectsPtr,
                         rects == null ? 0 : rects.length);
                 region = new Region(result);
-                region.takeOwnership();
+                MemoryCleaner.takeOwnership(region.handle());
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -137,7 +150,7 @@ public class Region extends ProxyInstance {
             MemorySegment result = (MemorySegment) cairo_region_copy
                     .invoke(original == null ? MemorySegment.NULL : original.handle());
             region = new Region(result);
-            region.takeOwnership();
+            MemoryCleaner.takeOwnership(region.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

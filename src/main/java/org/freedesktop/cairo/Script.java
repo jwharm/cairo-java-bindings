@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.io.OutputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
@@ -23,7 +26,7 @@ import java.lang.invoke.MethodHandle;
 public class Script extends Device {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /*
@@ -57,10 +60,10 @@ public class Script extends Device {
         Script script;
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment filenamePtr = Interop.allocateString(filename, arena);
+                MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_script_create.invoke(filenamePtr);
                 script = new Script(result);
-                script.takeOwnership();
+                MemoryCleaner.takeOwnership(script.handle());
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -95,7 +98,7 @@ public class Script extends Device {
             MemorySegment result = (MemorySegment) cairo_script_create_for_stream.invoke(writeFuncPtr,
                     MemorySegment.NULL);
             script = new Script(result);
-            script.takeOwnership();
+            MemoryCleaner.takeOwnership(script.handle());
             if (stream != null) {
                 script.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
             }
@@ -184,7 +187,7 @@ public class Script extends Device {
             MemorySegment result = (MemorySegment) cairo_script_surface_create.invoke(handle(), content.getValue(), width,
                     height);
             surface = new ScriptSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             surface.script = this; // keep the Script instance alive
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -213,7 +216,7 @@ public class Script extends Device {
             MemorySegment result = (MemorySegment) cairo_script_surface_create_for_target.invoke(handle(),
                     target == null ? MemorySegment.NULL : target.handle());
             surface = new ScriptSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             surface.script = this; // keep the Script instance alive
             surface.target = target; // keep the target Surface instance alive
         } catch (Throwable e) {
@@ -238,7 +241,7 @@ public class Script extends Device {
     public void writeComment(String comment) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment commentPtr = Interop.allocateString(comment, arena);
+                MemorySegment commentPtr = Interop.allocateNativeString(comment, arena);
                 cairo_script_write_comment.invoke(handle(), commentPtr, comment == null ? 0 : comment.length());
             }
         } catch (Throwable e) {

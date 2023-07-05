@@ -1,5 +1,9 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -30,7 +34,7 @@ import java.lang.invoke.MethodHandle;
 public class FontOptions extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -42,7 +46,16 @@ public class FontOptions extends ProxyInstance {
      */
     public FontOptions(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_font_options_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_font_options_destroy");
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**
@@ -56,7 +69,7 @@ public class FontOptions extends ProxyInstance {
         try {
             MemorySegment result = (MemorySegment) cairo_font_options_create.invoke();
             FontOptions options = new FontOptions(result);
-            options.takeOwnership();
+            MemoryCleaner.takeOwnership(options.handle());
             return options;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -78,7 +91,7 @@ public class FontOptions extends ProxyInstance {
         try {
             MemorySegment result = (MemorySegment) cairo_font_options_copy.invoke(handle());
             copy = new FontOptions(result);
-            copy.takeOwnership();
+            MemoryCleaner.takeOwnership(copy.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -382,7 +395,7 @@ public class FontOptions extends ProxyInstance {
     public void setVariations(String variations) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(variations, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(variations, arena);
                 cairo_font_options_set_variations.invoke(handle(), utf8);
             }
         } catch (Throwable e) {

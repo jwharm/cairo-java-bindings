@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.io.OutputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
@@ -83,7 +86,7 @@ import java.lang.invoke.MethodHandle;
 public final class PDFSurface extends Surface {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /*
@@ -131,11 +134,11 @@ public final class PDFSurface extends Surface {
         PDFSurface surface;
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment filenamePtr = Interop.allocateString(filename, arena);
+                MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_pdf_surface_create.invoke(filenamePtr, widthInPoints,
                         heightInPoints);
                 surface = new PDFSurface(result);
-                surface.takeOwnership();
+                MemoryCleaner.takeOwnership(surface.handle());
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -177,7 +180,7 @@ public final class PDFSurface extends Surface {
             MemorySegment result = (MemorySegment) cairo_pdf_surface_create_for_stream.invoke(writeFuncPtr,
                     MemorySegment.NULL, widthInPoints, heightInPoints);
             surface = new PDFSurface(result);
-            surface.takeOwnership();
+            MemoryCleaner.takeOwnership(surface.handle());
             if (stream != null) {
                 surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
             }
@@ -267,7 +270,7 @@ public final class PDFSurface extends Surface {
     public int addOutline(int parentId, String string, String linkAttribs, PDFOutlineFlags flags) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 MemorySegment linkAttribsPtr = linkAttribs == null ? MemorySegment.NULL
                         : arena.allocateUtf8String(linkAttribs);
                 return (int) cairo_pdf_surface_add_outline.invoke(handle(), parentId, utf8, linkAttribsPtr,
@@ -304,7 +307,7 @@ public final class PDFSurface extends Surface {
     public PDFSurface setMetadata(PDFMetadata metadata, String string) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_pdf_surface_set_metadata.invoke(handle(), metadata.getValue(), utf8);
                 return this;
             }
@@ -327,7 +330,7 @@ public final class PDFSurface extends Surface {
     public PDFSurface setPageLabel(String string) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateString(string, arena);
+                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_pdf_surface_set_page_label.invoke(handle(), utf8);
                 return this;
             }

@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -93,7 +96,16 @@ public class Path extends ProxyInstance implements Iterable<PathElement> {
      */
     public Path(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_path_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_path_destroy");
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**

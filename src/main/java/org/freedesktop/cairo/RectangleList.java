@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.base.ProxyInstance;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
@@ -16,7 +19,7 @@ import java.util.List;
 public class RectangleList extends ProxyInstance {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -75,7 +78,16 @@ public class RectangleList extends ProxyInstance {
      */
     public RectangleList(MemorySegment address) {
         super(address);
-        setDestroyFunc("cairo_rectangle_list_destroy");
+        MemoryCleaner.setFreeFunc(handle(), "cairo_rectangle_list_destroy");
+    }
+
+    /**
+     * Invokes the cleanup action that is normally invoked during garbage collection.
+     * If the instance is "owned" by the user, the {@code destroy()} function is run
+     * to dispose the native instance.
+     */
+    public void destroy() {
+        MemoryCleaner.free(handle());
     }
 
     /**

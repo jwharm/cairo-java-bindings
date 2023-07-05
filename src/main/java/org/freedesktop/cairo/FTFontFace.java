@@ -6,6 +6,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.ref.Cleaner;
 
+import io.github.jwharm.javagi.interop.Interop;
 import org.freedesktop.freetype.Face;
 
 /**
@@ -19,7 +20,7 @@ import org.freedesktop.freetype.Face;
 public class FTFontFace extends FontFace {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     // Keep a reference to the FreeType FT_Face during the lifetime of the

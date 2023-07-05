@@ -1,5 +1,8 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.javagi.interop.Interop;
+import io.github.jwharm.javagi.interop.MemoryCleaner;
+
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
@@ -12,7 +15,7 @@ import java.lang.invoke.MethodHandle;
 public class RadialGradient extends Gradient {
 
     static {
-        Interop.ensureInitialized();
+        Cairo.ensureInitialized();
     }
 
     /**
@@ -51,7 +54,7 @@ public class RadialGradient extends Gradient {
             MemorySegment result = (MemorySegment) cairo_pattern_create_radial.invoke(cx0, cy0, radius0, cx1, cy1,
                     radius1);
             RadialGradient pattern = new RadialGradient(result);
-            pattern.takeOwnership();
+            MemoryCleaner.takeOwnership(pattern.handle());
             return pattern;
         } catch (Throwable e) {
             throw new RuntimeException(e);
