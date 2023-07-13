@@ -16,18 +16,15 @@ import rife.bld.publish.PublishLicense;
  * Build definition for the cairo-java-bindings project.
  * <p>
  * Run {@code ./bld download publish} on the command-line to download
- * dependencies, compile the project and create a {@code cairo-x.y.z-i.j.jar}
- * file.
- * <p>
- * Version x.y.z is the version of cairo, the i.j qualifier is the version of
- * the Java bindings.
+ * dependencies, compile the project and create and publish artifacts
+ * to the build/dist folder and maven-local.
  */
 public class CairoBindingsBuild extends Project {
 
     public CairoBindingsBuild() {
         pkg = "org.freedesktop.cairo";
         name = "cairo";
-        version = version(1,16).withQualifier("0.1");
+        version = version("1.16-0.1.0");
         javaRelease = 20;
 
         compileOperation().compileOptions()
@@ -46,7 +43,7 @@ public class CairoBindingsBuild extends Project {
         repositories = List.of(MAVEN_CENTRAL, MAVEN_LOCAL);
 
         scope(compile)
-            .include(dependency("io.github.jwharm.javagi", "glib", version("2.76-0.6")));
+            .include(dependency("io.github.jwharm.javagi", "glib", version("2.76-0.6.0")));
 
         scope(test)
             .include(dependency("org.junit.jupiter", "junit-jupiter", version(5,9,3)))
