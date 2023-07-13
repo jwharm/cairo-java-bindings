@@ -46,7 +46,7 @@ import java.lang.invoke.MethodHandle;
  * @see Surface
  * @since 1.2
  */
-public final class PostScriptSurface extends Surface {
+public final class PSSurface extends Surface {
 
     static {
         Cairo.ensureInitialized();
@@ -55,19 +55,19 @@ public final class PostScriptSurface extends Surface {
     /*
      * Initialized by {@link #create(OutputStream, int, int)} to keep a reference to
      * the memory segment for the upcall stub alive during the lifetime of the
-     * PostScriptSurface instance.
+     * PSSurface instance.
      */
     @SuppressWarnings("unused")
     private MemorySegment callbackAllocation;
 
     /**
-     * Constructor used internally to instantiate a java PostScriptSurface object for a
+     * Constructor used internally to instantiate a java PSSurface object for a
      * native {@code cairo_surface_t} instance
      * 
      * @param address the memory address of the native {@code cairo_surface_t}
      *                instance
      */
-    public PostScriptSurface(MemorySegment address) {
+    public PSSurface(MemorySegment address) {
         super(address);
     }
 
@@ -91,14 +91,14 @@ public final class PostScriptSurface extends Surface {
      * @return the newly created surface.
      * @since 1.2
      */
-    public static PostScriptSurface create(String filename, int widthInPoints, int heightInPoints) {
-        PostScriptSurface surface;
+    public static PSSurface create(String filename, int widthInPoints, int heightInPoints) {
+        PSSurface surface;
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_ps_surface_create.invoke(filenamePtr, widthInPoints,
                         heightInPoints);
-                surface = new PostScriptSurface(result);
+                surface = new PSSurface(result);
                 MemoryCleaner.takeOwnership(surface.handle());
             }
         } catch (Throwable e) {
@@ -133,8 +133,8 @@ public final class PostScriptSurface extends Surface {
      * @return the newly created surface.
      * @since 1.2
      */
-    public static PostScriptSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
-        PostScriptSurface surface;
+    public static PSSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
+        PSSurface surface;
         try {
             MemorySegment writeFuncPtr;
             if (stream != null) {
@@ -145,7 +145,7 @@ public final class PostScriptSurface extends Surface {
             }
             MemorySegment result = (MemorySegment) cairo_ps_surface_create_for_stream.invoke(writeFuncPtr,
                     MemorySegment.NULL, widthInPoints, heightInPoints);
-            surface = new PostScriptSurface(result);
+            surface = new PSSurface(result);
             MemoryCleaner.takeOwnership(surface.handle());
             if (stream != null) {
                 surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
@@ -166,7 +166,7 @@ public final class PostScriptSurface extends Surface {
 
     /**
      * Restricts the generated PostSript file to {@code level}. See
-     * {@link PostScriptLevel#getLevels()} for a list of available level values that
+     * {@link PSLevel#getLevels()} for a list of available level values that
      * can be used here.
      * <p>
      * This function should only be called before any drawing operations have been
@@ -177,7 +177,7 @@ public final class PostScriptSurface extends Surface {
      * @return the PostScript surface
      * @since 1.6
      */
-    public PostScriptSurface restrictToLevel(PostScriptLevel level) {
+    public PSSurface restrictToLevel(PSLevel level) {
         try {
             cairo_ps_surface_restrict_to_level.invoke(handle(), level.getValue());
             return this;
@@ -202,7 +202,7 @@ public final class PostScriptSurface extends Surface {
      * @return the PostScript surface
      * @since 1.6
      */
-    public PostScriptSurface setEPS(boolean eps) {
+    public PSSurface setEPS(boolean eps) {
         try {
             cairo_ps_surface_set_eps.invoke(handle(), eps ? 1 : 0);
             return this;
@@ -247,7 +247,7 @@ public final class PostScriptSurface extends Surface {
      * @return the PostScript surface
      * @since 1.2
      */
-    public PostScriptSurface setSize(double widthInPoints, double heightInPoints) {
+    public PSSurface setSize(double widthInPoints, double heightInPoints) {
         try {
             cairo_ps_surface_set_size.invoke(handle(), widthInPoints, heightInPoints);
             return this;
@@ -272,7 +272,7 @@ public final class PostScriptSurface extends Surface {
      * @return the PostScript surface
      * @since 1.2
      */
-    public PostScriptSurface dscBeginSetup() {
+    public PSSurface dscBeginSetup() {
         try {
             cairo_ps_surface_dsc_begin_setup.invoke(handle());
             return this;
@@ -297,7 +297,7 @@ public final class PostScriptSurface extends Surface {
      * @return the PostScript surface
      * @since 1.2
      */
-    public PostScriptSurface dscBeginPageSetup() {
+    public PSSurface dscBeginPageSetup() {
         try {
             cairo_ps_surface_dsc_begin_page_setup.invoke(handle());
             return this;
@@ -370,7 +370,7 @@ public final class PostScriptSurface extends Surface {
      * Here is an example sequence showing how this function might be used:
      * 
      * <pre>
-     * var surface = PostScriptSurface.create(filename, width, height);
+     * var surface = PSSurface.create(filename, width, height);
      * ...
      * surface.dscComment("%%Title: My excellent document")
      *        .dscComment("%%Copyright: Copyright (C) 2006 Cairo Lover")
@@ -397,7 +397,7 @@ public final class PostScriptSurface extends Surface {
      *                                  characters) exceeds 255 characters.
      * @since 1.2
      */
-    public PostScriptSurface dscComment(String comment) throws IllegalArgumentException {
+    public PSSurface dscComment(String comment) throws IllegalArgumentException {
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment commentPtr = Interop.allocateNativeString(comment, arena);

@@ -1,7 +1,7 @@
 package org.freedesktop.cairo.test;
 
-import org.freedesktop.cairo.PostScriptLevel;
-import org.freedesktop.cairo.PostScriptSurface;
+import org.freedesktop.cairo.PSLevel;
+import org.freedesktop.cairo.PSSurface;
 import org.freedesktop.cairo.Status;
 import org.junit.jupiter.api.Test;
 
@@ -10,11 +10,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PostScriptSurfaceTest {
+class PSSurfaceTest {
 
     @Test
     void testCreateStringIntInt() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
             assertEquals(s.status(), Status.SUCCESS);
         }
     }
@@ -28,7 +28,7 @@ class PostScriptSurfaceTest {
                 success.set(true);
             }
         };
-        try (PostScriptSurface s = PostScriptSurface.create(stream, 120, 120)) {
+        try (PSSurface s = PSSurface.create(stream, 120, 120)) {
             s.showPage();
             assertEquals(s.status(), Status.SUCCESS);
         }
@@ -37,15 +37,15 @@ class PostScriptSurfaceTest {
 
     @Test
     void testRestrictToLevel() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
-            s.restrictToLevel(PostScriptLevel.LEVEL_3);
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
+            s.restrictToLevel(PSLevel.LEVEL_3);
             assertEquals(s.status(), Status.SUCCESS);
         }
     }
 
     @Test
     void testSetEPS() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
             s.setEPS(true);
             assertEquals(s.status(), Status.SUCCESS);
         }
@@ -53,7 +53,7 @@ class PostScriptSurfaceTest {
 
     @Test
     void testGetEPS() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
             s.getEPS();
             assertEquals(s.status(), Status.SUCCESS);
         }
@@ -61,7 +61,7 @@ class PostScriptSurfaceTest {
 
     @Test
     void testSetSize() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
             s.setSize(140, 140);
             assertEquals(s.status(), Status.SUCCESS);
         }
@@ -69,7 +69,7 @@ class PostScriptSurfaceTest {
 
     @Test
     void testDscBeginSetup() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
             s.dscBeginSetup();
             assertEquals(s.status(), Status.SUCCESS);
         }
@@ -77,7 +77,7 @@ class PostScriptSurfaceTest {
 
     @Test
     void testDscBeginPageSetup() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
             s.dscBeginPageSetup();
             assertEquals(s.status(), Status.SUCCESS);
         }
@@ -85,7 +85,7 @@ class PostScriptSurfaceTest {
 
     @Test
     void testDscComment() {
-        try (PostScriptSurface s = PostScriptSurface.create("", 120, 120)) {
+        try (PSSurface s = PSSurface.create("", 120, 120)) {
             s.dscComment("%%Title: Test");
             assertEquals(s.status(), Status.SUCCESS);
         }

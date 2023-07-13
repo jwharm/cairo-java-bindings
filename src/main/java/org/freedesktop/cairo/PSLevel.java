@@ -9,12 +9,12 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
 /**
- * PostScriptLevel is used to describe the language level of the PostScript
+ * PSLevel is used to describe the language level of the PostScript
  * Language Reference that a generated PostScript file will conform to.
  * 
  * @since 1.6
  */
-public enum PostScriptLevel {
+public enum PSLevel {
 
     /**
      * The language level 2 of the PostScript specification.
@@ -45,7 +45,7 @@ public enum PostScriptLevel {
      * @param ordinal the position in the enum declaration, starting from zero
      * @return the enum constant for the given ordinal
      */
-    public static PostScriptLevel of(int ordinal) {
+    public static PSLevel of(int ordinal) {
         return values()[ordinal];
     }
 
@@ -55,12 +55,12 @@ public enum PostScriptLevel {
 
     /**
      * Used to retrieve the list of supported levels. See
-     * {@link PostScriptSurface#restrictToLevel(PostScriptLevel)}.
+     * {@link PSSurface#restrictToLevel(PSLevel)}.
      * 
      * @return supported level list
      * @since 1.6
      */
-    public static PostScriptLevel[] getLevels() {
+    public static PSLevel[] getLevels() {
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment levelsPtr = arena.allocate(ValueLayout.ADDRESS);
@@ -69,9 +69,9 @@ public enum PostScriptLevel {
                 int numLevels = numLevelsPtr.get(ValueLayout.JAVA_INT, 0);
                 int[] levelInts = MemorySegment.ofAddress(levelsPtr.address(), numLevels, arena.scope())
                         .toArray(ValueLayout.JAVA_INT);
-                PostScriptLevel[] levels = new PostScriptLevel[numLevels];
+                PSLevel[] levels = new PSLevel[numLevels];
                 for (int i = 0; i < levelInts.length; i++) {
-                    levels[i] = PostScriptLevel.of(levelInts[i]);
+                    levels[i] = PSLevel.of(levelInts[i]);
                 }
                 return levels;
             }
