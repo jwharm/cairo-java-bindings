@@ -30,7 +30,7 @@ import java.lang.ref.Cleaner;
  * discussion of devices.
  */
 public sealed class Surface extends ProxyInstance implements AutoCloseable
-        permits ImageSurface, PDFSurface, PostScriptSurface, RecordingSurface, SVGSurface, ScriptSurface {
+        permits ImageSurface, PDFSurface, PSSurface, RecordingSurface, SVGSurface, ScriptSurface {
 
     static {
         Cairo.ensureInitialized();
@@ -104,7 +104,7 @@ public sealed class Surface extends ProxyInstance implements AutoCloseable
             } else if (type == SurfaceType.PDF) {
                 surface = new PDFSurface(result);
             } else if (type == SurfaceType.PS) {
-                surface = new PostScriptSurface(result);
+                surface = new PSSurface(result);
             } else if (type == SurfaceType.RECORDING) {
                 surface = new RecordingSurface(result);
             } else if (type == SurfaceType.SVG) {

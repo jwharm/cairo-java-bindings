@@ -60,11 +60,21 @@ class PathData extends ProxyInstance {
                     ).withName("point")
                 ).withName("cairo_path_data_t");
     }
+    
+    private static MemoryLayout headerLayout = MemoryLayout.structLayout(
+            ValueLayout.JAVA_INT.withName("type"),
+            ValueLayout.JAVA_INT.withName("length")
+        ).withName("header");
+    
+    private static MemoryLayout pointLayout = MemoryLayout.structLayout(
+            ValueLayout.JAVA_DOUBLE.withName("x"),
+            ValueLayout.JAVA_DOUBLE.withName("y")
+        ).withName("point");
 
-    private static final VarHandle TYPE = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("type"));
-    private static final VarHandle LENGTH = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("length"));
-    private static final VarHandle X = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("x"));
-    private static final VarHandle Y = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("y"));
+    private static final VarHandle TYPE = headerLayout.varHandle(MemoryLayout.PathElement.groupElement("type"));
+    private static final VarHandle LENGTH = headerLayout.varHandle(MemoryLayout.PathElement.groupElement("length"));
+    private static final VarHandle X = pointLayout.varHandle(MemoryLayout.PathElement.groupElement("x"));
+    private static final VarHandle Y = pointLayout.varHandle(MemoryLayout.PathElement.groupElement("y"));
 
     /**
      * Read the type field of the header

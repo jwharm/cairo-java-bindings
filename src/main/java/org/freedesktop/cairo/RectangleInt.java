@@ -99,4 +99,14 @@ public class RectangleInt extends ProxyInstance {
         HEIGHT.set(rect.handle(), height);
         return rect;
     }
+    
+    /**
+     * String representation of this RectangleInt
+     * 
+     * @return a String representation of this RectangleInt
+     */
+    @Override
+    public String toString() {
+        return String.format("RectangleInt address=%d x=%d y=%d width=%d height=%d", handle().address(), x(), y(), width(), height());
+    }
 }

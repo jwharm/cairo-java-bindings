@@ -39,12 +39,12 @@ public class TextExtents extends ProxyInstance {
             .withName("cairo_text_extents_t");
     }
 
-    private static final VarHandle X_BEARING = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("ascent"));
-    private static final VarHandle Y_BEARING = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("descent"));
-    private static final VarHandle WIDTH = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("height"));
+    private static final VarHandle X_BEARING = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("x_bearing"));
+    private static final VarHandle Y_BEARING = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("y_bearing"));
+    private static final VarHandle WIDTH = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("width"));
     private static final VarHandle HEIGHT = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("height"));
-    private static final VarHandle X_ADVANCE = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("max_x_advance"));
-    private static final VarHandle Y_ADVANCE = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("max_y_advance"));
+    private static final VarHandle X_ADVANCE = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("x_advance"));
+    private static final VarHandle Y_ADVANCE = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("y_advance"));
 
     /**
      * Allocate a new {@code cairo_text_extents_t}

@@ -90,7 +90,7 @@ public class FTFontFace extends FontFace {
     public FTSynthesize getSynthesize() {
         try {
             int result = (int) cairo_ft_font_face_get_synthesize.invoke(handle());
-            return FTSynthesize.of(result);
+            return new FTSynthesize(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

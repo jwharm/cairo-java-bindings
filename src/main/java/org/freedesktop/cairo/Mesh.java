@@ -66,18 +66,19 @@ public class Mesh extends Pattern {
      *      C0     Side 3        C3
      * </pre>
      * 
-     * Each patch is constructed by first calling cairo_mesh_pattern_begin_patch(),
-     * then cairo_mesh_pattern_move_to() to specify the first point in the patch
-     * (C0). Then the sides are specified with calls to
-     * cairo_mesh_pattern_curve_to() and cairo_mesh_pattern_line_to().
+     * Each patch is constructed by first calling {@link #beginPatch()}, then
+     * {@link #moveTo(double, double)} to specify the first point in the patch (C0).
+     * Then the sides are specified with calls to
+     * {@link #curveTo(double, double, double, double, double, double)} and
+     * {@link #lineTo(double, double)}
      * <p>
      * The four additional control points (P0, P1, P2, P3) in a patch can be
-     * specified with cairo_mesh_pattern_set_control_point().
+     * specified with {@link #setControlPoint(int, double, double)}.
      * <p>
      * At each corner of the patch (C0, C1, C2, C3) a color may be specified with
-     * cairo_mesh_pattern_set_corner_color_rgb() or
-     * cairo_mesh_pattern_set_corner_color_rgba(). Any corner whose color is not
-     * explicitly specified defaults to transparent black.
+     * {@link #setCornerColorRGB(int, double, double, double)} or
+     * {@link #setCornerColorRGBA(int, double, double, double, double)}. Any corner
+     * whose color is not explicitly specified defaults to transparent black.
      * <p>
      * A Coons patch is a special case of the tensor-product patch where the control
      * points are implicitly defined by the sides of the patch. The default value
@@ -96,41 +97,27 @@ public class Mesh extends Pattern {
      * point is located, when specifying colors, corner 0 will always be the first
      * point, corner 1 the point between side 0 and side 1 etc.
      * <p>
-     * Calling cairo_mesh_pattern_end_patch() completes the current patch. If less
-     * than 4 sides have been defined, the first missing side is defined as a line
-     * from the current point to the first point of the patch (C0) and the other
-     * sides are degenerate lines from C0 to C0. The corners between the added sides
-     * will all be coincident with C0 of the patch and their color will be set to be
-     * the same as the color of C0.
+     * Calling {@link #endPatch()} completes the current patch. If less than 4 sides
+     * have been defined, the first missing side is defined as a line from the
+     * current point to the first point of the patch (C0) and the other sides are
+     * degenerate lines from C0 to C0. The corners between the added sides will all
+     * be coincident with C0 of the patch and their color will be set to be the same
+     * as the color of C0.
      * <p>
      * Additional patches may be added with additional calls to
-     * cairo_mesh_pattern_begin_patch()/cairo_mesh_pattern_end_patch().
+     * {@link #beginPatch()}/{@link #endPatch()}.
      *
      * <pre>
      * Mesh pattern = Mesh.createMesh();
      * 
      * // Add a Coons patch
-     * pattern.beginPatch()
-     *        .moveTo(0, 0)
-     *        .curveTo(30, -30, 60, 30, 100, 0)
-     *        .curveTo(60, 30, 130, 60, 100, 100)
-     *        .curveTo(60, 70, 30, 130, 0, 100)
-     *        .curveTo(30, 70, -30, 30, 0, 0)
-     *        .setCornerColorRGB(0, 1, 0, 0)
-     *        .setCornerColorRGB(1, 0, 1, 0)
-     *        .setCornerColorRGB(2, 0, 0, 1)
-     *        .setCornerColorRGB(3, 1, 1, 0)
-     *        .endPatch();
+     * pattern.beginPatch().moveTo(0, 0).curveTo(30, -30, 60, 30, 100, 0).curveTo(60, 30, 130, 60, 100, 100)
+     *         .curveTo(60, 70, 30, 130, 0, 100).curveTo(30, 70, -30, 30, 0, 0).setCornerColorRGB(0, 1, 0, 0)
+     *         .setCornerColorRGB(1, 0, 1, 0).setCornerColorRGB(2, 0, 0, 1).setCornerColorRGB(3, 1, 1, 0).endPatch();
      * 
      * // Add a Gouraud-shaded triangle
-     * pattern.beginPatch()
-     *        .moveTo(100, 100)
-     *        .lineTo(130, 130)
-     *        .lineTo(130, 70)
-     *        .setCornerColorRGB(0, 1, 0, 0)
-     *        .setCornerColorRGB(1, 0, 1, 0)
-     *        .setCornerColorRGB(2, 0, 0, 1)
-     *        .endPatch();
+     * pattern.beginPatch().moveTo(100, 100).lineTo(130, 130).lineTo(130, 70).setCornerColorRGB(0, 1, 0, 0)
+     *         .setCornerColorRGB(1, 0, 1, 0).setCornerColorRGB(2, 0, 0, 1).endPatch();
      * </pre>
      * 
      * When two patches overlap, the last one that has been added is drawn over the
@@ -151,7 +138,7 @@ public class Mesh extends Pattern {
      * <p>
      * Note: The coordinates are always in pattern space. For a new pattern, pattern
      * space is identical to user space, but the relationship between the spaces can
-     * be changed with cairo_pattern_set_matrix().
+     * be changed with {@link #setMatrix(Matrix)}.
      * 
      * @return the newly created {@link Mesh}
      * @since 1.12
@@ -174,11 +161,11 @@ public class Mesh extends Pattern {
      * Begin a patch in a mesh pattern.
      * <p>
      * After calling this function, the patch shape should be defined with
-     * cairo_mesh_pattern_move_to(), cairo_mesh_pattern_line_to() and
-     * cairo_mesh_pattern_curve_to().
+     * {@link #moveTo(double, double)}, {@link #lineTo(double, double)} and
+     * {@link #curveTo(double, double, double, double, double, double)}.
      * <p>
-     * After defining the patch, cairo_mesh_pattern_end_patch() must be called
-     * before using pattern as a source or mask.
+     * After defining the patch, {@link #endPatch()} must be called before using
+     * pattern as a source or mask.
      * 
      * @return the mesh
      * @throws IllegalStateException If the pattern already has a current patch. See
@@ -205,7 +192,7 @@ public class Mesh extends Pattern {
      * <p>
      * If the current patch has less than 4 sides, it is closed with a straight line
      * from the current point to the first point of the patch as if
-     * cairo_mesh_pattern_line_to() was used.
+     * {@link #lineTo(double, double)} was used.
      * 
      * @return the mesh
      * @throws IllegalStateException If the pattern already has no current patch or
@@ -260,8 +247,8 @@ public class Mesh extends Pattern {
      * Adds a line to the current patch from the current point to position (x, y) in
      * pattern-space coordinates.
      * <p>
-     * If there is no current point before the call to cairo_mesh_pattern_line_to()
-     * this function will behave as cairo_mesh_pattern_move_to(pattern, x, y).
+     * If there is no current point before the call to {@code lineTo()}
+     * this function will behave as {@code moveTo(x, y)}.
      * <p>
      * After this call the current point will be (x, y).
      * 
@@ -294,8 +281,8 @@ public class Mesh extends Pattern {
      * as the control points.
      * <p>
      * If the current patch has no current point before the call to
-     * cairo_mesh_pattern_curve_to(), this function will behave as if preceded by a
-     * call to cairo_mesh_pattern_move_to(pattern, x1, y1).
+     * {@code curveTo()}, this function will behave as if preceded by a call to
+     * {@code moveTo(x, y)}.
      * <p>
      * After this call the current point will be (x3, y3).
      * 
@@ -332,7 +319,7 @@ public class Mesh extends Pattern {
      * Set an internal control point of the current patch.
      * <p>
      * Valid values for point_num are from 0 to 3 and identify the control points as
-     * explained in cairo_pattern_create_mesh().
+     * explained in {@link #create()}.
      * 
      * @param pointNum the control point to set the position for
      * @param x        the X coordinate of the control point
@@ -361,10 +348,11 @@ public class Mesh extends Pattern {
     /**
      * Sets the color of a corner of the current patch in a mesh pattern.
      * <p>
-     * The color is specified in the same way as in cairo_set_source_rgb().
+     * The color is specified in the same way as in
+     * {@link Context#setSourceRGB(double, double, double)}.
      * <p>
      * Valid values for corner_num are from 0 to 3 and identify the corners as
-     * explained in cairo_pattern_create_mesh().
+     * explained in {@link #create()}.
      * 
      * @param cornerNum the corner to set the color for
      * @param red       red component of color
@@ -394,10 +382,11 @@ public class Mesh extends Pattern {
     /**
      * Sets the color of a corner of the current patch in a mesh pattern.
      * <p>
-     * The color is specified in the same way as in cairo_set_source_rgba().
+     * The color is specified in the same way as in
+     * {@link Context#setSourceRGBA(double, double, double, double)}.
      * <p>
-     * Valid values for corner_num are from 0 to 3 and identify the corners as
-     * explained in cairo_pattern_create_mesh().
+     * Valid values for {@code cornerNum} are from 0 to 3 and identify the corners
+     * as explained in {@link #create()}.
      * 
      * @param cornerNum the corner to set the color for
      * @param red       red component of color
@@ -431,28 +420,33 @@ public class Mesh extends Pattern {
      * Gets the number of patches specified in the given mesh pattern.
      * <p>
      * The number only includes patches which have been finished by calling
-     * cairo_mesh_pattern_end_patch(). For example it will be 0 during the
-     * definition of the first patch.
+     * {@link #endPatch()}. For example it will be 0 during the definition of the
+     * first patch.
      * 
      * @return the number patches
      * @since 1.12
      */
     public int getPatchCount() {
         try {
-            return (int) cairo_mesh_pattern_get_patch_count.invoke(handle());
+            try (Arena arena = Arena.openConfined()) {
+                MemorySegment count = arena.allocate(ValueLayout.JAVA_INT);
+                cairo_mesh_pattern_get_patch_count.invoke(handle(), count);
+                return count.get(ValueLayout.JAVA_INT, 0);
+            }
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     private static final MethodHandle cairo_mesh_pattern_get_patch_count = Interop.downcallHandle(
-            "cairo_mesh_pattern_get_patch_count", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+            "cairo_mesh_pattern_get_patch_count",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
-     * Gets path defining the patch patch_num for a mesh pattern.
+     * Gets path defining the patch {@code patchNum} for a mesh pattern.
      * <p>
-     * patch_num can range from 0 to n-1 where n is the number returned by
-     * cairo_mesh_pattern_get_patch_count().
+     * {@code patchNum} can range from 0 to n-1 where n is the number returned by
+     * {@link #getPatchCount()}.
      * 
      * @param patchNum the patch number to return data for
      * @return the path defining the patch, or a path with status
@@ -478,7 +472,7 @@ public class Mesh extends Pattern {
 
     private static final MethodHandle cairo_mesh_pattern_get_path = Interop.downcallHandle(
             "cairo_mesh_pattern_get_path",
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
     /**
      * Gets the control point {@code pointNum} of patch {@code patchNum} for a mesh

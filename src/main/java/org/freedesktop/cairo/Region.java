@@ -138,26 +138,24 @@ public class Region extends ProxyInstance {
             FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
     /**
-     * Allocates a new region object copying the area from {@code original}.
+     * Allocates a new region object copying the area from this region.
      *
-     * @param  original a Region
      * @return A newly allocated Region
      * @since 1.10
      */
-    public static Region copy(Region original) {
-        Region region;
+    public Region copy() {
+        Region copy;
         try {
-            MemorySegment result = (MemorySegment) cairo_region_copy
-                    .invoke(original == null ? MemorySegment.NULL : original.handle());
-            region = new Region(result);
-            MemoryCleaner.takeOwnership(region.handle());
+            MemorySegment result = (MemorySegment) cairo_region_copy.invoke(handle());
+            copy = new Region(result);
+            MemoryCleaner.takeOwnership(copy.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-        if (region.status() == Status.NO_MEMORY) {
-            throw new RuntimeException(region.status().toString());
+        if (copy.status() == Status.NO_MEMORY) {
+            throw new RuntimeException(copy.status().toString());
         }
-        return region;
+        return copy;
     }
 
     private static final MethodHandle cairo_region_copy = Interop.downcallHandle("cairo_region_copy",
@@ -227,7 +225,7 @@ public class Region extends ProxyInstance {
     public RectangleInt getRectangle(int nth) {
         try {
             RectangleInt rectangle = RectangleInt.create(0, 0, 0, 0);
-            cairo_region_get_rectangle.invoke(handle(), nth, rectangle);
+            cairo_region_get_rectangle.invoke(handle(), nth, rectangle.handle());
             return rectangle;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -313,6 +311,9 @@ public class Region extends ProxyInstance {
      * @since 1.10
      */
     public boolean equal(Region other) {
+        // This method could be used to override equals(Object other), but then
+        // we should override hashcode() too, and there is no straightforward
+        // way to do that. So we keep it as a separate method (at least for now).
         try {
             int result = (int) cairo_region_equal.invoke(handle(), other == null ? MemorySegment.NULL : other.handle());
             return result != 0;

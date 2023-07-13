@@ -57,8 +57,6 @@ public class Matrix extends ProxyInstance {
     }
 
     /**
-     * Convenience method to use instead of {@code Matrix.create().init(...);}
-     * <p>
      * Sets the matrix to be the affine transformation given by {@code xx},
      * {@code yx}, {@code xy}, {@code yy}, {@code x0}, {@code y0}. The
      * transformation is given by:

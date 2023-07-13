@@ -90,10 +90,10 @@ public class ScaledFont extends ProxyInstance {
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
-                        fontFace == null ? MemorySegment.NULL : fontFace,
-                        fontMatrix == null ? MemorySegment.NULL : fontMatrix, 
-                        ctm == null ? MemorySegment.NULL : ctm,
-                        options == null ? MemorySegment.NULL : options);
+                        fontFace == null ? MemorySegment.NULL : fontFace.handle(),
+                        fontMatrix == null ? MemorySegment.NULL : fontMatrix.handle(), 
+                        ctm == null ? MemorySegment.NULL : ctm.handle(),
+                        options == null ? MemorySegment.NULL : options.handle());
                 font = new ScaledFont(result);
                 MemoryCleaner.takeOwnership(font.handle());
                 font.fontFace = fontFace;
@@ -116,7 +116,7 @@ public class ScaledFont extends ProxyInstance {
     /**
      * Increases the reference count on the ScaledFont by one. This prevents the
      * ScaledFont from being destroyed until a matching call to
-     * cairo_scaled_font_destroy() is made.
+     * {@link #destroy()} is made.
      * 
      * @since 1.0
      */
@@ -306,11 +306,11 @@ public class ScaledFont extends ProxyInstance {
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
-                MemorySegment glyphsPtr = arena.allocate(ValueLayout.ADDRESS);
-                MemorySegment numGlyphsPtr = arena.allocate(ValueLayout.ADDRESS);
-                MemorySegment clustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS);
-                MemorySegment numClustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS);
-                MemorySegment clusterFlagsPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment glyphsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment numGlyphsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment clustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment numClustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment clusterFlagsPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS.asUnbounded());
 
                 int result = (int) cairo_scaled_font_text_to_glyphs.invoke(handle(), x, y, utf8, string.length(),
                         glyphsPtr, numGlyphsPtr, clustersPtr, numClustersPtr, clusterFlagsPtr);
@@ -327,10 +327,13 @@ public class ScaledFont extends ProxyInstance {
 
                 // Read the glyphs array
                 int numGlyphs = numGlyphsPtr.get(ValueLayout.JAVA_INT, 0);
+                MemorySegment newPtr = glyphsPtr.get(ValueLayout.ADDRESS, 0);
+                MemorySegment glyphsArray = MemorySegment.ofAddress(newPtr.address(), numGlyphs * Glyph.getMemoryLayout().byteSize());
                 for (int i = 0; i < numGlyphs; i++) {
-                    glyphs.add(new Glyph(glyphsPtr.asSlice(i * ValueLayout.ADDRESS.byteSize())));
+                    MemorySegment gl = glyphsArray.asSlice(Glyph.getMemoryLayout().byteSize() * i);
+                    glyphs.add(new Glyph(gl));
                 }
-                cairo_glyph_free.invoke(glyphsPtr);
+                cairo_glyph_free.invoke(newPtr);
 
                 // Clusters are optional
                 if (clusters == null) {
@@ -339,10 +342,13 @@ public class ScaledFont extends ProxyInstance {
 
                 // Read the clusters array
                 int numClusters = numClustersPtr.get(ValueLayout.JAVA_INT, 0);
+                newPtr = clustersPtr.get(ValueLayout.ADDRESS, 0);
+                MemorySegment clustersArray = MemorySegment.ofAddress(newPtr.address(), numClusters * TextCluster.getMemoryLayout().byteSize());
                 for (int i = 0; i < numClusters; i++) {
-                    clusters.add(new TextCluster(clustersPtr.asSlice(i * ValueLayout.ADDRESS.byteSize())));
+                    MemorySegment tc = clustersArray.asSlice(TextCluster.getMemoryLayout().byteSize() * i);
+                    clusters.add(new TextCluster(tc));
                 }
-                cairo_text_cluster_free.invoke(clustersPtr);
+                cairo_text_cluster_free.invoke(newPtr);
 
                 // Read the cluster flags
                 int flags = clusterFlagsPtr.get(ValueLayout.JAVA_INT, 0);
@@ -358,10 +364,11 @@ public class ScaledFont extends ProxyInstance {
 
     private static final MethodHandle cairo_scaled_font_text_to_glyphs = Interop.downcallHandle(
             "cairo_scaled_font_text_to_glyphs",
-            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE,
-                    ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS.asUnbounded(),
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE,
+                    ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
                     ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded(),
-                    ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded()));
+                    ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded(),
+                    ValueLayout.ADDRESS.asUnbounded()));
 
     private static final MethodHandle cairo_glyph_free = Interop.downcallHandle(
             "cairo_glyph_free", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));

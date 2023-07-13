@@ -91,7 +91,8 @@ public class RadialGradient extends Gradient {
     }
 
     private static final MethodHandle cairo_pattern_get_radial_circles = Interop.downcallHandle(
-            "cairo_pattern_get_radial_circles", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+            "cairo_pattern_get_radial_circles",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
 }

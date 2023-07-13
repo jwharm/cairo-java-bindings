@@ -57,10 +57,10 @@ public class FTScaledFont extends ScaledFont {
         try {
             try (Arena arena = Arena.openConfined()) {
                 MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
-                        fontFace == null ? MemorySegment.NULL : fontFace,
-                        fontMatrix == null ? MemorySegment.NULL : fontMatrix,
-                        ctm == null ? MemorySegment.NULL : ctm,
-                        options == null ? MemorySegment.NULL : options);
+                        fontFace == null ? MemorySegment.NULL : fontFace.handle(),
+                        fontMatrix == null ? MemorySegment.NULL : fontMatrix.handle(),
+                        ctm == null ? MemorySegment.NULL : ctm.handle(),
+                        options == null ? MemorySegment.NULL : options.handle());
                 font = new FTScaledFont(result);
                 MemoryCleaner.takeOwnership(font.handle());
                 font.fontFace = fontFace;
