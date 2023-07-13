@@ -111,13 +111,27 @@ public class Mesh extends Pattern {
      * Mesh pattern = Mesh.createMesh();
      * 
      * // Add a Coons patch
-     * pattern.beginPatch().moveTo(0, 0).curveTo(30, -30, 60, 30, 100, 0).curveTo(60, 30, 130, 60, 100, 100)
-     *         .curveTo(60, 70, 30, 130, 0, 100).curveTo(30, 70, -30, 30, 0, 0).setCornerColorRGB(0, 1, 0, 0)
-     *         .setCornerColorRGB(1, 0, 1, 0).setCornerColorRGB(2, 0, 0, 1).setCornerColorRGB(3, 1, 1, 0).endPatch();
+     * pattern.beginPatch()
+     *        .moveTo(0, 0)
+     *        .curveTo(30, -30, 60, 30, 100, 0)
+     *        .curveTo(60, 30, 130, 60, 100, 100)
+     *        .curveTo(60, 70, 30, 130, 0, 100)
+     *        .curveTo(30, 70, -30, 30, 0, 0)
+     *        .setCornerColorRGB(0, 1, 0, 0)
+     *        .setCornerColorRGB(1, 0, 1, 0)
+     *        .setCornerColorRGB(2, 0, 0, 1)
+     *        .setCornerColorRGB(3, 1, 1, 0)
+     *        .endPatch();
      * 
      * // Add a Gouraud-shaded triangle
-     * pattern.beginPatch().moveTo(100, 100).lineTo(130, 130).lineTo(130, 70).setCornerColorRGB(0, 1, 0, 0)
-     *         .setCornerColorRGB(1, 0, 1, 0).setCornerColorRGB(2, 0, 0, 1).endPatch();
+     * pattern.beginPatch()
+     *        .moveTo(100, 100)
+     *        .lineTo(130, 130)
+     *        .lineTo(130, 70)
+     *        .setCornerColorRGB(0, 1, 0, 0)
+     *        .setCornerColorRGB(1, 0, 1, 0)
+     *        .setCornerColorRGB(2, 0, 0, 1)
+     *        .endPatch();
      * </pre>
      * 
      * When two patches overlap, the last one that has been added is drawn over the
