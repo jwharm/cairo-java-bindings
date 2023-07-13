@@ -19,7 +19,7 @@ available as Java enums. The proxy classes inherit when applicable: `RadialGradi
 functions and parameters follow Java (camel case) naming practices, so 
 `cairo_move_to(*cr, x, y)` becomes `cr.moveTo(x, y)`. Out-parameters in the C API 
 are mapped to return values in Java. Multiple out parameters (like coordinates) are mapped to a 
-`Point` or `Rectangle` return type in Java.
+`Point`, `Circle` or `Rectangle` return type in Java.
 
 ### Resource allocation and disposal
 
@@ -71,6 +71,8 @@ Some other features that the language bindings offer:
 * The functions for reading and comparing cairo version information are available in Java as static 
   methods in the `Cairo` class.
 
+* Basic functionality is included to load fonts with FreeType2 for use with cairo.
+
 ## API Documentation
 
 All API documentation is available as Javadoc, and has been reworked to use Javadoc syntax and 
@@ -85,27 +87,37 @@ General Public License (LGPL) version 2.1 (which is also one of the licenses of 
 
 ## Status
 
-This software is still a work in progress:
+Some things that are still on the to-do list:
 
-* Platform-specific surface types and font implementations are not (yet) available in the bindings.
+* Platform-specific surface types and font implementations
 
-* Test coverage is not complete yet.
-
-* The bindings should work on all platforms that support JDK 20 and cairo, but have mostly been 
-  tested on Linux for now.
+* The bindings should work on all platforms that support JDK 20 and cairo, but have only been 
+  tested on Linux and Windows.
 
 PRs and issue reports are welcome.
 
 ## Usage
 
-There aren't any unexpected dependencies. You obviusly need to have the cairo library installed on 
-your system, or else the Java bindings have nothing to bind to. You also need to install JDK 20 
-(not JDK 19 or earlier, nor the JDK 21 early-access version), because the JEP-434 Panama FFI is 
-slightly different between JDK versions.
+Thanks to [jitpack.io](https://jitpack.io/#jwharm/cairo-java-bindings), you can simply include 
+the library in your `gradle.build` or `pom.xml` file:
 
-You can download `cairo-1.6-0.1.jar` from GitHub, or add the dependency to your Gradle or 
-Maven build script (thanks to jitpack.io for hosting). The jar filename first contains the cairo 
-version, followed by the version of the Java bindings.
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    implementation 'com.github.jwharm:cairo-java-bindings:1.16.0'
+}
+```
+
+Furthermore, you obviously need to have the cairo library version 1.16 installed on your system, 
+or else the Java bindings have nothing to bind to. You also need to install JDK 20 (not JDK 19 or 
+earlier, nor the JDK 21 early-access version), because the JEP-434 Panama FFI is slightly different 
+between JDK versions.
 
 After you added the jar file to your classpath, you can start developing with cairo in Java. Have 
 fun! This is a simple example to get started, ported from 
@@ -124,26 +136,26 @@ public class CairoExample {
         // Create drawing context
         var cr = Context.create(surface);
 
-        double xc = 128.0;
-        double yc = 128.0;
+        double x = 128.0;
+        double y = 128.0;
         double radius = 100.0;
         double angle1 = 45.0  * (Math.PI/180.0); // angles are specified
         double angle2 = 180.0 * (Math.PI/180.0); // in radians
 
         // Draw shapes
         cr.setLineWidth(10.0)
-          .arc(xc, yc, radius, angle1, angle2)
+          .arc(x, y, radius, angle1, angle2)
           .stroke();
 
         cr.setSourceRGBA(1.0, 0.2, 0.2, 0.6)
           .setLineWidth(6.0)
-          .arc(xc, yc, 10.0, 0.0, 2 * Math.PI)
+          .arc(x, y, 10.0, 0.0, 2 * Math.PI)
           .fill();
 
-        cr.arc(xc, yc, radius, angle1, angle1)
-          .lineTo(xc, yc)
-          .arc(xc, yc, radius, angle2, angle2)
-          .lineTo(xc, yc)
+        cr.arc(x, y, radius, angle1, angle1)
+          .lineTo(x, y)
+          .arc(x, y, radius, angle2, angle2)
+          .lineTo(x, y)
           .stroke();
 
         // Write image to png file
