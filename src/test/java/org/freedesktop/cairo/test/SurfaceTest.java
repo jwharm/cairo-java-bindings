@@ -1,13 +1,20 @@
 package org.freedesktop.cairo.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
-import org.freedesktop.cairo.*;
+import org.freedesktop.cairo.Content;
+import org.freedesktop.cairo.Context;
+import org.freedesktop.cairo.FontOptions;
+import org.freedesktop.cairo.Format;
+import org.freedesktop.cairo.ImageSurface;
+import org.freedesktop.cairo.MimeType;
+import org.freedesktop.cairo.RectangleInt;
+import org.freedesktop.cairo.Status;
+import org.freedesktop.cairo.Surface;
+import org.freedesktop.cairo.UserDataKey;
 import org.junit.jupiter.api.Test;
 
 class SurfaceTest {

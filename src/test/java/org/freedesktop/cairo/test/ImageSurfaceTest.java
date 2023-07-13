@@ -9,20 +9,38 @@ import java.io.IOException;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SegmentScope;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.freedesktop.cairo.Context;
 import org.freedesktop.cairo.Format;
 import org.freedesktop.cairo.ImageSurface;
 import org.freedesktop.cairo.Status;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 class ImageSurfaceTest {
 
     @TempDir
-    Path tempDir;
+    static Path tempDir;
 
+    /* 
+     * Workaround for issue where the test fails because JUnit cannot delete 
+     * the temp directory: Explicitly create and delete the directory
+     */
+    
+    @BeforeAll
+    public static void before() throws IOException {
+        tempDir = Files.createTempDirectory(null);
+    }
+
+    @AfterAll
+    public static void after() {
+        tempDir.toFile().delete();
+    }
+    
     @Test
     void testFormatStrideForWidth() {
         int stride = ImageSurface.formatStrideForWidth(Format.ARGB32, 120);
