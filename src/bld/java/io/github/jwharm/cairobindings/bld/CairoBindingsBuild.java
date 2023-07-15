@@ -8,6 +8,7 @@ import static rife.bld.dependencies.Scope.test;
 import java.util.List;
 
 import rife.bld.Project;
+import rife.bld.dependencies.Repository;
 import rife.bld.publish.PublishDeveloper;
 import rife.bld.publish.PublishInfo;
 import rife.bld.publish.PublishLicense;
@@ -20,6 +21,8 @@ import rife.bld.publish.PublishLicense;
  * to the build/dist folder and maven-local.
  */
 public class CairoBindingsBuild extends Project {
+
+    public static final Repository JITPACK = new Repository("https://jitpack.io");
 
     public CairoBindingsBuild() {
         pkg = "org.freedesktop.cairo";
@@ -40,10 +43,10 @@ public class CairoBindingsBuild extends Project {
             .enablePreview()
             .quiet();
 
-        repositories = List.of(MAVEN_CENTRAL, MAVEN_LOCAL);
+        repositories = List.of(MAVEN_CENTRAL, JITPACK);
 
         scope(compile)
-            .include(dependency("io.github.jwharm.javagi", "glib", version("2.76-0.6.0")));
+            .include(dependency("com.github.jwharm.java-gi", "glib", version("0.6.0")));
 
         scope(test)
             .include(dependency("org.junit.jupiter", "junit-jupiter", version(5,9,3)))
