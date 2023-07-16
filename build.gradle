@@ -41,6 +41,7 @@ test {
     useJUnitPlatform()
     jvmArgs += "--enable-preview"
     jvmArgs += "--enable-native-access=ALL-UNNAMED"
+    systemProperty 'java.library.path','/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu'
 }
 
 publishing {

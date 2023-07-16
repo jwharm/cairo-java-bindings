@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 
 import io.github.jwharm.javagi.interop.Platform;
 
+import java.io.File;
+
 class FTFontFaceTest {
 
     private static String TTF_FILE;
@@ -22,7 +24,14 @@ class FTFontFaceTest {
     static void setup() {
         // These files are going to be in different locations depending on your system.
         switch (Platform.getRuntimePlatform()) {
-            case "linux" -> TTF_FILE = "/usr/share/fonts/liberation-serif/LiberationSerif-Regular.ttf";
+            case "linux" -> {
+                // Fedora
+                TTF_FILE = "/usr/share/fonts/liberation-serif/LiberationSerif-Regular.ttf";
+                if (! new File(TTF_FILE).exists()) {
+                    // Ubuntu
+                    TTF_FILE = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf";
+                }
+            }
             case "windows" -> TTF_FILE = "C:\\Windows\\Fonts\\arial.ttf";
             case "macos" -> TTF_FILE = "/Library/Fonts/Arial Unicode.ttf";
         }
