@@ -11,10 +11,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - name: Install cairo
+        run: sudo apt-get install -y cairo libfreetype6
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
+          # Install java 20 (for compile) and 19 (for gradle)
           java-version: |
             20
             19
