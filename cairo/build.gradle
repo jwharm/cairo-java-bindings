@@ -1,0 +1,49 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+group = "io.github.jwharm.cairo-java-bindings"
+version = "1.16.0"
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    implementation "com.github.jwharm.java-gi:glib:latest.release"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(20)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += "--enable-preview"
+}
+
+javadoc.options {
+    addBooleanOption("-enable-preview", true)
+    addStringOption("-release", "20")
+}
+
+test {
+    useJUnitPlatform()
+    jvmArgs += "--enable-preview"
+    jvmArgs += "--enable-native-access=ALL-UNNAMED"
+    systemProperty 'java.library.path','/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
