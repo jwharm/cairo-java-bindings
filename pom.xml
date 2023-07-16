@@ -5,5 +5,5 @@
   <artifactId>cairo</artifactId>
   <version>1.16-0.1.0</version>
   <packaging>pom</packaging>
-  <name>adwaita</name>
+  <name>cairo</name>
 </project>
