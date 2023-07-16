@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install cairo
-        run: sudo apt-get install -y cairo libfreetype6
+        run: sudo apt-get install -y libcairo2 libfreetype6
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
