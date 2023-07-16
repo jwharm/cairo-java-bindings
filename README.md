@@ -1,11 +1,11 @@
-# cairo-java-bindings
+# Cairo Java bindings
 Java language bindings for the [cairo](https://www.cairographics.org) graphics library using the 
 JEP-434 Panama FFI. The bindings are based on **cairo 1.16** and work with **JDK 20** (with preview 
 features enabled). 
 
-I created these language bindings primarily as a companion to the GObject-based language bindings 
-for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi). The bindings 
-depend on the `glib` module from Java-GI for a few common base classes and interfaces.
+I created these language bindings primarily as a companion to the GObject-Introspection-based Java 
+language bindings for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi). 
+The bindings depend on the `glib` module from Java-GI for a few common base classes and interfaces.
 
 ## Overview
 
@@ -110,7 +110,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.jwharm:cairo-java-bindings:1.16.0'
+    implementation 'com.github.jwharm:cairo-java-bindings:0.1.0'
 }
 ```
 
@@ -119,9 +119,8 @@ or else the Java bindings have nothing to bind to. You also need to install JDK 
 earlier, nor the JDK 21 early-access version), because the JEP-434 Panama FFI is slightly different 
 between JDK versions.
 
-After you added the jar file to your classpath, you can start developing with cairo in Java. Have 
-fun! This is a simple example to get started, ported from 
-[the first sample on this page](https://www.cairographics.org/samples/):
+Now, you can start developing with cairo in Java. Have fun! This is a simple example to get started, 
+ported from [the first sample on this page](https://www.cairographics.org/samples/):
 
 ```java
 import org.freedesktop.cairo.*;
@@ -176,10 +175,12 @@ developers of Rife2. The build file is very simple, and can be found under the `
 Because the entire `bld` build process is Java-based, as long as you have JDK 20 installed, you 
 don't need to download any build tools, compilers, or development packages.
 
-- Run `./bld download` to initialize `bld` and download dependencies (mostly JUnit 5).
+- Run `./bld download` to initialize `bld` and download dependencies.
 
 - Run `./bld publish` to build the project. The jar files can be found in the `build/dist/` 
   directory, and are also published to MavenLocal.
+
+- Run `./bld test` to run the tests.
 
 You can run `./bld` to see all other operations that are available.
 
