@@ -18,12 +18,14 @@ jobs:
           distribution: 'temurin'
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Build Project and Publish Artifacts
-        run: ./bld download publish
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run build with Gradle Wrapper
+        run: ./gradlew build
       - name: Create Site Artifact
         run: |
           mkdir site
-          mv build/javadoc site/
+          mv build/docs/javadoc site/
       - name: Upload Site Artifact
         uses: actions/upload-pages-artifact@v1
         with:
