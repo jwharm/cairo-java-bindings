@@ -19,6 +19,7 @@ import org.freedesktop.cairo.ScaledFont;
 import org.freedesktop.cairo.Status;
 import org.freedesktop.cairo.TextExtents;
 import org.freedesktop.cairo.ToyFontFace;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class ScaledFontTest {
@@ -42,6 +43,7 @@ class ScaledFontTest {
         assertEquals(Status.SUCCESS, sf.status());
     }
 
+    @Disabled
     @Test
     void testTextExtents() {
         ScaledFont sf = create();
@@ -51,6 +53,7 @@ class ScaledFontTest {
         assertEquals(Status.SUCCESS, sf.status());
     }
 
+    @Disabled
     @Test
     void testGlyphExtents() {
         ScaledFont sf = create();

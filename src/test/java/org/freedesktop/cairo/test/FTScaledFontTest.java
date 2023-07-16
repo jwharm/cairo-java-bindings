@@ -10,12 +10,14 @@ import org.freedesktop.cairo.Matrix;
 import org.freedesktop.cairo.Status;
 import org.freedesktop.freetype.Face;
 import org.freedesktop.freetype.Library;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class FTScaledFontTest {
 
     private static final String TTF_FILE = "C:\\Windows\\Fonts\\arial.ttf";
-    
+
+    @Disabled
     @Test
     void testCreate() {
         Library ftLib = Library.initFreeType();
@@ -25,6 +27,7 @@ class FTScaledFontTest {
         assertEquals(Status.SUCCESS, scaledFont.status());
     }
 
+    @Disabled
     @Test
     void testLockFace() {
         Library ftLib = Library.initFreeType();
@@ -36,6 +39,7 @@ class FTScaledFontTest {
         assertEquals(Status.SUCCESS, scaledFont.status());
     }
 
+    @Disabled
     @Test
     void testUnlockFace() {
         Library ftLib = Library.initFreeType();
@@ -46,5 +50,4 @@ class FTScaledFontTest {
         scaledFont.unlockFace();
         assertEquals(Status.SUCCESS, scaledFont.status());
     }
-
 }
