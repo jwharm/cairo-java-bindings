@@ -110,7 +110,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.jwharm:cairo-java-bindings:0.1.0'
+    implementation 'com.github.jwharm:cairo-java-bindings:1.16.0'
 }
 ```
 
@@ -168,23 +168,5 @@ When compiling and running the application, make sure to enable preview features
 access, you can optionally add `--enable-native-access=ALL-UNNAMED`.
 
 ## Building and Contributing
-
-The project can be built with [bld](https://rife2.com/bld), the pure-java build tool from the 
-developers of Rife2. The build file is very simple, and can be found under the `src/bld` tree.
-
-Because the entire `bld` build process is Java-based, as long as you have JDK 20 installed, you 
-don't need to download any build tools, compilers, or development packages.
-
-- Run `./bld download` to initialize `bld` and download dependencies.
-
-- Run `./bld publish` to build the project. The jar files can be found in the `build/dist/` 
-  directory, and are also published to MavenLocal.
-
-- Run `./bld test` to run the tests.
-
-You can run `./bld` to see all other operations that are available.
-
-The repository contains IntelliJ IDEA project files, to let it recognize the `bld` project 
-structure.
 
 Please contribute PRs or log issues on [Github](https://github.com/jwharm/cairo-java-bindings).
