@@ -1,5 +1,8 @@
 apply plugin: 'java'
-apply plugin: 'application'
+apply plugin: 'maven-publish'
+
+group = "io.github.jwharm.cairo-java-bindings"
+version = "1.16-0.1.0"
 
 repositories {
     mavenCentral()
@@ -7,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.jwharm.java-gi:glib:0.6.+"
+    implementation "com.github.jwharm.java-gi:glib:latest.release"
     testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
@@ -24,6 +27,11 @@ tasks.withType(JavaCompile) {
     options.compilerArgs += "--enable-preview"
 }
 
+javadoc.options {
+    addBooleanOption("-enable-preview", true)
+    addStringOption("-release", "20")
+}
+
 jar {
     archiveBaseName = "cairo"
     archiveVersion = "1.16-0.1.0"
@@ -33,5 +41,13 @@ test {
     useJUnitPlatform()
     jvmArgs += "--enable-preview"
     jvmArgs += "--enable-native-access=ALL-UNNAMED"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
