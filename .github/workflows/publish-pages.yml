@@ -30,7 +30,7 @@ jobs:
       - name: Create Site Artifact
         run: |
           mkdir site
-          mv cairo/build/docs/javadoc site/
+          mv build/docs/javadoc site/
       - name: Upload Site Artifact
         uses: actions/upload-pages-artifact@v1
         with:
