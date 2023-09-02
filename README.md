@@ -110,7 +110,7 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.jwharm:cairo-java-bindings:1.16.0'
+    implementation 'com.github.jwharm:cairo-java-bindings:1.16.1'
 }
 ```
 
