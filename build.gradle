@@ -1,0 +1,70 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = "io.github.jwharm.cairo-java-bindings"
+version = "1.16.1"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(20)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.named('compileJava') {
+    options.compilerArgs += "--enable-preview"
+}
+
+tasks.named('javadoc') {
+    options.addBooleanOption("-enable-preview", true)
+    options.addStringOption("-release", "20")
+}
+
+tasks.named('compileTestJava') {
+    options.compilerArgs += '--enable-preview'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    jvmArgs += "--enable-preview"
+    jvmArgs += "--enable-native-access=ALL-UNNAMED"
+    systemProperty 'java.library.path','/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                groupId = 'io.github.jwharm.cairobindings'
+                description = 'Java language bindings for cairo'
+                url = 'https://github.com/jwharm/cairo-java-bindings/'
+                licenses {
+                    license {
+                        name = 'GNU Lesser General Public License, version 2.1'
+                        url = 'https://www.gnu.org/licenses/lgpl-2.1.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'jwharm'
+                        name = 'Jan-Willem Harmannij'
+                        url = 'https://github.com/jwharm'
+                    }
+                }
+            }
+        }
+    }
+}
