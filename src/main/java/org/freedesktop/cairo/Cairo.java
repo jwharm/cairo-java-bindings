@@ -18,7 +18,7 @@ public final class Cairo {
     static {
         switch (Platform.getRuntimePlatform()) {
             case "linux" -> LibLoad.loadLibrary("libcairo.so.2");
-            case "windows" -> LibLoad.loadLibrary("cairo-2.dll");
+            case "windows" -> LibLoad.loadLibrary("libcairo-2.dll");
             case "macos" -> LibLoad.loadLibrary("libcairo.2.dylib");
         }
     }

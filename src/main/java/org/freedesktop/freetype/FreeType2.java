@@ -12,7 +12,7 @@ public class FreeType2 {
     static {
         switch (Platform.getRuntimePlatform()) {
             case "linux" -> LibLoad.loadLibrary("libfreetype.so.6");
-            case "windows" -> LibLoad.loadLibrary("freetype-6.dll");
+            case "windows" -> LibLoad.loadLibrary("libfreetype-6.dll");
             case "macos" -> LibLoad.loadLibrary("libfreetype.6.dylib");
         }
     }
