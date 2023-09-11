@@ -98,19 +98,11 @@ PRs and issue reports are welcome.
 
 ## Usage
 
-Thanks to [jitpack.io](https://jitpack.io/#jwharm/cairo-java-bindings), you can simply include 
-the library in your `gradle.build` or `pom.xml` file:
+The library is available on Maven Central. Include it in your `gradle.build` or `pom.xml` file:
 
 ```
-allprojects {
-    repositories {
-        ...
-        maven { url 'https://jitpack.io' }
-    }
-}
-
 dependencies {
-    implementation 'com.github.jwharm:cairo-java-bindings:1.16.1'
+  implementation 'io.github.jwharm.cairobindings:cairo:1.16.1'
 }
 ```
 
