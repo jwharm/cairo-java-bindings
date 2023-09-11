@@ -1,6 +1,9 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
     id 'java-library'
     id 'maven-publish'
+    id 'signing'
 }
 
 group = "io.github.jwharm.cairo-java-bindings"
@@ -37,10 +40,25 @@ tasks.named('compileTestJava') {
 }
 
 tasks.named('test') {
+    // Configure library path for MacOS (Homebrew) and set MacOS-specific JVM parameter
+    if (Os.isFamily(Os.FAMILY_MAC)) {
+        jvmArgs += '-Djava.library.path=/opt/homebrew/lib'
+        jvmArgs += '-XstartOnFirstThread'
+    }
+
+    // Configure library path for Arch, Fedora and Debian/Ubuntu
+    else if (Os.isFamily(Os.FAMILY_UNIX)) {
+        jvmArgs += '-Djava.library.path=/usr/lib64:/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu'
+    }
+
+    // Configure library path for Windows (MSYS2)
+    else if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        jvmArgs += '-Djava.library.path=C:/msys64/mingw64/bin'
+    }
+
     useJUnitPlatform()
     jvmArgs += "--enable-preview"
     jvmArgs += "--enable-native-access=ALL-UNNAMED"
-    systemProperty 'java.library.path','/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib:/lib/x86_64-linux-gnu'
 }
 
 publishing {
@@ -48,6 +66,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             pom {
+                name = "${groupId}:${artifactId}"
                 groupId = 'io.github.jwharm.cairobindings'
                 description = 'Java language bindings for cairo'
                 url = 'https://github.com/jwharm/cairo-java-bindings/'
@@ -61,10 +80,34 @@ publishing {
                     developer {
                         id = 'jwharm'
                         name = 'Jan-Willem Harmannij'
+                        email = 'jwharmannij@gmail.com'
                         url = 'https://github.com/jwharm'
                     }
                 }
+                scm {
+                    connection = 'scm:git:git://github.com/jwharm/cairo-java-bindings.git'
+                    developerConnection = 'scm:git:ssh://github.com:jwharm/cairo-java-bindings.git'
+                    url = 'http://github.com/jwharm/cairo-java-bindings/tree/master'
+                }
             }
+        }
+    }
+
+    if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
+        repositories {
+            maven {
+                name = 'OSSRH'
+                def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+            }
+        }
+        signing {
+            sign publishing.publications.mavenJava
         }
     }
 }
