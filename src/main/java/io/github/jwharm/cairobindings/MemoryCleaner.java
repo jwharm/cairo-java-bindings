@@ -11,7 +11,7 @@ import java.util.Map;
  * This class keeps a cache of all memory addresses for which a Proxy object
  * was created (except for GObject instances; those are handled in the InstanceCache).
  * <p>
- * When a new Proxy object is created, the refererence count in the cache is increased.
+ * When a new Proxy object is created, the reference count in the cache is increased.
  * When a Proxy object is garbage-collected, the reference count in the cache is decreased.
  * When the reference count is 0, the memory is released using the specified free-func.
  * <p>
