@@ -102,7 +102,7 @@ The library is available on Maven Central. Include it in your `gradle.build` or 
 
 ```
 dependencies {
-  implementation 'io.github.jwharm.cairobindings:cairo:1.16.1'
+  implementation 'io.github.jwharm.cairobindings:cairo:1.16.2'
 }
 ```
 
@@ -157,7 +157,7 @@ public class CairoExample {
 
 When compiling and running the application, make sure to enable preview features with 
 `--enable-preview` and set the Java version to 20. To suppress warnings about unsafe native 
-access, you can optionally add `--enable-native-access=ALL-UNNAMED`.
+access, you can optionally add `--enable-native-access=org.freedesktop.cairo`.
 
 ## Building and Contributing
 
