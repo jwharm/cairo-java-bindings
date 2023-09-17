@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.jwharm.cairo-java-bindings"
-version = "1.16.1"
+version = "1.16.2"
 
 repositories {
     mavenCentral()
