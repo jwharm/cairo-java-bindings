@@ -59,6 +59,8 @@ public class SolidPattern extends Pattern {
      * Creates a new {@link Pattern} corresponding to a translucent color. The color
      * components are floating point numbers in the range 0 to 1. If the values
      * passed in are outside that range, they will be clamped.
+     * <p>
+     * The color is specified in the same way as in {@link Context#setSourceRGB(double, double, double)}.
      * 
      * @param red   red component of the color
      * @param green green component of the color
@@ -84,6 +86,8 @@ public class SolidPattern extends Pattern {
 
     /**
      * Gets the solid color for a solid color pattern.
+     * <p>
+     * Note that the color and alpha values are not premultiplied.
      * 
      * @return a 4-element array with red, green, blue and alpha color components
      * @since 1.4

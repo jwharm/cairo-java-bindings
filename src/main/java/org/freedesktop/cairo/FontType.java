@@ -54,7 +54,14 @@ public enum FontType {
      * 
      * @since 1.8
      */
-    USER;
+    USER,
+
+    /**
+     * The font is of type Win32 DWrite
+     *
+     * @since 1.18
+     */
+    CAIRO_FONT_TYPE_DWRITE;
 
     /**
      * Return the value of this enum

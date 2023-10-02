@@ -121,7 +121,9 @@ public abstract class Gradient extends Pattern {
      * Gets the color and offset information at the given {@code index} for a
      * gradient pattern. Values of {@code index} range from 0 to n-1 where n is the
      * number returned by {@link #getColorStopCount()}.
-     * 
+     * <p>
+     * Note that the color and alpha values are not premultiplied.
+     *
      * @param index index of the stop to return data for
      * @return a 5-element array with the offset and red, green, blue and alpha
      *         color components
@@ -151,10 +153,8 @@ public abstract class Gradient extends Pattern {
         return values;
     }
 
-    private static final MethodHandle cairo_pattern_get_color_stop_rgba = Interop
-            .downcallHandle("cairo_pattern_get_color_stop_rgba",
-                    FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS));
-
+    private static final MethodHandle cairo_pattern_get_color_stop_rgba = Interop.downcallHandle(
+            "cairo_pattern_get_color_stop_rgba", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                    ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS));
 }

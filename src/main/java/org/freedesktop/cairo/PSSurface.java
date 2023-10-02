@@ -15,10 +15,10 @@ import java.lang.invoke.MethodHandle;
  * The PostScript surface is used to render cairo graphics to Adobe PostScript
  * files and is a multi-page vector surface backend.
  * <p>
- * The following mime types are supported: {@link MimeType#JPEG},
- * {@link MimeType#UNIQUE_ID}, {@link MimeType#CCITT_FAX},
- * {@link MimeType#CCITT_FAX_PARAMS}, {@link MimeType#TYPE_EPS},
- * {@link MimeType#EPS_PARAMS}.
+ * The following mime types are supported on source patterns:
+ * {@link MimeType#JPEG}, {@link MimeType#UNIQUE_ID},
+ * {@link MimeType#CCITT_FAX}, {@link MimeType#CCITT_FAX_PARAMS},
+ * {@link MimeType#TYPE_EPS}, {@link MimeType#EPS_PARAMS}.
  * <p>
  * Source surfaces used by the PostScript surface that have a
  * {@link MimeType#UNIQUE_ID} mime type will be stored in PostScript printer
@@ -41,7 +41,7 @@ import java.lang.invoke.MethodHandle;
  * a string of the form {@code "bbox=[llx lly urx ury]"} that specifies the
  * bounding box (in PS coordinates) of the EPS graphics. The parameters are:
  * lower left x, lower left y, upper right x, upper right y. Normally the bbox
- * data is identical to the {@code %%BoundingBox} data in the EPS file.
+ * data is identical to the {@code BoundingBox} data in the EPS file.
  * 
  * @see Surface
  * @since 1.2
@@ -326,7 +326,7 @@ public final class PSSurface extends Surface {
      * But beyond these two conditions, this function will not enforce conformance
      * of the comment with any particular specification.
      * <p>
-     * The comment string should not have a trailing newline.
+     * The comment string must not contain any newline characters.
      * <p>
      * The DSC specifies different sections in which particular comments can appear.
      * This function provides for comments to be emitted within three sections: the

@@ -28,7 +28,21 @@ public enum PDFVersion {
      * 
      * @since 1.10
      */
-    VERSION_1_5;
+    VERSION_1_5,
+
+    /**
+     * The version 1.6 of the PDF specification.
+     *
+     * @since 1.18
+     */
+    VERSION_1_6,
+
+    /**
+     * The version 1.7 of the PDF specification.
+     *
+     * @since 1.18
+     */
+    VERSION_1_7;
 
     /**
      * Return the value of this enum

@@ -1,13 +1,11 @@
 package org.freedesktop.cairo.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.IOException;
 
 import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ContextTest {
 
@@ -428,6 +426,23 @@ class ContextTest {
     void testShowPage() {
         Context cr = createContext();
         cr.showPage();
+        assertEquals(cr.status(), Status.SUCCESS);
+    }
+
+    @Test
+    void testSetHairLine() {
+        Context cr = createContext();
+        cr.setHairLine(true);
+        assertEquals(cr.status(), Status.SUCCESS);
+    }
+
+    @Test
+    void testGetHairLine() {
+        Context cr = createContext();
+        cr.setHairLine(true);
+        assertTrue(cr.getHairLine());
+        cr.setHairLine(false);
+        assertFalse(cr.getHairLine());
         assertEquals(cr.status(), Status.SUCCESS);
     }
 

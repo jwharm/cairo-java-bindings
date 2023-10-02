@@ -348,12 +348,7 @@ public class Matrix extends Proxy {
      * dx2 = dx1 * a + dy1 * c;
      * dy2 = dx1 * b + dy1 * d;
      * </pre>
-     * 
-     * Affine transformations are position invariant, so the same vector always
-     * transforms to the same vector. If {@code (x1, y1)} transforms to
-     * {@code (x2, y2)} then {@code (x1 + dx1, y1 + dy1)} will transform to
-     * {@code (x1 + dx2, y1 + dy2)} for all values of {@code x1} and {@code x2}.
-     * 
+     *
      * @param distanceVector X and Y component of a distance vector
      * @return the transformed X and Y component
      * @since 1.0

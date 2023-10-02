@@ -232,8 +232,9 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * This function finishes the surface and drops all references to external
      * resources. For example, for the Xlib backend it means that cairo will no
      * longer access the drawable, which can be freed. After calling
-     * {@code finish()} the only valid operations on a surface are getting and
-     * setting user, referencing and destroying, and flushing and finishing it.
+     * {@code finish()} the only valid operations on a surface are checking status,
+     * getting and setting user, referencing and destroying, and flushing and
+     * finishing it.
      * Further drawing to the surface will not affect the surface but will instead
      * trigger a {@link Status#SURFACE_FINISHED} error.
      * <p>
@@ -443,7 +444,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
-     * This function returns the previous device offset set by
+     * This function returns the previous device scale set by
      * {@link #setDeviceScale(double, double)}.
      * 
      * @return the x and y values of the returned Point object contain the scale in
@@ -474,7 +475,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * CTM when drawing to surface . One common use for this is to render to very
      * high resolution display devices at a scale factor, so that code that assumes
      * 1 pixel will be a certain size will still work. Setting a transformation via
-     * {@link Context#translate(double, double)} isn't sufficient to do this, since
+     * {@link Context#scale(double, double)} isn't sufficient to do this, since
      * functions like {@link Context#deviceToUser(Point)} will expose the hidden
      * scale.
      * <p>
@@ -519,7 +520,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * is currently no way to have more than one fallback resolution in effect on a
      * single page.
      * <p>
-     * The default fallback resoultion is 300 pixels per inch in both dimensions.
+     * The default fallback resolution is 300 pixels per inch in both dimensions.
      * 
      * @param xPixelsPerInch horizontal setting for pixels per inch
      * @param yPixelsPerInch vertical setting for pixels per inch

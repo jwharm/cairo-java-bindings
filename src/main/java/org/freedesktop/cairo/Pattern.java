@@ -312,4 +312,42 @@ public abstract class Pattern extends Proxy {
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Set the dithering mode of the rasterizer used for drawing shapes. This value
+     * is a hint, and a particular backend may or may not support a particular
+     * value. At the current time, only pixman is supported.
+     *
+     * @param dither a {@link Dither} describing the new dithering mode
+     * @since 1.18
+     */
+    public void setDither(Dither dither) {
+        try {
+            cairo_pattern_set_dither.invoke(handle(), dither.getValue());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_pattern_set_dither = Interop.downcallHandle("cairo_pattern_set_dither",
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+    /**
+     * Gets the current dithering mode, as set by {@link #setDither(Dither)}.
+     *
+     * @return the current dithering mode.
+     * @since 1.18
+     */
+    public Dither getDither() {
+        try {
+            int result = (int) cairo_pattern_get_dither.invoke(handle());
+            return Dither.of(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_pattern_get_dither = Interop.downcallHandle("cairo_pattern_get_dither",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
 }

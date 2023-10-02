@@ -59,7 +59,10 @@ public enum SurfaceType {
      * The surface is of type glitz
      * 
      * @since 1.2
+     * @deprecated 1.18 (glitz support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     GLITZ,
 
     /**
@@ -80,14 +83,20 @@ public enum SurfaceType {
      * The surface is of type beos
      * 
      * @since 1.2
+     * @deprecated 1.18 (beos support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     BEOS,
 
     /**
      * The surface is of type directfb
      * 
      * @since 1.2
+     * @deprecated 1.18 (directfb support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     DIRECTFB,
 
     /**
@@ -101,7 +110,10 @@ public enum SurfaceType {
      * The surface is of type os2
      * 
      * @since 1.4
+     * @deprecated 1.18 (os2 support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     OS2,
 
     /**
@@ -129,7 +141,10 @@ public enum SurfaceType {
      * The surface is of type Qt
      * 
      * @since 1.10
+     * @deprecated 1.18 (Qt support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     QT,
 
     /**
@@ -143,21 +158,30 @@ public enum SurfaceType {
      * The surface is a OpenVG surface
      * 
      * @since 1.10
+     * @deprecated 1.18 (OpenVG support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     VG,
 
     /**
      * The surface is of type OpenGL
      * 
      * @since 1.10
+     * @deprecated 1.18 (OpenGL support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     GL,
 
     /**
      * The surface is of type Direct Render Manager
      * 
      * @since 1.10
+     * @deprecated 1.18 (DRM support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     DRM,
 
     /**
@@ -174,10 +198,18 @@ public enum SurfaceType {
      */
     XML,
 
+    /**
+     * The surface is of type Skia
+     *
+     * @since 1.10
+     * @deprecated 1.18 (Skia support have been removed, this surface type will
+     *             never be set by cairo)
+     */
+    @Deprecated
     SKIA,
 
     /**
-     * The surface is a subsurface created with CAIRO_SURFACE_create_for_rectangle()
+     * The surface is a subsurface created with {@link Surface#createForRectangle}
      * 
      * @since 1.10
      */
@@ -187,7 +219,10 @@ public enum SurfaceType {
      * This surface is of type Cogl
      * 
      * @since 1.12
+     * @deprecated 1.18 (Cogl support have been removed, this surface type will
+     *             never be set by cairo)
      */
+    @Deprecated
     COGL;
 
     /**

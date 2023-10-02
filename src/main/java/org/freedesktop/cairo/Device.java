@@ -208,6 +208,12 @@ public class Device extends Proxy implements AutoCloseable {
     private static final MethodHandle cairo_device_release = Interop.downcallHandle("cairo_device_release",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
+    /**
+     * Returns the total elapsed time of the observation.
+     *
+     * @return the elapsed time, in nanoseconds.
+     * @since 1.12
+     */
     public double observerElapsed() {
         try {
             return (double) cairo_device_observer_elapsed.invoke(handle());
@@ -219,6 +225,12 @@ public class Device extends Proxy implements AutoCloseable {
     private static final MethodHandle cairo_device_observer_elapsed = Interop.downcallHandle(
             "cairo_device_observer_elapsed", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS));
 
+    /**
+     * Returns the elapsed time of the fill operations.
+     *
+     * @return the elapsed time, in nanoseconds.
+     * @since 1.12
+     */
     public double observerFillElapsed() {
         try {
             return (double) cairo_device_observer_fill_elapsed.invoke(handle());
@@ -230,6 +242,12 @@ public class Device extends Proxy implements AutoCloseable {
     private static final MethodHandle cairo_device_observer_fill_elapsed = Interop.downcallHandle(
             "cairo_device_observer_fill_elapsed", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS));
 
+    /**
+     * Returns the elapsed time of the glyph operations.
+     *
+     * @return the elapsed time, in nanoseconds.
+     * @since 1.12
+     */
     public double observerGlyphsElapsed() {
         try {
             return (double) cairo_device_observer_glyphs_elapsed.invoke(handle());
@@ -241,6 +259,12 @@ public class Device extends Proxy implements AutoCloseable {
     private static final MethodHandle cairo_device_observer_glyphs_elapsed = Interop.downcallHandle(
             "cairo_device_observer_glyphs_elapsed", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS));
 
+    /**
+     * Returns the elapsed time of the mask operations.
+     *
+     * @return the elapsed time, in nanoseconds
+     * @since 1.12
+     */
     public double observerMaskElapsed() {
         try {
             return (double) cairo_device_observer_mask_elapsed.invoke(handle());
@@ -252,6 +276,12 @@ public class Device extends Proxy implements AutoCloseable {
     private static final MethodHandle cairo_device_observer_mask_elapsed = Interop.downcallHandle(
             "cairo_device_observer_mask_elapsed", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS));
 
+    /**
+     * Returns the elapsed time of the paint operations.
+     *
+     * @return the elapsed time, in nanoseconds
+     * @since 1.12
+     */
     public double observerPaintElapsed() {
         try {
             return (double) cairo_device_observer_paint_elapsed.invoke(handle());
@@ -263,7 +293,14 @@ public class Device extends Proxy implements AutoCloseable {
     private static final MethodHandle cairo_device_observer_paint_elapsed = Interop.downcallHandle(
             "cairo_device_observer_paint_elapsed", FunctionDescriptor.of(ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS));
 
-    public void observerPrint(OutputStream stream) throws IllegalArgumentException, IOException {
+    /**
+     * Prints the device log using the given OutputStream.
+     *
+     * @param stream the OutputStream
+     * @throws IOException an unexpected error occured whil printing the device log
+     * @since 1.12
+     */
+    public void observerPrint(OutputStream stream) throws IOException {
         if (stream == null) {
             return;
         }
@@ -290,6 +327,12 @@ public class Device extends Proxy implements AutoCloseable {
             "cairo_device_observer_print",
             FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
+    /**
+     * Returns the elapsed time of the stroke operations.
+     *
+     * @return the elapsed time, in nanoseconds.
+     * @since 1.12
+     */
     public double observerStrokeElapsed() {
         try {
             return (double) cairo_device_observer_stroke_elapsed.invoke(handle());

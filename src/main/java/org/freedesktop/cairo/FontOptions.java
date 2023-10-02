@@ -38,6 +38,13 @@ public class FontOptions extends Proxy {
     }
 
     /**
+     * The default color palette index.
+     *
+     * @since 1.18
+     */
+    public static final int COLOR_PALETTE_DEFAULT = 0;
+
+    /**
      * Constructor used internally to instantiate a java FontOptions object for a
      * native {@code cairo_font_options_t} instance
      * 
@@ -107,7 +114,7 @@ public class FontOptions extends Proxy {
     /**
      * Checks whether an error has previously occurred for this font options object
      * 
-     * @return {@link Status#SUCCESS} or {@link Status#NO_MEMORY}
+     * @return {@link Status#SUCCESS}, {@link Status#NO_MEMORY} or {@link Status#NULL_POINTER}.
      * @since 1.0
      */
     public Status status() {
@@ -405,4 +412,144 @@ public class FontOptions extends Proxy {
 
     private static final MethodHandle cairo_font_options_set_variations = Interop.downcallHandle(
             "cairo_font_options_set_variations", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    /**
+     * Sets the color mode for the font options object. This controls whether color
+     * fonts are to be rendered in color or as outlines. See the documentation for
+     * {@link ColorMode} for full details.
+     *
+     * @param colorMode the new color mode
+     * @since 1.18
+     */
+    public void setColorMode(ColorMode colorMode) {
+        try {
+            cairo_font_options_set_color_mode.invoke(handle(), colorMode.getValue());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_font_options_set_color_mode = Interop.downcallHandle(
+            "cairo_font_options_set_color_mode", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+    /**
+     * Gets the color mode for the font options object. See the documentation for
+     * {@link ColorMode} for full details.
+     *
+     * @return the color mode for the font options object
+     * @since 1.18
+     */
+    public ColorMode getColorMode() {
+        try {
+            int result = (int) cairo_font_options_get_color_mode.invoke(handle());
+            return ColorMode.of(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_font_options_get_color_mode = Interop.downcallHandle(
+            "cairo_font_options_get_color_mode", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+    /**
+     * Sets the OpenType font color palette for the font options object. OpenType
+     * color fonts with a CPAL table may contain multiple palettes. The default
+     * color palette index is {@link FontOptions#COLOR_PALETTE_DEFAULT}.
+     * <p>
+     * If palette_index is invalid, the default palette is used.
+     * <p>
+     * Individual colors within the palette may be overriden with cairo_font_options_set_custom_palette_color().
+     *
+     * @param colorPalette the palette index in the CPAL table
+     * @since 1.18
+     */
+    public void setColorPalette(int colorPalette) {
+        try {
+            cairo_font_options_set_color_palette.invoke(handle(), colorPalette);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_font_options_set_color_palette = Interop.downcallHandle(
+            "cairo_font_options_set_color_palette", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+    /**
+     * Gets the current OpenType color font palette for the font options object.
+     *
+     * @return the palette index (an unsigned int)
+     * @since 1.18
+     */
+    public int getColorPalette() {
+        try {
+            return (int) cairo_font_options_get_color_palette.invoke(handle());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_font_options_get_color_palette = Interop.downcallHandle(
+            "cairo_font_options_get_color_palette", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+    /**
+     * Sets a custom palette color for the font options object. This overrides the
+     * palette color at the specified color index. This override is independent of
+     * the selected palette index and will remain in place even if
+     * {@link #setColorPalette(int)} is called to change the palette index.
+     * <p>
+     * It is only possible to override color indexes already in the font palette.
+     *
+     * @param index the index of the color to set
+     * @param red   red component of color
+     * @param green green component of color
+     * @param blue  blue component of color
+     * @param alpha alpha component of color
+     * @since 1.18
+     */
+    public void setCustomPaletteColor(int index, double red, double green, double blue, double alpha) {
+        try {
+            cairo_font_options_set_custom_palette_color.invoke(handle(), index, red, green, blue, alpha);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_font_options_set_custom_palette_color = Interop.downcallHandle(
+            "cairo_font_options_set_custom_palette_color", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
+                    ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
+
+    /**
+     * Gets the custom palette color for the color index for the font options object.
+     *
+     * @param  index the index of the color to get (an unsigned int)
+     * @return the red, green, blue and alpha components of color
+     * @throws IndexOutOfBoundsException if no custom color exists for the color index
+     * @since 1.18
+     */
+    public RGBA getCustomPaletteColor(int index) throws IndexOutOfBoundsException {
+        Status status;
+        RGBA rgba;
+        try {
+            try (Arena arena = Arena.openConfined()) {
+                MemorySegment x1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
+                MemorySegment y1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
+                MemorySegment x2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
+                MemorySegment y2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
+                int result = (int) cairo_font_options_get_custom_palette_color.invoke(handle(), index, x1Ptr, y1Ptr, x2Ptr, y2Ptr);
+                status = Status.of(result);
+                rgba = new RGBA(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
+                        x2Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y2Ptr.get(ValueLayout.JAVA_DOUBLE, 0));
+            }
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+        if (status == Status.INVALID_INDEX) {
+            throw new IndexOutOfBoundsException(status.toString());
+        }
+        return rgba;
+    }
+
+    private static final MethodHandle cairo_font_options_get_custom_palette_color = Interop.downcallHandle(
+            "cairo_font_options_get_custom_palette_color", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
+                    ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 }

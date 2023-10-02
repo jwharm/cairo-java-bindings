@@ -54,7 +54,8 @@ public class ToyFontFace extends FontFace {
     }
 
     /**
-     * Creates a toy font face from a triplet of family, slant, and weight.
+     * Creates a toy font face from a triplet of family, slant, and weight. These
+     * font faces are used in implementation of the Cairo "toy" font API.
      * <p>
      * If {@code family} is {@code null}, the platform-specific default family is
      * assumed. The default family then can be queried using {@link #getFamily()}.
@@ -88,7 +89,7 @@ public class ToyFontFace extends FontFace {
             FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
 
     /**
-     * Gets the familly name of a toy font.
+     * Gets the family name of a toy font.
      * 
      * @return the family name
      * @since 1.8

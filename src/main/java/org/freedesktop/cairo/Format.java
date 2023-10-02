@@ -63,7 +63,21 @@ public enum Format {
      * 
      * @since 1.12
      */
-    RGB30(5);
+    RGB30(5),
+
+    /**
+     * 3 floats, R, G, B.
+     *
+     * @since 1.17.2
+     */
+    RGB96F(6),
+
+    /**
+     * 4 floats, R, G, B, A.
+     *
+     * @since 1.17.2
+     */
+    RGBA128F(7);
 
     private final int value;
 

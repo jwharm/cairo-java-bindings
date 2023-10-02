@@ -15,10 +15,11 @@ import java.lang.invoke.MethodHandle;
  * The PDF surface is used to render cairo graphics to Adobe PDF files and is a
  * multi-page vector surface backend.
  * <p>
- * The following mime types are supported: {@link MimeType#JPEG},
- * {@link MimeType#JP2}, {@link MimeType#UNIQUE_ID}, {@link MimeType#JBIG2},
- * {@link MimeType#JBIG2_GLOBAL}, {@link MimeType#JBIG2_GLOBAL_ID},
- * {@link MimeType#CCITT_FAX}, {@link MimeType#CCITT_FAX_PARAMS}.
+ * The following mime types are supported on source patterns:
+ * {@link MimeType#JPEG}, {@link MimeType#JP2}, {@link MimeType#UNIQUE_ID},
+ * {@link MimeType#JBIG2}, {@link MimeType#JBIG2_GLOBAL},
+ * {@link MimeType#JBIG2_GLOBAL_ID}, {@link MimeType#CCITT_FAX},
+ * {@link MimeType#CCITT_FAX_PARAMS}.
  * <p>
  * <strong>JBIG2 Images</strong>
  * <p>
@@ -319,6 +320,38 @@ public final class PDFSurface extends Surface {
     private static final MethodHandle cairo_pdf_surface_set_metadata = Interop.downcallHandle(
             "cairo_pdf_surface_set_metadata",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+    /**
+     * Set custom document metadata. name may be any string except for the
+     * following names reserved by PDF: "Title", "Author", "Subject", "Keywords",
+     * "Creator", "Producer", "CreationDate", "ModDate", "Trapped".
+     * <p>
+     * If {@code value} is null or an empty string, the {@code name} metadata will not be set.
+     * <p>
+     * For example:
+     * <p>
+     * {@code pdfSurface.setCustomMetadata("ISBN", "978-0123456789");}
+     * @param name  The name of the custom metadata item to set (utf8).
+     * @param value The value of the metadata (utf8).
+     * @return the PDF surface
+     * @since 1.18
+     */
+    public PDFSurface setCustomMetadata(String name, String value) {
+        try {
+            try (Arena arena = Arena.openConfined()) {
+                MemorySegment namePtr = Interop.allocateNativeString(name, arena);
+                MemorySegment valuePtr = Interop.allocateNativeString(value, arena);
+                cairo_pdf_surface_set_custom_metadata.invoke(handle(), namePtr, valuePtr);
+                return this;
+            }
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_pdf_surface_set_custom_metadata = Interop.downcallHandle(
+            "cairo_pdf_surface_set_custom_metadata",
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Set page label for the current page.

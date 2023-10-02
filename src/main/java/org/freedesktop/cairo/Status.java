@@ -300,6 +300,18 @@ public enum Status {
      */
     TAG_ERROR,
     /**
+     * error occurred in the Windows Direct Write API
+     *
+     * @since 1.18
+     */
+    DWRITE_ERROR,
+    /**
+     * error occurred in OpenType-SVG font rendering
+     *
+     * @since 1.18
+     */
+    SVG_FONT_ERROR,
+    /**
      * this is a special value indicating the number of status values defined in
      * this enumeration. When using this value, note that the version of cairo at
      * run-time may have additional status values defined than the value of this

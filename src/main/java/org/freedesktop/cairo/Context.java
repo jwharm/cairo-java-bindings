@@ -66,7 +66,8 @@ public final class Context extends Proxy {
     }
 
     /**
-     * Create a destination for a hyperlink.
+     * Create a destination for a hyperlink. Destination tag attributes are detailed at
+     * <a href="https://www.cairographics.org/manual/cairo-Tags-and-Links.html#dest">Destinations</a>.
      * 
      * @see #tagBegin(String, String)
      * @since 1.16
@@ -74,12 +75,29 @@ public final class Context extends Proxy {
     public static final String TAG_DEST = "cairo.dest";
 
     /**
-     * Create hyperlink.
+     * Create hyperlink. Link tag attributes are detailed at
+     * <a href="https://www.cairographics.org/manual/cairo-Tags-and-Links.html#link">Links</a>.
      * 
      * @see #tagBegin(String, String)
      * @since 1.16
      */
     public static final String TAG_LINK = "Link";
+
+    /**
+     * Create a content tag.
+     *
+     * @see #tagBegin(String, String)
+     * @since 1.18
+     */
+    public static final String TAG_CONTENT = "cairo.content";
+
+    /**
+     * Create a content reference tag.
+     *
+     * @see #tagBegin(String, String)
+     * @since 1.18
+     */
+    public static final String TAG_CONTENT_REF = "cairo.content_ref";
 
     // Keeps user data keys and values
     private final UserDataStore userDataStore;
@@ -447,6 +465,8 @@ public final class Context extends Proxy {
      * <p>
      * The color and alpha components are floating point numbers in the range 0 to
      * 1. If the values passed in are outside that range, they will be clamped.
+     * <p>
+     * Note that the color and alpha values are not premultiplied.
      * <p>
      * The default source pattern is opaque black, (that is, it is equivalent to
      * {@code setSourceRGBA(0.0, 0.0, 0.0, 1.0)}).
@@ -1597,6 +1617,62 @@ public final class Context extends Proxy {
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     /**
+     * Sets lines within the cairo context to be hairlines. Hairlines are logically
+     * zero-width lines that are drawn at the thinnest renderable width possible in
+     * the current context.
+     * <p>
+     * On surfaces with native hairline support, the native hairline functionality
+     * will be used. Surfaces that support hairlines include:
+     * <ul>
+     * <li>pdf/ps: Encoded as 0-width line.
+     * <li>win32_printing: Rendered with PS_COSMETIC pen.
+     * <li>svg: Encoded as 1px non-scaling-stroke.
+     * <li>script: Encoded with set-hairline function.
+     * </ul>
+     * Cairo will always render hairlines at 1 device unit wide, even if an
+     * anisotropic scaling was applied to the stroke width. In the wild, handling
+     * of this situation is not well-defined. Some PDF, PS, and SVG renderers match
+     * Cairo's output, but some very popular implementations (Acrobat, Chrome,
+     * rsvg) will scale the hairline unevenly. As such, best practice is to reset
+     * any anisotropic scaling before calling {@link #stroke()}. See
+     * <a href="https://cairographics.org/cookbook/ellipses/">https://cairographics.org/cookbook/ellipses/</a>
+     * for an example.
+     *
+     * @param  setHairline whether or not to set hairline mode
+     * @return the context
+     * @since 1.18
+     */
+    public Context setHairLine(boolean setHairline) {
+        try {
+            cairo_set_hairline.invoke(handle(), setHairline ? 1 : 0);
+            return this;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_set_hairline = Interop.downcallHandle(
+            "cairo_set_hairline", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+    /**
+     * Returns whether or not hairline mode is set, as set by {@link #setHairLine(boolean)}.
+     *
+     * @return whether hairline mode is set.
+     * @since 1.18
+     */
+    public boolean getHairLine() {
+        try {
+            int result = (int) cairo_get_hairline.invoke(handle());
+            return result != 0;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_get_hairline = Interop.downcallHandle("cairo_get_hairline",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+
+    /**
      * Creates a copy of the current path and returns it to the user as a
      * {@link Path}. See {@link PathData} for hints on how to iterate over the
      * returned data structure.
@@ -1715,8 +1791,7 @@ public final class Context extends Proxy {
      * {@link #arc(double, double, double, double, double)},
      * {@link #arcNegative(double, double, double, double, double)},
      * {@link #rectangle(double, double, double, double)},
-     * {@link #textPath(String)}, {@link #glyphPath(Glyph[])},
-     * cairo_stroke_to_path().
+     * {@link #textPath(String)}, {@link #glyphPath(Glyph[])}.
      * <p>
      * Some functions use and alter the current point but do not otherwise change
      * current path: cairo_show_text().

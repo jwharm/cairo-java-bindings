@@ -67,6 +67,14 @@ class PDFSurfaceTest {
     }
 
     @Test
+    void testSetCustomMetadata() {
+        try (PDFSurface s = PDFSurface.create((String) null, 120, 120)) {
+            s.setCustomMetadata("ISBN", "978-0123456789");
+            assertEquals(Status.SUCCESS, s.status());
+        }
+    }
+
+    @Test
     void testSetPageLabel() {
         try (PDFSurface s = PDFSurface.create((String) null, 120, 120)) {
             s.setPageLabel("label");

@@ -86,7 +86,7 @@ public class Rectangle extends Proxy {
      * A data structure for holding a rectangle.
      * 
      * @param x      X coordinate of the left side of the rectangle
-     * @param y      Y coordinate of the the top side of the rectangle
+     * @param y      Y coordinate of the top side of the rectangle
      * @param width  width of the rectangle
      * @param height height of the rectangle
      * @return the newly created rectangle

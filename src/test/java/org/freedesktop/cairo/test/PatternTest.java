@@ -2,13 +2,7 @@ package org.freedesktop.cairo.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.freedesktop.cairo.Extend;
-import org.freedesktop.cairo.Filter;
-import org.freedesktop.cairo.Gradient;
-import org.freedesktop.cairo.LinearGradient;
-import org.freedesktop.cairo.Matrix;
-import org.freedesktop.cairo.PatternType;
-import org.freedesktop.cairo.Status;
+import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
 
 class PatternTest {
@@ -74,4 +68,18 @@ class PatternTest {
         assertEquals(Status.SUCCESS, pattern.status());
     }
 
+    @Test
+    void testSetDither() {
+        Pattern pattern = LinearGradient.create(0, 0, 10, 10);
+        pattern.setDither(Dither.FAST);
+        assertEquals(Status.SUCCESS, pattern.status());
+    }
+
+    @Test
+    void testGetDither() {
+        Pattern pattern = LinearGradient.create(0, 0, 10, 10);
+        pattern.setDither(Dither.FAST);
+        assertEquals(Dither.FAST, pattern.getDither());
+        assertEquals(Status.SUCCESS, pattern.status());
+    }
 }

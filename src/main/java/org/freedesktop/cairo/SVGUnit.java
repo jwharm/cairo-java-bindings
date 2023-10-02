@@ -3,7 +3,7 @@ package org.freedesktop.cairo;
 /**
  * SVGUnit is used to describe the units valid for coordinates and lengths in
  * the SVG specification.
- * 
+ * <p>
  * See also:
  * <ul>
  * <li><a href=
