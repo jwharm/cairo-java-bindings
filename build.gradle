@@ -6,8 +6,8 @@ plugins {
     id 'signing'
 }
 
-group = "io.github.jwharm.cairo-java-bindings"
-version = "1.16.2"
+group = "io.github.jwharm.cairobindings"
+version = "1.18.0"
 
 repositories {
     mavenCentral()
