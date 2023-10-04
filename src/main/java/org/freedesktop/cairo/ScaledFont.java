@@ -23,7 +23,7 @@ import java.util.List;
  * <p>
  * There are various types of scaled fonts, depending on the font backend they
  * use. The type of a scaled font can be queried using
- * {@link ScaledFont#getType()}.
+ * {@link ScaledFont#getFontType()}.
  * 
  * @see FontFace
  * @see Matrix
@@ -487,7 +487,7 @@ public class ScaledFont extends Proxy {
      * @return the type of the ScaledFont.
      * @since 1.2
      */
-    public FontType getType() {
+    public FontType getFontType() {
         try {
             int result = (int) cairo_scaled_font_get_type.invoke(handle());
             return FontType.of(result);
@@ -563,4 +563,20 @@ public class ScaledFont extends Proxy {
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Get the CairoScaledFont GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_scaled_font_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_scaled_font_get_type = Interop.downcallHandle(
+            "cairo_gobject_scaled_font_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

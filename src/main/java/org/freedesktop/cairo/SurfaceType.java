@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * SurfaceType is used to describe the type of a given surface. The surface
  * types are also known as "backends" or "surface backends" within cairo.
@@ -225,6 +231,10 @@ public enum SurfaceType {
     @Deprecated
     COGL;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * @return the value
@@ -243,4 +253,20 @@ public enum SurfaceType {
     public static SurfaceType of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoSurfaceType GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_surface_type_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_surface_type_get_type = Interop.downcallHandle(
+            "cairo_gobject_surface_type_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

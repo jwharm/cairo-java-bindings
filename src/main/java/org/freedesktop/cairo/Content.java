@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * cairo_content_t is used to describe the content that a surface will contain,
  * whether color information, alpha information (translucence vs. opacity), or
@@ -34,6 +40,10 @@ public enum Content {
      */
     COLOR_ALPHA(0x3000);
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     private final int value;
 
     Content(int value) {
@@ -65,4 +75,20 @@ public enum Content {
             throw new IllegalArgumentException("No Content enum with value " + value);
         }
     }
+
+    /**
+     * Get the CairoContent GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_content_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_content_get_type = Interop.downcallHandle(
+            "cairo_gobject_content_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

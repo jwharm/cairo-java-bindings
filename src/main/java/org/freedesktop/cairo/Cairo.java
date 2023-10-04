@@ -21,6 +21,15 @@ public final class Cairo {
             case "windows" -> LibLoad.loadLibrary("libcairo-2.dll");
             case "macos" -> LibLoad.loadLibrary("libcairo.2.dylib");
         }
+        try {
+            switch (Platform.getRuntimePlatform()) {
+                case "linux" -> LibLoad.loadLibrary("libcairo-gobject.so.2");
+                case "windows" -> LibLoad.loadLibrary("libcairo-gobject-2.dll");
+                case "macos" -> LibLoad.loadLibrary("libcairo-gobject.2.dylib");
+            }
+        } catch (Throwable ignored) {
+            // libcairo-gobject is an optional dependency
+        }
     }
 
     /**

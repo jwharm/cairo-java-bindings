@@ -1,12 +1,10 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.Proxy;
 
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.*;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.VarHandle;
 
 /**
@@ -109,4 +107,20 @@ public class RectangleInt extends Proxy {
     public String toString() {
         return String.format("RectangleInt address=%d x=%d y=%d width=%d height=%d", handle().address(), x(), y(), width(), height());
     }
+
+    /**
+     * Get the CairoRectangleInt GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_rectangle_int_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_rectangle_int_get_type = Interop.downcallHandle(
+            "cairo_gobject_rectangle_int_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

@@ -71,7 +71,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * fallback resolution and font options as other . Generally, the new surface
      * will also use the same backend as other , unless that is not possible for
      * some reason. The type of the returned surface may be examined with
-     * {@link Surface#getType()}.
+     * {@link Surface#getSurfaceType()}.
      * <p>
      * Initially the surface contents are all 0 (transparent if contents have
      * transparency, black otherwise.)
@@ -570,7 +570,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * @return The type of {@link Surface}.
      * @since 1.2
      */
-    public SurfaceType getType() {
+    public SurfaceType getSurfaceType() {
         try {
             int result = (int) cairo_surface_get_type.invoke(handle());
             return SurfaceType.of(result);
@@ -916,4 +916,20 @@ public sealed class Surface extends Proxy implements AutoCloseable
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Get the CairoSurface GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_surface_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_surface_get_type = Interop.downcallHandle(
+            "cairo_gobject_surface_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

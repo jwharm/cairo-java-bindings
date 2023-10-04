@@ -78,7 +78,7 @@ class ScaledFontTest {
     void testGetFontFace() {
         ScaledFont sf = create();
         FontFace f = sf.getFontFace();
-        assertEquals(FontType.TOY, f.getType());
+        assertEquals(FontType.TOY, f.getFontType());
         assertEquals(Status.SUCCESS, f.status());
         assertEquals(Status.SUCCESS, sf.status());
     }
@@ -117,9 +117,9 @@ class ScaledFontTest {
     }
 
     @Test
-    void testGetType() {
+    void testGetFontType() {
         ScaledFont sf = create();
-        FontType t = sf.getType();
+        FontType t = sf.getFontType();
         assertEquals(Status.SUCCESS, sf.status());
     }
 }

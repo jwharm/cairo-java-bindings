@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * Used as the return value for cairo_region_contains_rectangle().
  * 
@@ -28,6 +34,10 @@ public enum RegionOverlap {
      */
     PART;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * @return the value
@@ -46,4 +56,20 @@ public enum RegionOverlap {
     public static RegionOverlap of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoRegionOverlap GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_region_overlap_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_region_overlap_get_type = Interop.downcallHandle(
+            "cairo_gobject_region_overlap_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

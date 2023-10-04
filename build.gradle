@@ -13,17 +13,22 @@ repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
-    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-}
-
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(20)
     }
     withSourcesJar()
     withJavadocJar()
+    // Optional dependency on java-gi when cairo-gobject is used
+    registerFeature('gobject') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
+dependencies {
+    gobjectImplementation "io.github.jwharm.javagi:glib:0.7.2"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 tasks.named('compileJava') {

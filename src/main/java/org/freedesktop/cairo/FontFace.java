@@ -28,7 +28,7 @@ import java.lang.invoke.MethodHandle;
  * {@link Context#setFontMatrix(Matrix)}.
  * <p>
  * There are various types of font faces, depending on the font backend they
- * use. The type of a font face can be queried using {@link FontFace#getType()}.
+ * use. The type of a font face can be queried using {@link FontFace#getFontType()}.
  * 
  * @see ScaledFont
  * @since 1.0
@@ -90,7 +90,7 @@ public class FontFace extends Proxy {
      * @return The type of the FontFace.
      * @since 1.2
      */
-    public FontType getType() {
+    public FontType getFontType() {
         try {
             int result = (int) cairo_font_face_get_type.invoke(handle());
             return FontType.of(result);
@@ -184,4 +184,20 @@ public class FontFace extends Proxy {
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Get the CairoFontFace GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_font_face_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_font_face_get_type = Interop.downcallHandle(
+            "cairo_gobject_font_face_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

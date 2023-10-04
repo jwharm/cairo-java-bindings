@@ -3235,4 +3235,20 @@ public final class Context extends Proxy {
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Get the CairoContext GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_context_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_context_get_type = Interop.downcallHandle(
+            "cairo_gobject_context_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

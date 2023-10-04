@@ -17,7 +17,7 @@ class FontFaceTest {
     }
 
     @Test
-    void testGetType() {
-        assertEquals(FontType.TOY, ToyFontFace.create("Arial", FontSlant.NORMAL, FontWeight.NORMAL).getType());
+    void testGetFontType() {
+        assertEquals(FontType.TOY, ToyFontFace.create("Arial", FontSlant.NORMAL, FontWeight.NORMAL).getFontType());
     }
 }

@@ -50,14 +50,14 @@ public class ToyFontFace extends FontFace {
      * @return a newly created ToyFontFace
      */
     public static ToyFontFace create() {
-        return create(null, FontSlant.NORMAL, FontWeight.NORMAL);
+        return create("", FontSlant.NORMAL, FontWeight.NORMAL);
     }
 
     /**
      * Creates a toy font face from a triplet of family, slant, and weight. These
      * font faces are used in implementation of the Cairo "toy" font API.
      * <p>
-     * If {@code family} is {@code null}, the platform-specific default family is
+     * If {@code family} is empty, the platform-specific default family is
      * assumed. The default family then can be queried using {@link #getFamily()}.
      * <p>
      * The {@link Context#selectFontFace(String, FontSlant, FontWeight)} function

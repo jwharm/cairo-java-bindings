@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 class ToyFontFaceTest {
 
-    @Disabled
     @Test
     void testCreate() {
         ToyFontFace f = ToyFontFace.create();

@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * The subpixel order specifies the order of color elements within each pixel on
  * the display device when rendering with an antialiasing mode of
@@ -44,6 +50,10 @@ public enum SubpixelOrder {
      */
     VBGR;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * @return the value
@@ -62,4 +72,20 @@ public enum SubpixelOrder {
     public static SubpixelOrder of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoSubpixelOrder GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_subpixel_order_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_subpixel_order_get_type = Interop.downcallHandle(
+            "cairo_gobject_subpixel_order_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * Used to identify the memory format of image data.
  * <p>
@@ -79,6 +85,10 @@ public enum Format {
      */
     RGBA128F(7);
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     private final int value;
 
     Format(int value) {
@@ -118,4 +128,20 @@ public enum Format {
             throw new IllegalArgumentException("No Format enum with value " + value);
         }
     }
+
+    /**
+     * Get the CairoFormat GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_format_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_format_get_type = Interop.downcallHandle(
+            "cairo_gobject_format_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

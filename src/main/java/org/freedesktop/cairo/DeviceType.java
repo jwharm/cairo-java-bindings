@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * DeviceType is used to describe the type of a given device. The
  * devices types are also known as "backends" within cairo.
@@ -79,6 +85,10 @@ public enum DeviceType {
      */
     INVALID(-1);
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     private final int value;
 
     DeviceType(int value) {
@@ -122,4 +132,20 @@ public enum DeviceType {
             throw new IllegalArgumentException("No DeviceType enum with value " + value);
         }
     }
+
+    /**
+     * Get the CairoDeviceType GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_device_type_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_device_type_get_type = Interop.downcallHandle(
+            "cairo_gobject_device_type_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

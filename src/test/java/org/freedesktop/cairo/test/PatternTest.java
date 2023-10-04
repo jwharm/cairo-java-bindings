@@ -63,9 +63,9 @@ class PatternTest {
     }
 
     @Test
-    void testGetType() {
+    void testGetPatternType() {
         Gradient pattern = LinearGradient.create(0, 0, 10, 10);
-        assertEquals(PatternType.LINEAR, pattern.getType());
+        assertEquals(PatternType.LINEAR, pattern.getPatternType());
         assertEquals(Status.SUCCESS, pattern.status());
     }
 

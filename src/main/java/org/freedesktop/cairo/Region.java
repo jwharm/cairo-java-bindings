@@ -538,4 +538,20 @@ public class Region extends Proxy {
 
     private static final MethodHandle cairo_region_xor_rectangle = Interop.downcallHandle("cairo_region_xor_rectangle",
             FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    /**
+     * Get the CairoRegion GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_region_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_region_get_type = Interop.downcallHandle(
+            "cairo_gobject_region_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }
