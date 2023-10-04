@@ -30,7 +30,7 @@ import java.lang.ref.Cleaner;
  * discussion of devices.
  */
 public sealed class Surface extends Proxy implements AutoCloseable
-        permits ImageSurface, PDFSurface, PSSurface, RecordingSurface, SVGSurface, ScriptSurface {
+        permits ImageSurface, PDFSurface, PSSurface, RecordingSurface, SVGSurface, ScriptSurface, SurfaceObserver, TeeSurface {
 
     static {
         Cairo.ensureInitialized();
@@ -88,7 +88,6 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * @return the newly allocated surface.
      * @since 1.0
      */
-    @SuppressWarnings("unchecked")
     public static <T extends Surface> T createSimilar(T other, Content content, int width, int height) {
         if (other == null) {
             return null;
@@ -96,25 +95,21 @@ public sealed class Surface extends Proxy implements AutoCloseable
         try {
             MemorySegment result = (MemorySegment) cairo_surface_create_similar.invoke(other.handle(), content.getValue(),
                     width, height);
-            Surface surface = new Surface(result);
-            // Try to instantiate the correct class, based on the SurfaceType
-            SurfaceType type = other.getType();
-            if (type == SurfaceType.IMAGE) {
-                surface = new ImageSurface(result);
-            } else if (type == SurfaceType.PDF) {
-                surface = new PDFSurface(result);
-            } else if (type == SurfaceType.PS) {
-                surface = new PSSurface(result);
-            } else if (type == SurfaceType.RECORDING) {
-                surface = new RecordingSurface(result);
-            } else if (type == SurfaceType.SVG) {
-                surface = new SVGSurface(result);
-            } else if (type == SurfaceType.SCRIPT) {
-                surface = new ScriptSurface(result);
-            }
+            // Cast to T is safe, because we construct the exact same class in all cases
+            @SuppressWarnings("unchecked")
+            T surface = (T) switch (other) {
+                case ImageSurface s -> new ImageSurface(result);
+                case PDFSurface s -> new PDFSurface(result);
+                case PSSurface s -> new PSSurface(result);
+                case RecordingSurface s -> new RecordingSurface(result);
+                case SVGSurface s -> new SVGSurface(result);
+                case ScriptSurface s -> new ScriptSurface(result);
+                case TeeSurface s -> new TeeSurface(result);
+                case SurfaceObserver s -> new SurfaceObserver(result);
+                case Surface s -> new Surface(result);
+            };
             MemoryCleaner.takeOwnership(surface.handle());
-            // Cast to T is safe, because all possible Surface types are instantiated above
-            return (T) surface;
+            return surface;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
