@@ -11,22 +11,17 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Install cairo
-        run: sudo apt-get install -y libcairo2 libfreetype6
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          # Install java 20 (for compile) and 19 (for gradle)
-          java-version: |
-            20
-            19
+          java-version: 20
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Run build with Gradle Wrapper
-        run: ./gradlew build
+      - name: Create javadoc with Gradle Wrapper
+        run: ./gradlew javadoc
       - name: Create Site Artifact
         run: |
           mkdir site
