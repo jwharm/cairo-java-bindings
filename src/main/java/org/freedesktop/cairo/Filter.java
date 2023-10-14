@@ -8,9 +8,9 @@ import java.lang.invoke.MethodHandle;
 
 /**
  * Filter is used to indicate what filtering should be applied when reading
- * pixel values from patterns. See cairo_pattern_set_filter() for indicating the
+ * pixel values from patterns. See {@link Pattern#setFilter} for indicating the
  * desired filter to be used with a particular pattern.
- * 
+ *
  * @since 1.0
  */
 public enum Filter {

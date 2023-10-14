@@ -9,7 +9,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
 /**
- * Base class (linear or radial) gradient patterns.
+ * Base class for (linear or radial) gradient patterns.
  */
 public abstract class Gradient extends Pattern {
 
