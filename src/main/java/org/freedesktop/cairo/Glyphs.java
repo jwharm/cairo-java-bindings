@@ -4,8 +4,6 @@ import io.github.jwharm.cairobindings.MemoryCleaner;
 import io.github.jwharm.cairobindings.Proxy;
 
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
-import java.lang.foreign.ValueLayout;
 
 /**
  * The {@code Glyphs} class represents an array of glyphs. It will also optionally
@@ -18,14 +16,6 @@ public class Glyphs implements AutoCloseable {
     private final int numGlyphs;
     private final int numClusters;
     private final TextClusterFlags clusterFlags;
-
-    /**
-     * Represents an empty glyphs array
-     */
-    public static Glyphs empty() {
-        var glyphsPtr = MemorySegment.allocateNative(ValueLayout.ADDRESS, SegmentScope.auto());
-        return new Glyphs(glyphsPtr, 0, MemorySegment.NULL, 0, null);
-    }
 
     /**
      * Constructor used internally to instantiate a java Glyphs object for a native
