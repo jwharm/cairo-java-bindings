@@ -77,7 +77,7 @@ public class Rectangle extends Proxy {
      *                instance
      */
     public Rectangle(MemorySegment address) {
-        super(address);
+        super(Interop.reinterpret(address, getMemoryLayout()));
     }
 
     /**

@@ -20,6 +20,20 @@ public final class Interop {
     private Interop() {}
 
     /**
+     * Reinterpret a zero-length MemorySegment to the size of
+     * {@code layout}
+     *
+     * @param address the address with {@code layout} memory layout
+     * @param layout the actual memory layout
+     * @return a MemorySegment with the size of {@code layout}
+     */
+    public static MemorySegment reinterpret(MemorySegment address, MemoryLayout layout) {
+        if (address.byteSize() == layout.byteSize())
+            return address;
+        return MemorySegment.ofAddress(address.address(), layout.byteSize());
+    }
+
+    /**
      * Creates a method handle that is used to call the native function with
      * the provided name and function descriptor. The method handle is cached
      * and reused in subsequent lookups.
