@@ -60,10 +60,6 @@ public class RectangleList extends Proxy {
     public List<Rectangle> rectangles() {
         MemorySegment address = (MemorySegment) RECTANGLES.get(handle());
         int length = (int) NUM_RECTANGLES.get(handle());
-        // MemorySegment.elements() only works for >1 elements
-        if (length == 1) {
-            return List.of(new Rectangle(address));
-        }
         long segmentSize = Rectangle.getMemoryLayout().byteSize() * length;
         MemorySegment array = MemorySegment.ofAddress(address.address(), segmentSize, handle().scope());
         return array.elements(Rectangle.getMemoryLayout()).map(Rectangle::new).toList();
