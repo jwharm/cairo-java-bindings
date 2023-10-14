@@ -21,46 +21,18 @@ class RasterSourceTest {
     }
 
     @Test
-    void testSetAcquire() {
+    void testAcquireAndRelease() {
         RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
-        RasterSourceAcquireFunc f = (pattern, target, extents) -> null;
-        RasterSourceReleaseFunc r = (pattern, target) -> {};
-        source.setAcquire(f, r);
+        RasterSourceAcquireFunc acquireFunc = (pattern, target, extents) -> null;
+        RasterSourceReleaseFunc releaseFunc = (pattern, target) -> {};
+        source.setAcquire(acquireFunc, releaseFunc);
+        assertEquals(acquireFunc, source.getAcquire());
+        assertEquals(releaseFunc, source.getRelease());
         assertEquals(Status.SUCCESS, source.status());
     }
 
     @Test
-    void testGetAcquire() {
-        RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
-        RasterSourceAcquireFunc f1 = (pattern, target, extents) -> null;
-        RasterSourceReleaseFunc r1 = (pattern, target) -> {};
-        source.setAcquire(f1, r1);
-        RasterSourceAcquireFunc f2 = source.getAcquire();
-        assertEquals(f1, f2);
-        assertEquals(Status.SUCCESS, source.status());
-    }
-
-    @Test
-    void testGetRelease() {
-        RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
-        RasterSourceAcquireFunc f1 = (pattern, target, extents) -> null;
-        RasterSourceReleaseFunc r1 = (pattern, target) -> {};
-        source.setAcquire(f1, r1);
-        RasterSourceReleaseFunc r2 = source.getRelease();
-        assertEquals(r1, r2);
-        assertEquals(Status.SUCCESS, source.status());
-    }
-
-    @Test
-    void testSetSnapshot() {
-        RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
-        RasterSourceSnapshotFunc s = (pattern) -> null;
-        source.setSnapshot(s);
-        assertEquals(Status.SUCCESS, source.status());
-    }
-
-    @Test
-    void testGetSnapshot() {
+    void testSnapshot() {
         RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
         RasterSourceSnapshotFunc s1 = (pattern) -> null;
         source.setSnapshot(s1);
@@ -70,15 +42,7 @@ class RasterSourceTest {
     }
 
     @Test
-    void testSetCopy() {
-        RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
-        RasterSourceCopyFunc c = (pattern, other) -> null;
-        source.setCopy(c);
-        assertEquals(Status.SUCCESS, source.status());
-    }
-
-    @Test
-    void testGetCopy() {
+    void testCopy() {
         RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
         RasterSourceCopyFunc c1 = (pattern, other) -> null;
         source.setCopy(c1);
@@ -88,15 +52,7 @@ class RasterSourceTest {
     }
 
     @Test
-    void testSetFinish() {
-        RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
-        RasterSourceFinishFunc f = (pattern) -> {};
-        source.setFinish(f);
-        assertEquals(Status.SUCCESS, source.status());
-    }
-
-    @Test
-    void testGetFinish() {
+    void testFinish() {
         RasterSource source = RasterSource.create(Content.COLOR_ALPHA, 100, 100);
         RasterSourceFinishFunc f1 = (pattern) -> {};
         source.setFinish(f1);

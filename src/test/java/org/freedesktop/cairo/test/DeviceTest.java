@@ -16,7 +16,7 @@ class DeviceTest {
     @Test
     void status() {
         try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
-            assertEquals(d.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, d.status());
         }
     }
 
@@ -24,7 +24,7 @@ class DeviceTest {
     void finish() {
         try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
             d.finish();
-            assertEquals(d.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, d.status());
         }
     }
 
@@ -32,29 +32,21 @@ class DeviceTest {
     void flush() {
         try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
             d.flush();
-            assertEquals(d.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, d.status());
         }
     }
 
     @Test
-    void getType() {
+    void getDeviceType() {
         try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
-            d.getType();
-            assertEquals(d.status(), Status.SUCCESS);
+            DeviceType type = d.getDeviceType();
+            assertEquals(DeviceType.SCRIPT, type);
+            assertEquals(Status.SUCCESS, d.status());
         }
     }
 
     @Test
-    void acquire() {
-        try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
-            d.acquire();
-            d.release();
-            assertEquals(d.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void release() {
+    void acquireAndRelease() {
         try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
             d.acquire();
             d.release();
@@ -63,15 +55,7 @@ class DeviceTest {
     }
 
     @Test
-    void testSetUserData() {
-        try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
-            d.setUserData(Rectangle.create(0, 0, 10, 10));
-            assertEquals(d.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testGetUserData() {
+    void testUserData() {
         try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
             Rectangle input = Rectangle.create(0, 0, 10, 10);
             UserDataKey key = d.setUserData(input);

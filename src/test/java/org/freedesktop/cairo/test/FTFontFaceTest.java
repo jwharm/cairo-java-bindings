@@ -46,26 +46,7 @@ class FTFontFaceTest {
     }
 
     @Test
-    void testGetSynthesize() {
-        Library ftLib = Library.initFreeType();
-        Face ftFace = new Face(ftLib, TTF_FILE, 0);
-        FTFontFace face = FTFontFace.create(ftFace, 0);
-        face.setSynthesize(FTSynthesize.BOLD);
-        assertEquals(FTSynthesize.BOLD, face.getSynthesize());
-        assertEquals(Status.SUCCESS, face.status());
-    }
-
-    @Test
-    void testSetSynthesize() {
-        Library ftLib = Library.initFreeType();
-        Face ftFace = new Face(ftLib, TTF_FILE, 0);
-        FTFontFace face = FTFontFace.create(ftFace, 0);
-        face.setSynthesize(FTSynthesize.combined(BOLD, OBLIQUE));
-        assertEquals(Status.SUCCESS, face.status());
-    }
-
-    @Test
-    void testUnsetSynthesize() {
+    void testSynthesize() {
         Library ftLib = Library.initFreeType();
         Face ftFace = new Face(ftLib, TTF_FILE, 0);
         FTFontFace face = FTFontFace.create(ftFace, 0);

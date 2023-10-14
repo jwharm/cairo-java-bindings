@@ -1,11 +1,6 @@
 package org.freedesktop.cairo.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SegmentScope;
@@ -20,6 +15,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class ImageSurfaceTest {
 
@@ -44,13 +41,13 @@ class ImageSurfaceTest {
     @Test
     void testFormatStrideForWidth() {
         int stride = ImageSurface.formatStrideForWidth(Format.ARGB32, 120);
-        assertNotEquals(stride, -1);
+        assertNotEquals(-1, stride);
     }
 
     @Test
     void testCreateFormatIntInt() {
         try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -59,97 +56,79 @@ class ImageSurfaceTest {
         int stride = ImageSurface.formatStrideForWidth(Format.ARGB32, 120);
         MemorySegment data = SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(120L * 120 * stride);
         try (ImageSurface s = ImageSurface.create(data, Format.ARGB32, 120, 120, stride)) {
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
-    void testCreateFromPNGString() throws IOException {
+    void testWriteAndCreatePNG_String() throws IOException {
         try (ImageSurface s1 = ImageSurface.create(Format.ARGB32, 120, 120)) {
             Context cr = Context.create(s1);
             cr.rectangle(10, 10, 20, 20);
             cr.stroke();
             String filename = tempDir.resolve("test.png").toString();
             s1.writeToPNG(filename);
-            ImageSurface s2 = ImageSurface.createFromPNG(filename);
-            assertEquals(s2.status(), Status.SUCCESS);
+            try (ImageSurface s2 = ImageSurface.createFromPNG(filename)) {
+                assertEquals(Status.SUCCESS, s2.status());
+            }
         }
     }
 
     @Test
-    void testCreateFromPNGInputStream() throws IOException {
+    void testWriteAndCreatePNG_Stream() throws IOException {
         try (ImageSurface s1 = ImageSurface.create(Format.ARGB32, 120, 120)) {
             Context cr = Context.create(s1);
             cr.rectangle(10, 10, 20, 20);
             cr.stroke();
             String filename = tempDir.resolve("test.png").toString();
-            s1.writeToPNG(filename);
-            ImageSurface s2 = ImageSurface.createFromPNG(new FileInputStream(filename));
-            assertEquals(s2.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testWriteToPNGString() throws IOException {
-        try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            Context cr = Context.create(s);
-            cr.rectangle(10, 10, 20, 20);
-            cr.stroke();
-            String filename = tempDir.resolve("test.png").toString();
-            s.writeToPNG(filename);
-            assertEquals(s.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testWriteToPNGOutputStream() throws IOException {
-        try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            Context cr = Context.create(s);
-            cr.rectangle(10, 10, 20, 20);
-            cr.stroke();
-            String filename = tempDir.resolve("test.png").toString();
-            s.writeToPNG(new FileOutputStream(filename));
-            assertEquals(s.status(), Status.SUCCESS);
+            try (OutputStream outStream = new FileOutputStream(filename)) {
+                s1.writeToPNG(outStream);
+            }
+            try (InputStream inStream = new FileInputStream(filename);
+                 ImageSurface s2 = ImageSurface.createFromPNG(inStream)) {
+                assertEquals(Status.SUCCESS, s2.status());
+            }
         }
     }
 
     @Test
     void testGetData() {
         try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getData();
-            assertEquals(s.status(), Status.SUCCESS);
+            MemorySegment data = s.getData();
+            assertNotEquals(MemorySegment.NULL, data);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
     void testGetFormat() {
         try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getFormat();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Format.ARGB32, s.getFormat());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
     void testGetWidth() {
-        try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getWidth();
-            assertEquals(s.status(), Status.SUCCESS);
+        try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 100)) {
+            assertEquals(120, s.getWidth());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
     void testGetHeight() {
-        try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getHeight();
-            assertEquals(s.status(), Status.SUCCESS);
+        try (ImageSurface s = ImageSurface.create(Format.ARGB32, 100, 120)) {
+            assertEquals(120, s.getHeight());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
     void testGetStride() {
         try (ImageSurface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getStride();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(480, s.getStride());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 }

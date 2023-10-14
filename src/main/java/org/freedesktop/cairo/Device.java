@@ -177,7 +177,7 @@ public class Device extends Proxy implements AutoCloseable {
      * Acquires the device for the current thread. This function will block until no
      * other thread has acquired the device. From then on, your thread owns the
      * device and no other thread will be able to acquire it until a matching call
-     * to cairo_device_release(). It is allowed to recursively acquire the device
+     * to {@link #release()}. It is allowed to recursively acquire the device
      * multiple times from the same thread.
      * <p>
      * <strong>You must never acquire two different devices at the same time unless

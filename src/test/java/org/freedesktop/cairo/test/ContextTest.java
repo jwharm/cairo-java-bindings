@@ -532,7 +532,7 @@ class ContextTest {
     void testTextPath() {
         Context cr = createContext();
         cr.textPath("test");
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
@@ -540,7 +540,7 @@ class ContextTest {
         Context cr = createContext();
         cr.moveTo(0, 0);
         cr.relCurveTo(10, 10, 10, 10, 10, 10);
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
@@ -548,7 +548,7 @@ class ContextTest {
         Context cr = createContext();
         cr.moveTo(0, 0);
         cr.relLineTo(10, 10);
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
@@ -556,102 +556,95 @@ class ContextTest {
         Context cr = createContext();
         cr.moveTo(0, 0);
         cr.relMoveTo(10, 10);
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testPathExtents() {
         Context cr = createContext();
-        cr.pathExtents();
-        assertEquals(cr.status(), Status.SUCCESS);
+        cr.rectangle(10, 20, 30, 40);
+        Rectangle rect = cr.pathExtents();
+        assertEquals(10, rect.x());
+        assertEquals(20, rect.y());
+        assertEquals(40, rect.width());
+        assertEquals(60, rect.height());
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testTranslate() {
         Context cr = createContext();
         cr.translate(10, 10);
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testScale() {
         Context cr = createContext();
         cr.scale(1, 1);
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testRotate() {
         Context cr = createContext();
         cr.rotate(0);
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testTransform() {
         Context cr = createContext();
         cr.transform(Matrix.createIdentity());
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
-    void testSetMatrix() {
+    void testMatrix() {
         Context cr = createContext();
         cr.setMatrix(Matrix.createIdentity());
-        assertEquals(cr.status(), Status.SUCCESS);
-    }
-
-    @Test
-    void testGetMatrix() {
-        Context cr = createContext();
         cr.getMatrix();
-        assertEquals(cr.status(), Status.SUCCESS);
-    }
-
-    @Test
-    void testIdentityMatrix() {
-        Context cr = createContext();
-        cr.identityMatrix();
-        assertEquals(cr.status(), Status.SUCCESS);
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testUserToDevice() {
         Context cr = createContext();
-        cr.userToDevice(new Point(0, 0));
-        assertEquals(cr.status(), Status.SUCCESS);
+        Point p = cr.userToDevice(new Point(10, 20));
+        assertEquals(10, p.x());
+        assertEquals(20, p.y());
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testUserToDeviceDistance() {
         Context cr = createContext();
-        cr.userToDeviceDistance(new Point(0, 0));
-        assertEquals(cr.status(), Status.SUCCESS);
+        Point p = cr.userToDeviceDistance(new Point(10, 20));
+        assertEquals(10, p.x());
+        assertEquals(20, p.y());
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testDeviceToUser() {
         Context cr = createContext();
-        cr.deviceToUser(new Point(0, 0));
-        assertEquals(cr.status(), Status.SUCCESS);
+        Point p = cr.deviceToUser(new Point(0, 0));
+        assertEquals(0, p.x());
+        assertEquals(0, p.y());
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
     void testDeviceToUserDistance() {
         Context cr = createContext();
-        cr.deviceToUserDistance(new Point(0, 0));
-        assertEquals(cr.status(), Status.SUCCESS);
+        Point p = cr.deviceToUserDistance(new Point(0, 0));
+        assertEquals(0, p.x());
+        assertEquals(0, p.y());
+        assertEquals(Status.SUCCESS, cr.status());
     }
 
     @Test
-    void testSetUserData() {
-        Context cr = createContext();
-        cr.setUserData(12345);
-        assertEquals(cr.status(), Status.SUCCESS);
-    }
-
-    @Test
-    void testGetUserData() {
+    void testUserData() {
         Context cr = createContext();
         int input = 12345;
         UserDataKey key = cr.setUserData(input);

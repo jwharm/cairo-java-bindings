@@ -44,17 +44,10 @@ class PSSurfaceTest {
     }
 
     @Test
-    void testSetEPS() {
+    void testEPS() {
         try (PSSurface s = PSSurface.create((String) null, 120, 120)) {
             s.setEPS(true);
-            assertEquals(Status.SUCCESS, s.status());
-        }
-    }
-
-    @Test
-    void testGetEPS() {
-        try (PSSurface s = PSSurface.create((String) null, 120, 120)) {
-            s.getEPS();
+            assertTrue(s.getEPS());
             assertEquals(Status.SUCCESS, s.status());
         }
     }

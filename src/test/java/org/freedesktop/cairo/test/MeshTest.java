@@ -18,14 +18,7 @@ class MeshTest {
     }
 
     @Test
-    void testBeginPatch() {
-        Mesh mesh = Mesh.create();
-        mesh.beginPatch();
-        assertEquals(Status.SUCCESS, mesh.status());
-    }
-
-    @Test
-    void testEndPatch() {
+    void testBeginAndEndPatch() {
         Mesh mesh = Mesh.create();
         mesh.beginPatch();
         mesh.moveTo(10, 10);
@@ -58,14 +51,6 @@ class MeshTest {
     }
 
     @Test
-    void testSetControlPoint() {
-        Mesh mesh = Mesh.create();
-        mesh.beginPatch();
-        mesh.setControlPoint(0, 10, 10);
-        assertEquals(Status.SUCCESS, mesh.status());
-    }
-
-    @Test
     void testSetCornerColorRGB() {
         Mesh mesh = Mesh.create();
         mesh.beginPatch()
@@ -73,17 +58,6 @@ class MeshTest {
             .lineTo(20, 20)
             .lineTo(30, 30)
             .setCornerColorRGB(0, 0.5, 0.5, 0.5);
-        assertEquals(Status.SUCCESS, mesh.status());
-    }
-
-    @Test
-    void testSetCornerColorRGBA() {
-        Mesh mesh = Mesh.create();
-        mesh.beginPatch()
-            .moveTo(10, 10)
-            .lineTo(20, 20)
-            .lineTo(30, 30)
-            .setCornerColorRGBA(0, 0.5, 0.5, 0.5, 1);
         assertEquals(Status.SUCCESS, mesh.status());
     }
 
@@ -110,19 +84,20 @@ class MeshTest {
     }
 
     @Test
-    void testGetControlPoint() {
+    void testControlPoint() {
         Mesh mesh = Mesh.create();
         mesh.beginPatch();
-        mesh.setControlPoint(0, 10, 10);
-        mesh.moveTo(20, 20);
+        mesh.setControlPoint(0, 10, 15);
+        mesh.moveTo(20, 30);
         mesh.endPatch();
         Point point = mesh.getControlPoint(0, 0);
-        assertNotNull(point);
+        assertEquals(10, point.x());
+        assertEquals(15, point.y());
         assertEquals(Status.SUCCESS, mesh.status());
     }
 
     @Test
-    void testGetCornerColorRGBA() {
+    void testCornerColorRGBA() {
         Mesh mesh = Mesh.create();
         mesh.beginPatch()
             .moveTo(10, 10)

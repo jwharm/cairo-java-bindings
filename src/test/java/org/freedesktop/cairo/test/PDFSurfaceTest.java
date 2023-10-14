@@ -29,7 +29,7 @@ class PDFSurfaceTest {
         };
         try (PDFSurface s = PDFSurface.create(stream, 120, 120)) {
             s.showPage();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
         assertTrue(success.get());
     }

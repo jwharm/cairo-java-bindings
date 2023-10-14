@@ -9,12 +9,12 @@ class CairoTest {
 
     @Test
     void testVersionEncode() {
-        assertEquals(Cairo.versionEncode(1, 2, 3), 10203);
+        assertEquals(10203, Cairo.versionEncode(1, 2, 3));
     }
 
     @Test
     void testVersionStringize() {
-        assertEquals(Cairo.versionStringize(1, 2, 3), "1.2.3");
+        assertEquals("1.2.3", Cairo.versionStringize(1, 2, 3));
     }
 
     @Test

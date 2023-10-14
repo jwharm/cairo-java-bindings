@@ -15,14 +15,7 @@ class PatternTest {
     }
 
     @Test
-    void testSetExtend() {
-        Gradient pattern = LinearGradient.create(0, 0, 10, 10);
-        pattern.setExtend(Extend.PAD);
-        assertEquals(Status.SUCCESS, pattern.status());
-    }
-
-    @Test
-    void testGetExtend() {
+    void testExtend() {
         Gradient pattern = LinearGradient.create(0, 0, 10, 10);
         pattern.setExtend(Extend.PAD);
         Extend e = pattern.getExtend();
@@ -31,14 +24,7 @@ class PatternTest {
     }
 
     @Test
-    void testSetFilter() {
-        Gradient pattern = LinearGradient.create(0, 0, 10, 10);
-        pattern.setFilter(Filter.NEAREST);
-        assertEquals(Status.SUCCESS, pattern.status());
-    }
-
-    @Test
-    void testGetFilter() {
+    void testFilter() {
         Gradient pattern = LinearGradient.create(0, 0, 10, 10);
         pattern.setFilter(Filter.NEAREST);
         Filter f = pattern.getFilter();
@@ -47,14 +33,7 @@ class PatternTest {
     }
 
     @Test
-    void testSetMatrix() {
-        Gradient pattern = LinearGradient.create(0, 0, 10, 10);
-        pattern.setMatrix(Matrix.createScale(2, 2));
-        assertEquals(Status.SUCCESS, pattern.status());
-    }
-
-    @Test
-    void testGetMatrix() {
+    void testMatrix() {
         Gradient pattern = LinearGradient.create(0, 0, 10, 10);
         pattern.setMatrix(Matrix.createScale(2, 2));
         Matrix m = Matrix.create(0, 0, 0, 0, 0, 0);
@@ -71,15 +50,7 @@ class PatternTest {
 
     @Disabled("Does not work with cairo 1.17.8 (Fedora 38, Gnome 45 Flatpak SDK)")
     @Test
-    void testSetDither() {
-        Pattern pattern = LinearGradient.create(0, 0, 10, 10);
-        pattern.setDither(Dither.FAST);
-        assertEquals(Status.SUCCESS, pattern.status());
-    }
-
-    @Disabled("Does not work with cairo 1.17.8 (Fedora 38, Gnome 45 Flatpak SDK)")
-    @Test
-    void testGetDither() {
+    void testDither() {
         Pattern pattern = LinearGradient.create(0, 0, 10, 10);
         pattern.setDither(Dither.FAST);
         assertEquals(Dither.FAST, pattern.getDither());
