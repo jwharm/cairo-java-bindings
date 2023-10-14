@@ -22,16 +22,6 @@ public class TeeSurfaceTest {
     }
 
     @Test
-    void testAdd() {
-        try (Surface primary = ImageSurface.create(Format.ARGB32, 120, 120);
-                Surface target = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            TeeSurface tee = TeeSurface.create(primary);
-            tee.add(target);
-            assertEquals(Status.SUCCESS, tee.status());
-        }
-    }
-
-    @Test
     void testIndex() {
         try (Surface primary = ImageSurface.create(Format.ARGB32, 120, 120);
              Surface target1 = ImageSurface.create(Format.ARGB32, 120, 120);
@@ -45,7 +35,7 @@ public class TeeSurfaceTest {
             assertEquals(target2, tee.index(2));
 
             /* We don't actually call `cairo_tee_surface_index` in the bindings,
-             * but we bind it in the method below, to assert that the results
+             * but we call it in the method below, to assert that the results
              * are the same.
              */
             assertEquals(tee.index(0).handle(), cairo_tee_surface_index(tee, 0));
@@ -67,7 +57,7 @@ public class TeeSurfaceTest {
     }
 
     @Test
-    void testRemove() {
+    void testAddAndRemove() {
         try (Surface primary = ImageSurface.create(Format.ARGB32, 120, 120);
              Surface target = ImageSurface.create(Format.ARGB32, 120, 120)) {
             TeeSurface tee = TeeSurface.create(primary);

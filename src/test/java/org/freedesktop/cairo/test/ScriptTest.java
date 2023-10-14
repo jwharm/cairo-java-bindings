@@ -18,7 +18,7 @@ class ScriptTest {
     @Test
     void testCreateString() {
         try (Script s = Script.create(tempDir.resolve("test.script").toString())) {
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -32,7 +32,7 @@ class ScriptTest {
             }
         };
         try (Script s = Script.create(stream)) {
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
         assertTrue(success.get());
     }
@@ -40,24 +40,17 @@ class ScriptTest {
     @Test
     void testFrom() {
         try (Script s = Script.create(tempDir.resolve("test.script").toString())) {
-            s.from(RecordingSurface.create(Content.COLOR_ALPHA, Rectangle.create(10, 10, 20, 20)));
-            assertEquals(s.status(), Status.SUCCESS);
+            s.from(RecordingSurface.create(Content.COLOR_ALPHA, null));
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
-    void testGetMode() {
-        try (Script s = Script.create(tempDir.resolve("test.script").toString())) {
-            s.getMode();
-            assertEquals(s.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testSetMode() {
+    void testMode() {
         try (Script s = Script.create(tempDir.resolve("test.script").toString())) {
             s.setMode(ScriptMode.ASCII);
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(ScriptMode.ASCII, s.getMode());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -65,7 +58,7 @@ class ScriptTest {
     void testCreateScriptSurface() {
         try (Script s = Script.create(tempDir.resolve("test.script").toString())) {
             s.createScriptSurface(Content.COLOR, 30, 30);
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -73,7 +66,7 @@ class ScriptTest {
     void testCreateScriptSurfaceForTarget() {
         try (Script s = Script.create(tempDir.resolve("test.script").toString())) {
             s.createScriptSurfaceForTarget(ImageSurface.create(Format.ARGB32, 120, 120));
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -81,7 +74,7 @@ class ScriptTest {
     void testWriteComment() {
         try (Script s = Script.create(tempDir.resolve("test.script").toString())) {
             s.writeComment("test");
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 }

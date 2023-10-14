@@ -1,21 +1,12 @@
 package org.freedesktop.cairo.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.freedesktop.cairo.Content;
-import org.freedesktop.cairo.Context;
-import org.freedesktop.cairo.FontOptions;
-import org.freedesktop.cairo.Format;
-import org.freedesktop.cairo.ImageSurface;
-import org.freedesktop.cairo.MimeType;
-import org.freedesktop.cairo.RectangleInt;
-import org.freedesktop.cairo.Status;
-import org.freedesktop.cairo.Surface;
-import org.freedesktop.cairo.UserDataKey;
+import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class SurfaceTest {
 
@@ -23,7 +14,7 @@ class SurfaceTest {
     void testCreateSimilar() {
         try (Surface s1 = ImageSurface.create(Format.ARGB32, 120, 120)) {
             Surface s2 = Surface.createSimilar(s1, Content.COLOR_ALPHA, 120, 120);
-            assertEquals(s2.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s2.status());
         }
     }
 
@@ -31,7 +22,7 @@ class SurfaceTest {
     void testCreateSimilarImage() {
         try (Surface s1 = ImageSurface.create(Format.ARGB32, 120, 120)) {
             Surface s2 = Surface.createSimilarImage(s1, Format.ARGB32, 120, 120);
-            assertEquals(s2.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s2.status());
         }
     }
 
@@ -39,14 +30,14 @@ class SurfaceTest {
     void testCreateForRectangle() {
         try (Surface s1 = ImageSurface.create(Format.ARGB32, 120, 120)) {
             Surface s2 = Surface.createForRectangle(s1, 50, 50, 20, 20);
-            assertEquals(s2.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s2.status());
         }
     }
 
     @Test
     void testStatus() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -54,7 +45,7 @@ class SurfaceTest {
     void testFinish() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             s.finish();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -62,7 +53,7 @@ class SurfaceTest {
     void testFlush() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             s.flush();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -70,7 +61,7 @@ class SurfaceTest {
     void testGetDevice() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             s.getDevice();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -79,16 +70,16 @@ class SurfaceTest {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             FontOptions options = FontOptions.create();
             s.getFontOptions(options);
-            assertEquals(s.status(), Status.SUCCESS);
-            assertEquals(options.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
+            assertEquals(Status.SUCCESS, options.status());
         }
     }
 
     @Test
     void testGetContent() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getContent();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Content.COLOR_ALPHA, s.getContent());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -96,7 +87,7 @@ class SurfaceTest {
     void testMarkDirty() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             s.markDirty();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -104,63 +95,48 @@ class SurfaceTest {
     void testMarkDirtyRectangle() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             s.markDirtyRectangle(0, 0, 10, 10);
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
-    void testSetDeviceOffset() {
+    void testDeviceOffset() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.setDeviceOffset(0, 0);
-            assertEquals(s.status(), Status.SUCCESS);
+            Point p = s.setDeviceOffset(3, 5)
+                    .getDeviceOffset();
+            assertEquals(3, p.x());
+            assertEquals(5, p.y());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
-    void testGetDeviceOffset() {
+    void testDeviceScale() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getDeviceOffset();
-            assertEquals(s.status(), Status.SUCCESS);
+            Point p = s.setDeviceScale(2.5, 3.5)
+                    .getDeviceScale();
+            assertEquals(2.5, p.x());
+            assertEquals(3.5, p.y());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
-    void testGetDeviceScale() {
+    void testFallbackResolution() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getDeviceScale();
-            assertEquals(s.status(), Status.SUCCESS);
+            Point p = s.setFallbackResolution(2.5, 3.5)
+                    .getFallbackResolution();
+            assertEquals(2.5, p.x());
+            assertEquals(3.5, p.y());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
-    void testSetDeviceScale() {
+    void testGetSurfaceType() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.setDeviceScale(1, 1);
-            assertEquals(s.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testSetFallbackResolution() {
-        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.setFallbackResolution(1, 1);
-            assertEquals(s.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testGetFallbackResolution() {
-        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getFallbackResolution();
-            assertEquals(s.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testGetType() {
-        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.getType();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(SurfaceType.IMAGE, s.getSurfaceType());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -168,7 +144,7 @@ class SurfaceTest {
     void testCopyPage() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             s.copyPage();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
@@ -176,37 +152,20 @@ class SurfaceTest {
     void testShowPage() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             s.showPage();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
     void testHasShowTextGlyphs() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.hasShowTextGlyphs();
-            assertEquals(s.status(), Status.SUCCESS);
+            assertFalse(s.hasShowTextGlyphs());
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
-    void testSetMimeData() throws IOException {
-        try (ImageSurface s1 = ImageSurface.create(Format.ARGB32, 120, 120);
-                ImageSurface s2 = ImageSurface.createSimilar(s1, Content.COLOR_ALPHA, 120, 120)) {
-            Context cr = Context.create(s1);
-            cr.rectangle(10, 10, 20, 20);
-            cr.stroke();
-
-            var outstream = new ByteArrayOutputStream();
-            s1.writeToPNG(outstream);
-            byte[] data = outstream.toByteArray();
-
-            s2.setMimeData(MimeType.PNG, data);
-            assertEquals(s2.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testGetMimeData() throws IOException {
+    void testMimeData() throws IOException {
         try (ImageSurface s1 = ImageSurface.create(Format.ARGB32, 120, 120);
                 ImageSurface s2 = ImageSurface.createSimilar(s1, Content.COLOR_ALPHA, 120, 120)) {
             Context cr = Context.create(s1);
@@ -221,51 +180,36 @@ class SurfaceTest {
             byte[] result = s2.getMimeData(MimeType.PNG);
 
             assertEquals(data.length, result.length);
-            assertEquals(s2.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s2.status());
         }
     }
 
     @Test
     void testSupportsMimeType() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.supportsMimeType(MimeType.PNG);
-            assertEquals(s.status(), Status.SUCCESS);
+            assertFalse(s.supportsMimeType(MimeType.PNG));
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 
     @Test
     void testMapToImage() {
-        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.mapToImage(RectangleInt.create(0, 0, 120, 120));
-            assertEquals(s.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testUnmapImage() {
-        try (Surface s1 = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            ImageSurface s2 = s1.mapToImage(RectangleInt.create(0, 0, 120, 120));
+        try (Surface s1 = ImageSurface.create(Format.ARGB32, 120, 120);
+             ImageSurface s2 = s1.mapToImage(RectangleInt.create(0, 0, 120, 120))) {
             s1.unmapImage(s2);
-            assertEquals(s1.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s1.status());
+            assertEquals(Status.SUCCESS, s2.status());
         }
     }
 
     @Test
-    void testSetUserData() {
-        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
-            s.setUserData("test");
-            assertEquals(s.status(), Status.SUCCESS);
-        }
-    }
-
-    @Test
-    void testGetUserData() {
+    void testUserData() {
         try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             String input = "test";
             UserDataKey key = s.setUserData(input);
             String output = (String) s.getUserData(key);
             assertEquals(input, output);
-            assertEquals(s.status(), Status.SUCCESS);
+            assertEquals(Status.SUCCESS, s.status());
         }
     }
 }
