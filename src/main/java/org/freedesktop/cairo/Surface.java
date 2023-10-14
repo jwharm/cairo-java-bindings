@@ -496,13 +496,15 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * Note that the scale affects drawing to the surface as well as using the
      * surface in a source pattern.
      * 
-     * @param xScale a scale factor in the X direction
-     * @param yScale a scale factor in the Y direction
+     * @param  xScale a scale factor in the X direction
+     * @param  yScale a scale factor in the Y direction
+     * @return the surface
      * @since 1.14
      */
-    public void setDeviceScale(double xScale, double yScale) {
+    public Surface setDeviceScale(double xScale, double yScale) {
         try {
             cairo_surface_set_device_scale.invoke(handle(), xScale, yScale);
+            return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -648,16 +650,16 @@ public sealed class Surface extends Proxy implements AutoCloseable
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
     /**
-     * Returns whether the surface supports sophisticated cairo_show_text_glyphs()
+     * Returns whether the surface supports sophisticated {@link Context#showTextGlyphs}
      * operations. That is, whether it actually uses the provided text and cluster
-     * data to a cairo_show_text_glyphs() call.
+     * data to a {@link Context#showTextGlyphs} call.
      * <p>
-     * Note: Even if this function returns {@code false}, a cairo_show_text_glyphs()
+     * Note: Even if this function returns {@code false}, a {@link Context#showTextGlyphs}
      * operation targeted at surface will still succeed. It just will act like a
-     * cairo_show_glyphs() operation. Users can use this function to avoid computing
+     * {@link Context#showGlyphs} operation. Users can use this function to avoid computing
      * UTF-8 text and cluster mapping if the target surface does not use it.
      * 
-     * @return {@code true} if surface supports cairo_show_text_glyphs(),
+     * @return {@code true} if surface supports {@link Context#showTextGlyphs},
      *         {@code false} otherwise
      * @since 1.8
      */
