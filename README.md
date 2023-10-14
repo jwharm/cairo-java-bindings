@@ -85,28 +85,17 @@ the javadoc or sources jar to use in your IDE.
 The bindings are available to be redistributed and/or modified under the terms of  the GNU Lesser 
 General Public License (LGPL) version 2.1 (which is also one of the licenses of cairo itself.)
 
-## Status
-
-Some things that are still on the to-do list:
-
-* Platform-specific surface types and font implementations
-
-* The bindings should work on all platforms that support JDK 20 and cairo, but have only been 
-  tested on Linux, Windows and MacOS.
-
-PRs and issue reports are welcome.
-
 ## Usage
 
 The library is available on Maven Central. Include it in your `gradle.build` or `pom.xml` file:
 
 ```
 dependencies {
-  implementation 'io.github.jwharm.cairobindings:cairo:1.16.2'
+  implementation 'io.github.jwharm.cairobindings:cairo:1.18.0'
 }
 ```
 
-Furthermore, you obviously need to have the cairo library version 1.16 installed on your system, 
+Furthermore, you obviously need to have the cairo library version 1.18 installed on your system, 
 or else the Java bindings have nothing to bind to. You also need to install JDK 20 (not JDK 19 or 
 earlier, nor the JDK 21 early-access version), because the JEP-434 Panama FFI is slightly different 
 between JDK versions.
