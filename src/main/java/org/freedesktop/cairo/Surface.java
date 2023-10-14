@@ -30,7 +30,7 @@ import java.lang.ref.Cleaner;
  * discussion of devices.
  */
 public sealed class Surface extends Proxy implements AutoCloseable
-        permits ImageSurface, PDFSurface, PSSurface, RecordingSurface, SVGSurface, ScriptSurface {
+        permits ImageSurface, PDFSurface, PSSurface, RecordingSurface, SVGSurface, ScriptSurface, SurfaceObserver, TeeSurface {
 
     static {
         Cairo.ensureInitialized();
@@ -71,7 +71,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * fallback resolution and font options as other . Generally, the new surface
      * will also use the same backend as other , unless that is not possible for
      * some reason. The type of the returned surface may be examined with
-     * {@link Surface#getType()}.
+     * {@link Surface#getSurfaceType()}.
      * <p>
      * Initially the surface contents are all 0 (transparent if contents have
      * transparency, black otherwise.)
@@ -88,7 +88,6 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * @return the newly allocated surface.
      * @since 1.0
      */
-    @SuppressWarnings("unchecked")
     public static <T extends Surface> T createSimilar(T other, Content content, int width, int height) {
         if (other == null) {
             return null;
@@ -96,25 +95,21 @@ public sealed class Surface extends Proxy implements AutoCloseable
         try {
             MemorySegment result = (MemorySegment) cairo_surface_create_similar.invoke(other.handle(), content.getValue(),
                     width, height);
-            Surface surface = new Surface(result);
-            // Try to instantiate the correct class, based on the SurfaceType
-            SurfaceType type = other.getType();
-            if (type == SurfaceType.IMAGE) {
-                surface = new ImageSurface(result);
-            } else if (type == SurfaceType.PDF) {
-                surface = new PDFSurface(result);
-            } else if (type == SurfaceType.PS) {
-                surface = new PSSurface(result);
-            } else if (type == SurfaceType.RECORDING) {
-                surface = new RecordingSurface(result);
-            } else if (type == SurfaceType.SVG) {
-                surface = new SVGSurface(result);
-            } else if (type == SurfaceType.SCRIPT) {
-                surface = new ScriptSurface(result);
-            }
+            // Cast to T is safe, because we construct the exact same class in all cases
+            @SuppressWarnings("unchecked")
+            T surface = (T) switch (other) {
+                case ImageSurface s -> new ImageSurface(result);
+                case PDFSurface s -> new PDFSurface(result);
+                case PSSurface s -> new PSSurface(result);
+                case RecordingSurface s -> new RecordingSurface(result);
+                case SVGSurface s -> new SVGSurface(result);
+                case ScriptSurface s -> new ScriptSurface(result);
+                case TeeSurface s -> new TeeSurface(result);
+                case SurfaceObserver s -> new SurfaceObserver(result);
+                case Surface s -> new Surface(result);
+            };
             MemoryCleaner.takeOwnership(surface.handle());
-            // Cast to T is safe, because all possible Surface types are instantiated above
-            return (T) surface;
+            return surface;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -575,7 +570,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * @return The type of {@link Surface}.
      * @since 1.2
      */
-    public SurfaceType getType() {
+    public SurfaceType getSurfaceType() {
         try {
             int result = (int) cairo_surface_get_type.invoke(handle());
             return SurfaceType.of(result);
@@ -921,4 +916,20 @@ public sealed class Surface extends Proxy implements AutoCloseable
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Get the CairoSurface GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_surface_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_surface_get_type = Interop.downcallHandle(
+            "cairo_gobject_surface_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

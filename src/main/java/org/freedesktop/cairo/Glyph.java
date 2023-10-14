@@ -1,5 +1,6 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.Proxy;
 
 import java.lang.foreign.MemoryLayout;
@@ -80,6 +81,6 @@ public class Glyph extends Proxy {
      *                instance
      */
     public Glyph(MemorySegment address) {
-        super(address);
+        super(Interop.reinterpret(address, getMemoryLayout()));
     }
 }

@@ -4,6 +4,7 @@
  * and work with <strong>JDK 20</strong> (with preview features enabled).
  */
 module org.freedesktop.cairo {
+    requires static org.gnome.glib; // Optional dependency on java-gi when cairo-gobject is used
     exports org.freedesktop.cairo;
     exports org.freedesktop.freetype;
     exports io.github.jwharm.cairobindings;

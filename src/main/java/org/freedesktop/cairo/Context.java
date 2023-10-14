@@ -1791,7 +1791,7 @@ public final class Context extends Proxy {
      * {@link #arc(double, double, double, double, double)},
      * {@link #arcNegative(double, double, double, double, double)},
      * {@link #rectangle(double, double, double, double)},
-     * {@link #textPath(String)}, {@link #glyphPath(Glyph[])}.
+     * {@link #textPath(String)}, {@link #glyphPath}.
      * <p>
      * Some functions use and alter the current point but do not otherwise change
      * current path: cairo_show_text().
@@ -2106,25 +2106,19 @@ public final class Context extends Proxy {
 
     /**
      * Adds closed paths for the glyphs to the current path. The generated path if
-     * filled, achieves an effect similar to that of {@link #showGlyphs(Glyph[])}.
+     * filled, achieves an effect similar to that of {@link #showGlyphs}.
      * 
      * @param glyphs array of glyphs to show
      * @return the context
      * @since 1.0
      */
-    public Context glyphPath(Glyph[] glyphs) {
-        if (glyphs == null || glyphs.length == 0) {
+    public Context glyphPath(Glyphs glyphs) {
+        if (glyphs == null) {
             return this;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
-                MemorySegment glyphsPtr = arena.allocateArray(ValueLayout.ADDRESS, glyphs.length);
-                for (int i = 0; i < glyphs.length; i++) {
-                    glyphsPtr.setAtIndex(ValueLayout.ADDRESS, i, glyphs[i].handle());
-                }
-                cairo_glyph_path.invoke(handle(), glyphsPtr, glyphs.length);
-                return this;
-            }
+            cairo_glyph_path.invoke(handle(), glyphs.getGlyphsPointer(), glyphs.getNumGlyphs());
+            return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2148,7 +2142,7 @@ public final class Context extends Proxy {
      * <strong>Note:</strong> The {@code textPath()} function call is part of
      * what the cairo designers call the "toy" text API. It is convenient for short
      * demos and simple programs, but it is not expected to be adequate for serious
-     * text-using applications. See {@link #glyphPath(Glyph[])} for the "real" text
+     * text-using applications. See {@link #glyphPath} for the "real" text
      * path API in cairo.
      * 
      * @param string a string of text
@@ -2507,7 +2501,7 @@ public final class Context extends Proxy {
      * components of the CTM will be ignored when transforming {@code (dx, dy)}.
      * 
      * @param point X and Y components of a distance vector
-     * @return a Point with the transformed X and Y compontents
+     * @return a Point with the transformed X and Y components
      * @since 1.0
      */
     public Point userToDeviceDistance(Point point) {
@@ -2568,7 +2562,7 @@ public final class Context extends Proxy {
      * {@code (dx, dy)}.
      * 
      * @param point X and Y components of a distance vector
-     * @return a Point with the transformed X and Y compontents
+     * @return a Point with the transformed X and Y components
      * @since 1.0
      */
     public Point deviceToUserDistance(Point point) {
@@ -2889,7 +2883,7 @@ public final class Context extends Proxy {
      * <strong>Note:</strong> The {@code showText()} function call is part of what
      * the cairo designers call the "toy" text API. It is convenient for short demos
      * and simple programs, but it is not expected to be adequate for serious
-     * text-using applications. See {@link #showGlyphs(Glyph[])} for the "real" text
+     * text-using applications. See {@link #showGlyphs} for the "real" text
      * display API in cairo.
      * 
      * @param string a string of text, or {@code null}
@@ -2919,19 +2913,13 @@ public final class Context extends Proxy {
      * @return the context
      * @since 1.0
      */
-    public Context showGlyphs(Glyph[] glyphs) {
-        if (glyphs == null || glyphs.length == 0) {
+    public Context showGlyphs(Glyphs glyphs) {
+        if (glyphs == null) {
             return this;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
-                MemorySegment glyphsPtr = arena.allocateArray(ValueLayout.ADDRESS, glyphs.length);
-                for (int i = 0; i < glyphs.length; i++) {
-                    glyphsPtr.setAtIndex(ValueLayout.ADDRESS, i, glyphs[i].handle());
-                }
-                cairo_show_glyphs.invoke(handle(), glyphsPtr, glyphs.length);
-                return this;
-            }
+            cairo_show_glyphs.invoke(handle(), glyphs.getGlyphsPointer(), glyphs.getNumGlyphs());
+            return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2941,11 +2929,11 @@ public final class Context extends Proxy {
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
     /**
-     * This operation has rendering effects similar to {@link #showGlyphs(Glyph[])}
+     * This operation has rendering effects similar to {@link #showGlyphs}
      * but, if the target surface supports it, uses the provided text and cluster
      * mapping to embed the text for the glyphs shown in the output. If the target
      * does not support the extended attributes, this function acts like the basic
-     * {@link #showGlyphs(Glyph[])} as if it had been passed {@code glyphs}.
+     * {@link #showGlyphs} as if it had been passed {@code glyphs}.
      * <p>
      * The mapping between the string and glyphs array is provided by an array of
      * <i>clusters</i>. Each cluster covers a number of text bytes and glyphs, and
@@ -2962,37 +2950,18 @@ public final class Context extends Proxy {
      * 
      * @param string       a string of text
      * @param glyphs       array of glyphs to show
-     * @param clusters     array of cluster mapping information
-     * @param clusterFlags cluster mapping flags
      * @return the context
      * @since 1.8
      */
-    public Context showTextGlyphs(String string, Glyph[] glyphs, TextCluster[] clusters,
-            TextClusterFlags clusterFlags) {
+    public Context showTextGlyphs(String string, Glyphs glyphs) {
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
-                MemorySegment glyphsPtr;
-                MemorySegment clustersPtr;
-                if (glyphs == null || glyphs.length == 0) {
-                    glyphsPtr = MemorySegment.NULL;
-                } else {
-                    glyphsPtr = arena.allocateArray(ValueLayout.ADDRESS, glyphs.length);
-                    for (int i = 0; i < glyphs.length; i++) {
-                        glyphsPtr.setAtIndex(ValueLayout.ADDRESS, i, glyphs[i].handle());
-                    }
-                }
-                if (clusters == null || clusters.length == 0) {
-                    clustersPtr = MemorySegment.NULL;
-                } else {
-                    clustersPtr = arena.allocateArray(ValueLayout.ADDRESS, clusters.length);
-                    for (int i = 0; i < clusters.length; i++) {
-                        clustersPtr.setAtIndex(ValueLayout.ADDRESS, i, clusters[i].handle());
-                    }
-                }
-                cairo_show_text_glyphs.invoke(handle(), utf8, string == null ? 0 : string.length(), glyphsPtr,
-                        glyphs == null ? 0 : glyphs.length, clustersPtr, clusters == null ? 0 : clusters.length,
-                                clusterFlags.getValue());
+                MemorySegment stringPtr = Interop.allocateNativeString(string, arena);
+                cairo_show_text_glyphs.invoke(handle(),
+                        stringPtr, string == null ? 0 : string.length(),
+                        glyphs.getGlyphsPointer(), glyphs.getNumGlyphs(),
+                        glyphs.getClustersPointer(), glyphs.getNumClusters(),
+                        glyphs.getClusterFlags().getValue());
                 return this;
             }
         } catch (Throwable e) {
@@ -3061,9 +3030,9 @@ public final class Context extends Proxy {
     /**
      * Gets the extents for an array of glyphs. The extents describe a user-space
      * rectangle that encloses the "inked" portion of the glyphs, (as they would be
-     * drawn by {@link #showGlyphs(Glyph[])}). Additionally, the {@code xAdvance}
+     * drawn by {@link #showGlyphs}). Additionally, the {@code xAdvance}
      * and {@code yAdvance} values indicate the amount by which the current point
-     * would be advanced by {@link #showGlyphs(Glyph[])}.
+     * would be advanced by {@link #showGlyphs}.
      * <p>
      * Note that whitespace glyphs do not contribute to the size of the rectangle
      * ({@code extents.width} and {@code extents.height}).
@@ -3072,20 +3041,14 @@ public final class Context extends Proxy {
      * @return the glyph extents
      * @since 1.0
      */
-    public TextExtents glyphExtents(Glyph[] glyphs) {
-        if (glyphs == null || glyphs.length == 0) {
+    public TextExtents glyphExtents(Glyphs glyphs) {
+        if (glyphs == null) {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
-                TextExtents extents = TextExtents.create();
-                MemorySegment glyphsPtr = arena.allocateArray(ValueLayout.ADDRESS, glyphs.length);
-                for (int i = 0; i < glyphs.length; i++) {
-                    glyphsPtr.setAtIndex(ValueLayout.ADDRESS, i, glyphs[i].handle());
-                }
-                cairo_glyph_extents.invoke(handle(), glyphsPtr, glyphs.length, extents.handle());
-                return extents;
-            }
+            TextExtents extents = TextExtents.create();
+            cairo_glyph_extents.invoke(handle(), glyphs.getGlyphsPointer(), glyphs.getNumGlyphs(), extents.handle());
+            return extents;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -3235,4 +3198,20 @@ public final class Context extends Proxy {
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Get the CairoContext GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_context_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_context_get_type = Interop.downcallHandle(
+            "cairo_gobject_context_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

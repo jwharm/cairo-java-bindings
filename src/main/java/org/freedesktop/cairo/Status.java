@@ -365,4 +365,20 @@ public enum Status {
     public static Status of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoStatus GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_status_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_status_get_type = Interop.downcallHandle(
+            "cairo_gobject_status_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

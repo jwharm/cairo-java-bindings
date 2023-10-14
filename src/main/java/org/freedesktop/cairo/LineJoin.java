@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * Specifies how to render the junction of two lines when stroking.
  * <p>
@@ -29,6 +35,10 @@ public enum LineJoin {
      */
     BEVEL;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * @return the value
@@ -47,4 +57,20 @@ public enum LineJoin {
     public static LineJoin of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoLineJoin GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_line_join_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_line_join_get_type = Interop.downcallHandle(
+            "cairo_gobject_line_join_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * Extend is used to describe how pattern color/alpha will be determined for
  * areas "outside" the pattern's natural area, (for example, outside the surface
@@ -44,6 +50,10 @@ public enum Extend {
      */
     PAD;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * @return the value
@@ -62,4 +72,20 @@ public enum Extend {
     public static Extend of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoExtend GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_extend_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_extend_get_type = Interop.downcallHandle(
+            "cairo_gobject_extend_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

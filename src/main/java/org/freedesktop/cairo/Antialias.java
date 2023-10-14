@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * Specifies the type of antialiasing to do when rendering text or shapes.
  * <p>
@@ -79,6 +85,10 @@ public enum Antialias {
      */
     BEST;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * @return the value
@@ -97,4 +107,20 @@ public enum Antialias {
     public static Antialias of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoAntialias GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_antialias_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_antialias_get_type = Interop.downcallHandle(
+            "cairo_gobject_antialias_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

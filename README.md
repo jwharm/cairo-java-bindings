@@ -1,6 +1,6 @@
 # Cairo Java bindings
 Java language bindings for the [cairo](https://www.cairographics.org) graphics library using the 
-JEP-434 Panama FFI. The bindings are based on **cairo 1.16** and work with **JDK 20** (with preview 
+JEP-434 Panama FFI. The bindings are based on **cairo 1.18.0** and work with **JDK 20** (with preview 
 features enabled). 
 
 I created these language bindings primarily as a companion to the GObject-Introspection-based Java 
@@ -92,7 +92,7 @@ Some things that are still on the to-do list:
 * Platform-specific surface types and font implementations
 
 * The bindings should work on all platforms that support JDK 20 and cairo, but have only been 
-  tested on Linux and Windows.
+  tested on Linux, Windows and MacOS.
 
 PRs and issue reports are welcome.
 

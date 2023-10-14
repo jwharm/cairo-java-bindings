@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * cairo_operator_t is used to set the compositing operator for all cairo
  * drawing operations.
@@ -231,6 +237,10 @@ public enum Operator {
      */
     HSL_LUMINOSITY;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * @return the value
@@ -249,4 +259,20 @@ public enum Operator {
     public static Operator of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoOperator GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_operator_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_operator_get_type = Interop.downcallHandle(
+            "cairo_gobject_operator_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

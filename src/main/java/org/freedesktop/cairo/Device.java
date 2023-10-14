@@ -138,11 +138,11 @@ public class Device extends Proxy implements AutoCloseable {
     /**
      * This function returns the type of the device. See {@link DeviceType} for
      * available types.
-     * 
+     *
      * @return the type of the device
      * @since 1.10
      */
-    public DeviceType getType() {
+    public DeviceType getDeviceType() {
         try {
             int result = (int) cairo_device_get_type.invoke(handle());
             return DeviceType.of(result);
@@ -425,4 +425,20 @@ public class Device extends Proxy implements AutoCloseable {
     public void close() {
         finish();
     }
+
+    /**
+     * Get the CairoDevice GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_device_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_device_get_type = Interop.downcallHandle(
+            "cairo_gobject_device_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

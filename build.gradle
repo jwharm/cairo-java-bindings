@@ -6,16 +6,11 @@ plugins {
     id 'signing'
 }
 
-group = "io.github.jwharm.cairo-java-bindings"
-version = "1.16.2"
+group = "io.github.jwharm.cairobindings"
+version = "1.18.0"
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
-    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 java {
@@ -24,6 +19,16 @@ java {
     }
     withSourcesJar()
     withJavadocJar()
+    // Optional dependency on java-gi when cairo-gobject is used
+    registerFeature('gobject') {
+        usingSourceSet(sourceSets.main)
+    }
+}
+
+dependencies {
+    gobjectImplementation "io.github.jwharm.javagi:glib:0.7.2"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 tasks.named('compileJava') {

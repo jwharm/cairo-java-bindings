@@ -552,4 +552,20 @@ public class FontOptions extends Proxy {
     private static final MethodHandle cairo_font_options_get_custom_palette_color = Interop.downcallHandle(
             "cairo_font_options_get_custom_palette_color", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                     ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    /**
+     * Get the CairoFontOptions GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_font_options_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_font_options_get_type = Interop.downcallHandle(
+            "cairo_gobject_font_options_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

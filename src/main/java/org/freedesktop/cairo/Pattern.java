@@ -236,7 +236,7 @@ public abstract class Pattern extends Proxy {
      * @return The type of pattern.
      * @since 1.2
      */
-    public PatternType getType() {
+    public PatternType getPatternType() {
         try {
             int result = (int) cairo_pattern_get_type.invoke(handle());
             return PatternType.of(result);
@@ -350,4 +350,19 @@ public abstract class Pattern extends Proxy {
     private static final MethodHandle cairo_pattern_get_dither = Interop.downcallHandle("cairo_pattern_get_dither",
             FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
+    /**
+     * Get the CairoPattern GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_pattern_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_pattern_get_type = Interop.downcallHandle(
+            "cairo_gobject_pattern_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

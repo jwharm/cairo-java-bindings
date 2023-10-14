@@ -1,5 +1,11 @@
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
+
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+
 /**
  * FontType is used to describe the type of a given font face or scaled font.
  * The font types are also known as "font backends" within cairo.
@@ -63,6 +69,10 @@ public enum FontType {
      */
     CAIRO_FONT_TYPE_DWRITE;
 
+    static {
+        Cairo.ensureInitialized();
+    }
+
     /**
      * Return the value of this enum
      * 
@@ -82,4 +92,20 @@ public enum FontType {
     public static FontType of(int ordinal) {
         return values()[ordinal];
     }
+
+    /**
+     * Get the CairoFontType GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_font_type_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_font_type_get_type = Interop.downcallHandle(
+            "cairo_gobject_font_type_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }

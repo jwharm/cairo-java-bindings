@@ -11,7 +11,6 @@ import java.lang.foreign.SegmentAllocator;
 import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
-import java.util.List;
 
 /**
  * Font face at particular size and options.
@@ -23,7 +22,7 @@ import java.util.List;
  * <p>
  * There are various types of scaled fonts, depending on the font backend they
  * use. The type of a scaled font can be queried using
- * {@link ScaledFont#getType()}.
+ * {@link ScaledFont#getFontType()}.
  * 
  * @see FontFace
  * @see Matrix
@@ -88,18 +87,16 @@ public class ScaledFont extends Proxy {
     public static ScaledFont create(FontFace fontFace, Matrix fontMatrix, Matrix ctm, FontOptions options) {
         ScaledFont font;
         try {
-            try (Arena arena = Arena.openConfined()) {
-                MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
-                        fontFace == null ? MemorySegment.NULL : fontFace.handle(),
-                        fontMatrix == null ? MemorySegment.NULL : fontMatrix.handle(), 
-                        ctm == null ? MemorySegment.NULL : ctm.handle(),
-                        options == null ? MemorySegment.NULL : options.handle());
-                font = new ScaledFont(result);
-                MemoryCleaner.takeOwnership(font.handle());
-                font.fontFace = fontFace;
-                font.fontMatrix = fontMatrix;
-                font.ctm = ctm;
-            }
+            MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
+                    fontFace == null ? MemorySegment.NULL : fontFace.handle(),
+                    fontMatrix == null ? MemorySegment.NULL : fontMatrix.handle(),
+                    ctm == null ? MemorySegment.NULL : ctm.handle(),
+                    options == null ? MemorySegment.NULL : options.handle());
+            font = new ScaledFont(result);
+            MemoryCleaner.takeOwnership(font.handle());
+            font.fontFace = fontFace;
+            font.fontMatrix = fontMatrix;
+            font.ctm = ctm;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -218,7 +215,7 @@ public class ScaledFont extends Proxy {
      * FontFace, font Matrix, CTM, and FontOptions as this ScaledFont).
      * Additionally, the {@code xAdvance()} and {@code yAdvance()} values indicate
      * the amount by which the current point would be advanced by
-     * {@link Context#showGlyphs(Glyph[])}.
+     * {@link Context#showGlyphs}.
      * <p>
      * Note that whitespace glyphs do not contribute to the size of the rectangle
      * ({@code extents.width()} and {@code extents.height()}).
@@ -227,21 +224,15 @@ public class ScaledFont extends Proxy {
      * @return the retrieved extents
      * @since 1.0
      */
-    public TextExtents glyphExtents(Glyph[] glyphs) {
-        if (glyphs == null || glyphs.length == 0) {
+    public TextExtents glyphExtents(Glyphs glyphs) {
+        if (glyphs == null) {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
-                MemorySegment glyphsPtr = arena.allocateArray(ValueLayout.ADDRESS, glyphs.length);
-                for (int i = 0; i < glyphs.length; i++) {
-                    glyphsPtr.setAtIndex(ValueLayout.ADDRESS, i, glyphs[i].handle());
-                }
-                TextExtents extents = new TextExtents(
-                        SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(TextExtents.getMemoryLayout()));
-                cairo_scaled_font_glyph_extents.invoke(handle(), glyphsPtr, glyphs.length, extents.handle());
-                return extents;
-            }
+            TextExtents extents = new TextExtents(
+                    SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(TextExtents.getMemoryLayout()));
+            cairo_scaled_font_glyph_extents.invoke(handle(), glyphs.getGlyphsPointer(), glyphs.getNumGlyphs(), extents.handle());
+            return extents;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -279,80 +270,53 @@ public class ScaledFont extends Proxy {
      * 
      * For details of how TextClusters and TextClusterFlags map input UTF-8 text to
      * the output glyphs see
-     * {@link Context#showTextGlyphs(String, Glyph[], TextCluster[], TextClusterFlags)}.
+     * {@link Context#showTextGlyphs(String, Glyphs)}.
      * <p>
      * The output values can be converted to arrays and then readily passed to
-     * {@link Context#showTextGlyphs(String, Glyph[], TextCluster[], TextClusterFlags)},
-     * {@link Context#showGlyphs(Glyph[])}, or related functions, assuming that the
+     * {@link Context#showTextGlyphs(String, Glyphs)},
+     * {@link Context#showGlyphs}, or related functions, assuming that the
      * exact same ScaledFont is used for the operation.
      * 
-     * @param x        X position to place first glyph
-     * @param y        Y position to place first glyph
-     * @param string   a string of text
-     * @param glyphs   a modifiable list of glyphs to fill
-     * @param clusters a modifiable list of cluster mapping information to fill, or
-     *                 {@code null}
-     * @return cluster flags corresponding to the output {@code clusters}, or
-     *         {@code null} when {@code clusters} was {@code null}
+     * @param  x       X position to place first glyph
+     * @param  y       Y position to place first glyph
+     * @param  string  a string of text
+     * @return the glyphs array
      * @throws IllegalStateException if the input values are wrong or if conversion
      *                               failed
      * @since 1.8
      */
-    public TextClusterFlags textToGlyphs(double x, double y, String string, List<Glyph> glyphs,
-            List<TextCluster> clusters) throws IllegalStateException {
-        if (string == null || glyphs == null) {
+    public Glyphs textToGlyphs(double x, double y, String string) throws IllegalStateException {
+        if (string == null) {
             return null;
         }
         try {
             try (Arena arena = Arena.openConfined()) {
-                MemorySegment utf8 = Interop.allocateNativeString(string, arena);
+                MemorySegment stringPtr = Interop.allocateNativeString(string, arena);
                 MemorySegment glyphsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
                 MemorySegment numGlyphsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
-                MemorySegment clustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS.asUnbounded());
-                MemorySegment numClustersPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS.asUnbounded());
-                MemorySegment clusterFlagsPtr = clusters == null ? MemorySegment.NULL : arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment clustersPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment numClustersPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment clusterFlagsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
 
-                int result = (int) cairo_scaled_font_text_to_glyphs.invoke(handle(), x, y, utf8, string.length(),
+                int result = (int) cairo_scaled_font_text_to_glyphs.invoke(handle(), x, y, stringPtr, string.length(),
                         glyphsPtr, numGlyphsPtr, clustersPtr, numClustersPtr, clusterFlagsPtr);
 
                 // Check returned status, throw exception
                 Status status = Status.of(result);
                 if (status != Status.SUCCESS) {
                     cairo_glyph_free.invoke(glyphsPtr);
-                    if (clusters != null) {
-                        cairo_text_cluster_free.invoke(clustersPtr);
-                    }
+                    cairo_text_cluster_free.invoke(clustersPtr);
                     throw new IllegalStateException(status.toString());
                 }
 
-                // Read the glyphs array
-                int numGlyphs = numGlyphsPtr.get(ValueLayout.JAVA_INT, 0);
-                MemorySegment newPtr = glyphsPtr.get(ValueLayout.ADDRESS, 0);
-                MemorySegment glyphsArray = MemorySegment.ofAddress(newPtr.address(), numGlyphs * Glyph.getMemoryLayout().byteSize());
-                for (int i = 0; i < numGlyphs; i++) {
-                    MemorySegment gl = glyphsArray.asSlice(Glyph.getMemoryLayout().byteSize() * i);
-                    glyphs.add(new Glyph(gl));
-                }
-                cairo_glyph_free.invoke(newPtr);
+                var numGlyphs = numGlyphsPtr.get(ValueLayout.JAVA_INT, 0);
+                var glyphsArray = glyphsPtr.get(ValueLayout.ADDRESS, 0);
+                var numClusters = numClustersPtr.get(ValueLayout.JAVA_INT, 0);
+                var clustersArray = clustersPtr.get(ValueLayout.ADDRESS, 0);
+                var flags = clusterFlagsPtr.get(ValueLayout.JAVA_INT, 0);
 
-                // Clusters are optional
-                if (clusters == null) {
-                    return null;
-                }
-
-                // Read the clusters array
-                int numClusters = numClustersPtr.get(ValueLayout.JAVA_INT, 0);
-                newPtr = clustersPtr.get(ValueLayout.ADDRESS, 0);
-                MemorySegment clustersArray = MemorySegment.ofAddress(newPtr.address(), numClusters * TextCluster.getMemoryLayout().byteSize());
-                for (int i = 0; i < numClusters; i++) {
-                    MemorySegment tc = clustersArray.asSlice(TextCluster.getMemoryLayout().byteSize() * i);
-                    clusters.add(new TextCluster(tc));
-                }
-                cairo_text_cluster_free.invoke(newPtr);
-
-                // Read the cluster flags
-                int flags = clusterFlagsPtr.get(ValueLayout.JAVA_INT, 0);
-                return TextClusterFlags.of(flags);
+                return new Glyphs(glyphsArray, numGlyphs, clustersArray, numClusters,
+                        flags == 0 ? null : TextClusterFlags.of(flags));
             }
         } catch (Throwable e) {
             if (e instanceof IllegalStateException ise) {
@@ -487,7 +451,7 @@ public class ScaledFont extends Proxy {
      * @return the type of the ScaledFont.
      * @since 1.2
      */
-    public FontType getType() {
+    public FontType getFontType() {
         try {
             int result = (int) cairo_scaled_font_get_type.invoke(handle());
             return FontType.of(result);
@@ -563,4 +527,20 @@ public class ScaledFont extends Proxy {
     public Object getUserData(UserDataKey key) {
         return key == null ? null : userDataStore.get(key);
     }
+
+    /**
+     * Get the CairoScaledFont GType
+     * @return the GType
+     */
+    public static org.gnome.glib.Type getType() {
+        try {
+            long result = (long) cairo_gobject_scaled_font_get_type.invoke();
+            return new org.gnome.glib.Type(result);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_gobject_scaled_font_get_type = Interop.downcallHandle(
+            "cairo_gobject_scaled_font_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
 }
