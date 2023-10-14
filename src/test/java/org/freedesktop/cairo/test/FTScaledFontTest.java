@@ -17,7 +17,7 @@ class FTScaledFontTest {
 
     private static final String TTF_FILE = "C:\\Windows\\Fonts\\arial.ttf";
 
-    @Disabled
+    @Disabled("Needs valid path to TTF file")
     @Test
     void testCreate() {
         Library ftLib = Library.initFreeType();
@@ -27,7 +27,7 @@ class FTScaledFontTest {
         assertEquals(Status.SUCCESS, scaledFont.status());
     }
 
-    @Disabled
+    @Disabled("Needs valid path to TTF file")
     @Test
     void testLockFace() {
         Library ftLib = Library.initFreeType();
@@ -39,7 +39,7 @@ class FTScaledFontTest {
         assertEquals(Status.SUCCESS, scaledFont.status());
     }
 
-    @Disabled
+    @Disabled("Needs valid path to TTF file")
     @Test
     void testUnlockFace() {
         Library ftLib = Library.initFreeType();
