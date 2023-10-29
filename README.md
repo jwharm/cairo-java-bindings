@@ -5,14 +5,15 @@ features enabled).
 
 I created these language bindings primarily as a companion to the GObject-Introspection-based Java 
 language bindings for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi). 
-The bindings depend on the `glib` module from Java-GI for a few common base classes and interfaces.
+The bindings can be used separately from Java-GI, but have an optional dependency on the `glib` module
+from Java-GI to expose GType declarations for cairo data types (to enable interoperability with Gtk).
 
 ## Overview
 
 ### Java API
 
 In general, the Java bindings match the cairo C API, but with a Java "coding style". C structs like 
-`cairo_t`, `cairo_surface_t` and `cairo_matrix_t` are modeled with Java `Proxy` 
+`cairo_t`, `cairo_surface_t` and `cairo_matrix_t` are modeled with Java proxy 
 classes like `Context`, `Surface` and `Matrix`, and all flags and enumerations are 
 available as Java enums. The proxy classes inherit when applicable: `RadialGradient` extends 
 `Gradient`, which extends `Pattern`, and `ImageSurface` extends `Surface`. Types, 
@@ -97,8 +98,7 @@ dependencies {
 
 Furthermore, you obviously need to have the cairo library version 1.18 installed on your system, 
 or else the Java bindings have nothing to bind to. You also need to install JDK 20 (not JDK 19 or 
-earlier, nor the JDK 21 early-access version), because the JEP-434 Panama FFI is slightly different 
-between JDK versions.
+earlier, nor JDK 21 or later), because the Panama FFI is slightly different between JDK versions.
 
 Now, you can start developing with cairo in Java. Have fun! This is a simple example to get started, 
 ported from [the first sample on this page](https://www.cairographics.org/samples/):
