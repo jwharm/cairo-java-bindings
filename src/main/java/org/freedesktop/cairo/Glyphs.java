@@ -19,10 +19,14 @@
 
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.MemoryCleaner;
 import io.github.jwharm.cairobindings.Proxy;
 
+import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
 
 /**
  * The {@code Glyphs} class represents an array of glyphs. It will also optionally
@@ -30,11 +34,11 @@ import java.lang.foreign.MemorySegment;
  */
 public class Glyphs implements AutoCloseable {
 
-    private final Proxy glyphsPointer;
-    private final Proxy clustersPointer;
-    private final int numGlyphs;
-    private final int numClusters;
-    private final TextClusterFlags clusterFlags;
+    private Proxy glyphsPointer;
+    private Proxy clustersPointer;
+    private int numGlyphs;
+    private int numClusters;
+    private TextClusterFlags clusterFlags;
 
     /**
      * Constructor used internally to instantiate a java Glyphs object for a native
@@ -54,10 +58,10 @@ public class Glyphs implements AutoCloseable {
         this.clustersPointer = new Proxy(clustersPtr);
         this.numClusters = numClusters;
         this.clusterFlags = clusterFlags;
-        MemoryCleaner.setFreeFunc(this.glyphsPointer.handle(), "cairo_glyph_free");
-        MemoryCleaner.setFreeFunc(this.clustersPointer.handle(), "cairo_text_cluster_free");
-        MemoryCleaner.takeOwnership(this.glyphsPointer.handle());
-        MemoryCleaner.takeOwnership(this.clustersPointer.handle());
+        MemoryCleaner.setFreeFunc(glyphsPtr, "cairo_glyph_free");
+        MemoryCleaner.setFreeFunc(clustersPtr, "cairo_text_cluster_free");
+        MemoryCleaner.takeOwnership(glyphsPtr);
+        MemoryCleaner.takeOwnership(clustersPtr);
     }
 
     /**
@@ -69,11 +73,30 @@ public class Glyphs implements AutoCloseable {
     }
 
     /**
+     * Set a pointer to the glyphs array
+     * @param glyphsPointer a MemorySegment pointing to the glyphs array
+     */
+    public void setGlyphsPointer(MemorySegment glyphsPointer) {
+        MemoryCleaner.free(this.glyphsPointer.handle());
+        this.glyphsPointer = new Proxy(glyphsPointer);
+        MemoryCleaner.setFreeFunc(glyphsPointer, "cairo_glyph_free");
+        MemoryCleaner.takeOwnership(glyphsPointer);
+    }
+
+    /**
      * Get the number of glyphs in the array
      * @return the number of glyphs
      */
     public int getNumGlyphs() {
         return numGlyphs;
+    }
+
+    /**
+     * Set the number of glyphs in the array
+     * @param numGlyphs the number of glyphs
+     */
+    public void setNumGlyphs(int numGlyphs) {
+        this.numGlyphs = numGlyphs;
     }
 
     /**
@@ -85,11 +108,30 @@ public class Glyphs implements AutoCloseable {
     }
 
     /**
+     * Set a pointer to the clusters array
+     * @param clustersPointer the MemorySegment pointing to the clusters array
+     */
+    public void setClustersPointer(MemorySegment clustersPointer) {
+        MemoryCleaner.free(this.clustersPointer.handle());
+        this.clustersPointer = new Proxy(clustersPointer);
+        MemoryCleaner.setFreeFunc(clustersPointer, "cairo_text_cluster_free");
+        MemoryCleaner.takeOwnership(clustersPointer);
+    }
+
+    /**
      * Get the number of text clusters in the cluster array
      * @return the number of text clusters
      */
     public int getNumClusters() {
         return numClusters;
+    }
+
+    /**
+     * Set the number of text clusters in the cluster array
+     * @param numClusters the number of text clusters
+     */
+    public void setNumClusters(int numClusters) {
+        this.numClusters = numClusters;
     }
 
     /**
@@ -101,6 +143,14 @@ public class Glyphs implements AutoCloseable {
     }
 
     /**
+     * Set the text cluster flags
+     * @param clusterFlags the text cluster flags
+     */
+    public void setClusterFlags(TextClusterFlags clusterFlags) {
+        this.clusterFlags = clusterFlags;
+    }
+
+    /**
      * Free the glyphs array using {@code cairo_glyph_free} and the clusters array
      * using {@code cairo_text_cluster_free}.
      */
@@ -109,4 +159,54 @@ public class Glyphs implements AutoCloseable {
         MemoryCleaner.free(glyphsPointer.handle());
         MemoryCleaner.free(clustersPointer.handle());
     }
+
+    /**
+     * Allocates an array of {@link Glyph}s. This function is only useful in
+     * implementations of {@link UserScaledFontTextToGlyphsFunc} where the user
+     * needs to allocate an array of glyphs that cairo will free. For all other
+     * uses, user can use their own allocation method for glyphs.
+     * <p>
+     * This function returns {@link MemorySegment#NULL} if {@code numGlyphs} is not
+     * positive, or if out of memory. That means, the {@code NULL} return value
+     * signals out-of-memory only if {@code numGlyphs} was positive.
+     *
+     * @param numGlyphs number of glyphs to allocate
+     * @return the newly allocated array of glyphs
+     * @since 1.8
+     */
+    public static MemorySegment allocateGlyphs(int numGlyphs) {
+        try {
+            return (MemorySegment) cairo_glyph_allocate.invoke(numGlyphs);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_glyph_allocate = Interop.downcallHandle(
+            "cairo_glyph_allocate", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+
+    /**
+     * Allocates an array of {@link TextCluster}s. This function is only useful in
+     * implementations of {@link UserScaledFontTextToGlyphsFunc} where the user
+     * needs to allocate an array of text clusters that cairo will free. For all
+     * other uses, user can use their own allocation method for text clusters.
+     * <p>
+     * This function returns {@link MemorySegment#NULL} if {@code numClusters} is
+     * not positive, or if out of memory. That means, the {@code NULL} return value
+     * signals out-of-memory only if {@code numClusters} was positive.
+     *
+     * @param numClusters number of TextClusters to allocate
+     * @return the newly allocated array of text clusters
+     * @since 1.8
+     */
+    public static MemorySegment allocateClusters(int numClusters) {
+        try {
+            return (MemorySegment) cairo_text_cluster_allocate.invoke(numClusters);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final MethodHandle cairo_text_cluster_allocate = Interop.downcallHandle(
+            "cairo_text_cluster_allocate", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 }

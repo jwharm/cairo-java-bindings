@@ -36,7 +36,7 @@ import org.freedesktop.freetype.Face;
  * 
  * @since 1.0
  */
-public class FTFontFace extends FontFace {
+public final class FTFontFace extends FontFace {
 
     static {
         Cairo.ensureInitialized();

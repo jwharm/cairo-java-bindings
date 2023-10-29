@@ -43,7 +43,7 @@ import java.lang.invoke.MethodHandle;
  * @see FontFace
  * @since 1.8
  */
-public class ToyFontFace extends FontFace {
+public final class ToyFontFace extends FontFace {
 
     static {
         Cairo.ensureInitialized();

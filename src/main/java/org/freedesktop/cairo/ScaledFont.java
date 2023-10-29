@@ -369,7 +369,14 @@ public class ScaledFont extends Proxy {
     public FontFace getFontFace() {
         try {
             MemorySegment result = (MemorySegment) cairo_scaled_font_get_font_face.invoke(handle());
-            FontFace fontFace = new FontFace(result);
+            FontFace temp = new FontFace(result);
+            // Instantiate the correct FontFace subclass for the FontType
+            FontFace fontFace = switch(temp.getFontType()) {
+                case TOY -> new ToyFontFace(result);
+                case FT -> new FTFontFace(result);
+                case USER -> new UserFontFace(result);
+                default -> temp;
+            };
             // Take a reference on the returned fontface
             fontFace.reference();
             MemoryCleaner.takeOwnership(fontFace.handle());

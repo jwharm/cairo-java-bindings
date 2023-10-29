@@ -384,4 +384,25 @@ public abstract class Pattern extends Proxy {
 
     private static final MethodHandle cairo_gobject_pattern_get_type = Interop.downcallHandle(
             "cairo_gobject_pattern_get_type", FunctionDescriptor.of(ValueLayout.JAVA_LONG));
+
+    /**
+     * Package-private helper class used internally to instantiate Pattern objects
+     * for native {@code cairo_pattern_t} structs of unspecified type, while keeping
+     * the base Pattern class abstract. This is used for the Pattern objects
+     * returned by {@link UserScaledFont#getForegroundMarker()} and
+     * {@link UserScaledFont#getForegroundSource()}.
+     */
+    static class PatternImpl extends Pattern {
+
+        /**
+         * Constructor used internally to instantiate a java Pattern object for a
+         * native {@code cairo_pattern_t} instance
+         *
+         * @param address the memory address of the native {@code cairo_pattern_t}
+         *                instance
+         */
+        public PatternImpl(MemorySegment address) {
+            super(address);
+        }
+    }
 }

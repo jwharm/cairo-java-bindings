@@ -52,7 +52,7 @@ import java.lang.invoke.MethodHandle;
  * @see ScaledFont
  * @since 1.0
  */
-public class FontFace extends Proxy {
+public sealed class FontFace extends Proxy permits ToyFontFace, FTFontFace, UserFontFace {
 
     static {
         Cairo.ensureInitialized();

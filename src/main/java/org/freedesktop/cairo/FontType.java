@@ -86,7 +86,7 @@ public enum FontType {
      *
      * @since 1.18
      */
-    CAIRO_FONT_TYPE_DWRITE;
+    DWRITE;
 
     static {
         Cairo.ensureInitialized();
