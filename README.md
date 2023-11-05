@@ -89,7 +89,7 @@ The library is available on Maven Central. Include it in your `gradle.build` or 
 
 ```
 dependencies {
-  implementation 'io.github.jwharm.cairobindings:cairo:1.18.0'
+  implementation 'io.github.jwharm.cairobindings:cairo:1.18.1'
 }
 ```
 
