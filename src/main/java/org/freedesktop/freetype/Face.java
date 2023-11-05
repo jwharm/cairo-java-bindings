@@ -62,6 +62,9 @@ public class Face extends Proxy {
      * @param faceIndex    See <a href=
      *                     "https://freetype.org/freetype2/docs/reference/ft2-face_creation.html#ft_open_face">FT_Open_Face</a>
      *                     for a detailed description of this parameter.
+     * @return the newly created Face instance
+     * @throws UnsupportedOperationException when {@code FT_Init_FreeType} returns a
+     *                                       non-zero error code
      */
     public static Face newFace(Library library, String filepathname, long faceIndex) {
         Arena allocator = Arena.ofConfined();
