@@ -59,10 +59,10 @@ public class Path extends Proxy implements Iterable<PathElement> {
     static MemoryLayout getMemoryLayout() {
         return MemoryLayout.structLayout(
                 ValueLayout.JAVA_INT.withName("status"),
-                MemoryLayout.paddingLayout(32),
-                ValueLayout.ADDRESS.asUnbounded().withName("data"),
+                MemoryLayout.paddingLayout(4),
+                ValueLayout.ADDRESS.withName("data"),
                 ValueLayout.JAVA_INT.withName("num_data"),
-                MemoryLayout.paddingLayout(32)
+                MemoryLayout.paddingLayout(4)
             ).withName("cairo_path_t");
     }
 
@@ -87,13 +87,13 @@ public class Path extends Proxy implements Iterable<PathElement> {
      * @return a stream of data segments
      */
     private Stream<MemorySegment> data() {
-        // Read the `data` field (a pointer with unbounded size)
+        // Read the `data` pointer
         MemorySegment dataSegment = (MemorySegment) DATA.get(handle());
         // Construct a SequenceLayout, based on the size that is specified in the
         // `num_data` field
         MemoryLayout sequenceLayout = MemoryLayout.sequenceLayout(numData(), PathData.getMemoryLayout());
-        // Create a slice that fits the exact size of the SequenceLayout
-        MemorySegment slice = dataSegment.asSlice(0, sequenceLayout.byteSize());
+        // Reinterpret the data field to the exact size of the SequenceLayout
+        MemorySegment slice = dataSegment.reinterpret(sequenceLayout.byteSize());
         // Split the slice into PathData blocks
         return slice.elements(PathData.getMemoryLayout());
     }
@@ -114,7 +114,7 @@ public class Path extends Proxy implements Iterable<PathElement> {
      * @param address the memory address of the native {@code cairo_path_t} instance
      */
     public Path(MemorySegment address) {
-        super(address);
+        super(address.reinterpret(getMemoryLayout().byteSize()));
         MemoryCleaner.setFreeFunc(handle(), "cairo_path_destroy");
     }
 

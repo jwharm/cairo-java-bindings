@@ -95,13 +95,12 @@ public enum PDFVersion {
      */
     public static PDFVersion[] getVersions() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment versionsPtr = arena.allocate(ValueLayout.ADDRESS);
                 MemorySegment numVersionsPtr = arena.allocate(ValueLayout.JAVA_INT);
                 cairo_pdf_get_versions.invoke(versionsPtr, numVersionsPtr);
                 int numVersions = numVersionsPtr.get(ValueLayout.JAVA_INT, 0);
-                int[] versionInts = MemorySegment.ofAddress(versionsPtr.address(), numVersions, arena.scope())
-                        .toArray(ValueLayout.JAVA_INT);
+                int[] versionInts = versionsPtr.reinterpret(ValueLayout.JAVA_INT.byteSize() * numVersions).toArray(ValueLayout.JAVA_INT);
                 PDFVersion[] versions = new PDFVersion[numVersions];
                 for (int i = 0; i < versionInts.length; i++) {
                     versions[i] = PDFVersion.of(versionInts[i]);
@@ -131,7 +130,7 @@ public enum PDFVersion {
             if (MemorySegment.NULL.equals(result)) {
                 return null;
             }
-            return result.getUtf8String(0);
+            return result.reinterpret(Integer.MAX_VALUE).getUtf8String(0);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -139,5 +138,5 @@ public enum PDFVersion {
 
     private static final MethodHandle cairo_pdf_version_to_string = Interop.downcallHandle(
             "cairo_pdf_version_to_string",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 }

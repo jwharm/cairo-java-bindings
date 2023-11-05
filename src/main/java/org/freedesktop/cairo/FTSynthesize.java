@@ -51,8 +51,8 @@ public record FTSynthesize(int value) {
      */
     public FTSynthesize or(FTSynthesize... masks) {
         int value = this.value();
-        for (FTSynthesize(int arg) : masks) {
-            value |= arg;
+        for (var arg : masks) {
+            value |= arg.value();
         }
         return new FTSynthesize(value);
     }
@@ -66,8 +66,8 @@ public record FTSynthesize(int value) {
      */
     public static FTSynthesize combined(FTSynthesize mask, FTSynthesize... masks) {
         int value = mask.value();
-        for (FTSynthesize(int arg) : masks) {
-            value |= arg;
+        for (var arg : masks) {
+            value |= arg.value();
         }
         return new FTSynthesize(value);
     }

@@ -55,9 +55,6 @@ public sealed class Surface extends Proxy implements AutoCloseable
         Cairo.ensureInitialized();
     }
 
-    // Keeps user data keys and values
-    private final UserDataStore userDataStore;
-    
     // Keep a reference to the target surface during the lifetime of this surface
     @SuppressWarnings("unused")
     private Surface target;
@@ -72,7 +69,6 @@ public sealed class Surface extends Proxy implements AutoCloseable
     public Surface(MemorySegment address) {
         super(address);
         MemoryCleaner.setFreeFunc(handle(), "cairo_surface_destroy");
-        userDataStore = new UserDataStore(address.scope());
     }
 
     /**
@@ -117,15 +113,15 @@ public sealed class Surface extends Proxy implements AutoCloseable
             // Cast to T is safe, because we construct the exact same class in all cases
             @SuppressWarnings("unchecked")
             T surface = (T) switch (other) {
-                case ImageSurface s -> new ImageSurface(result);
-                case PDFSurface s -> new PDFSurface(result);
-                case PSSurface s -> new PSSurface(result);
-                case RecordingSurface s -> new RecordingSurface(result);
-                case SVGSurface s -> new SVGSurface(result);
-                case ScriptSurface s -> new ScriptSurface(result);
-                case TeeSurface s -> new TeeSurface(result);
-                case SurfaceObserver s -> new SurfaceObserver(result);
-                case Surface s -> new Surface(result);
+                case ImageSurface _ -> new ImageSurface(result);
+                case PDFSurface _ -> new PDFSurface(result);
+                case PSSurface _ -> new PSSurface(result);
+                case RecordingSurface _ -> new RecordingSurface(result);
+                case SVGSurface _ -> new SVGSurface(result);
+                case ScriptSurface _ -> new ScriptSurface(result);
+                case TeeSurface _ -> new TeeSurface(result);
+                case SurfaceObserver _ -> new SurfaceObserver(result);
+                case Surface _ -> new Surface(result);
             };
             MemoryCleaner.takeOwnership(surface.handle());
             return surface;
@@ -440,7 +436,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      */
     public Point getDeviceOffset() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_surface_get_device_offset.invoke(handle(), xPtr, yPtr);
@@ -467,7 +463,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      */
     public Point getDeviceScale() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_surface_get_device_scale.invoke(handle(), xPtr, yPtr);
@@ -567,7 +563,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      */
     public Point getFallbackResolution() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_surface_get_fallback_resolution.invoke(handle(), xPtr, yPtr);
@@ -716,7 +712,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
     public Surface setMimeData(MimeType mimeType, byte[] data) {
         Status status;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment mimeTypePtr = Interop.allocateNativeString(mimeType.toString(), arena);
                 MemorySegment dataPtr = data == null ? MemorySegment.NULL :
                         arena.allocateArray(ValueLayout.JAVA_BYTE, data);
@@ -752,10 +748,14 @@ public sealed class Surface extends Proxy implements AutoCloseable
      */
     public byte[] getMimeData(MimeType mimeType) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            // Define shorthands for void* and long* memory layouts
+            final ValueLayout VOID_POINTER = ValueLayout.ADDRESS.withTargetLayout(ValueLayout.ADDRESS);
+            final ValueLayout LONG_POINTER = ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_LONG);
+
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment mimeTypePtr = Interop.allocateNativeString(mimeType.toString(), arena);
-                MemorySegment dataPtr = arena.allocate(ValueLayout.ADDRESS);
-                MemorySegment lengthPtr = arena.allocate(ValueLayout.ADDRESS);
+                MemorySegment dataPtr = arena.allocate(VOID_POINTER);
+                MemorySegment lengthPtr = arena.allocate(LONG_POINTER);
                 cairo_surface_get_mime_data.invoke(handle(), mimeTypePtr, dataPtr, lengthPtr);
                 long length = lengthPtr.get(ValueLayout.JAVA_LONG, 0);
                 if (length <= 0) {
@@ -765,8 +765,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
                 if (MemorySegment.NULL.equals(data)) {
                     return null;
                 }
-                MemorySegment array = MemorySegment.ofAddress(data.address(), length);
-                return array.toArray(ValueLayout.JAVA_BYTE);
+                return data.reinterpret(length).toArray(ValueLayout.JAVA_BYTE);
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -775,7 +774,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
 
     private static final MethodHandle cairo_surface_get_mime_data = Interop
             .downcallHandle("cairo_surface_get_mime_data", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS,
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded()));
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Return whether this surface supports {@code mime_type}.
@@ -787,7 +786,7 @@ public sealed class Surface extends Proxy implements AutoCloseable
      */
     public boolean supportsMimeType(MimeType mimeType) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment mimeTypePtr = Interop.allocateNativeString(mimeType.toString(), arena);
                 int result = (int) cairo_surface_supports_mime_type.invoke(handle(), mimeTypePtr);
                 return result != 0;
@@ -874,43 +873,20 @@ public sealed class Surface extends Proxy implements AutoCloseable
     }
 
     /**
-     * Attach user data to the surface. This method will generate and return a
-     * {@link UserDataKey}. To update the user data for the same key, call
-     * {@link #setUserData(UserDataKey, Object)}. To remove user data from a
-     * surface, call this function with {@code null} for {@code userData}.
-     * 
-     * @param userData the user data to attach to the surface. {@code userData} can
-     *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
-     * @return the key that the user data is attached to
-     * @since 1.0
-     */
-    public UserDataKey setUserData(Object userData) {
-        UserDataKey key = UserDataKey.create(this);
-        return setUserData(key, userData);
-    }
-
-    /**
      * Attach user data to the surface. To remove user data from a surface, call
      * this function with the key that was used to set it and {@code null} for
      * {@code userData}.
-     * 
-     * @param key      the key to attach the user data to
-     * @param userData the user data to attach to the surface. {@code userData} can
-     *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
+     *
+     * @param  key      the key to attach the user data to
+     * @param  userData the user data to attach to the surface
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}
-     * @since 1.0
+     * @since 1.4
      */
-    public UserDataKey setUserData(UserDataKey key, Object userData) {
+    public UserDataKey setUserData(UserDataKey key, MemorySegment userData) {
         Status status;
-        userDataStore.set(key, userData);
         try {
-            int result = (int) cairo_surface_set_user_data.invoke(handle(), key.handle(), userDataStore.dataSegment(userData),
-                    MemorySegment.NULL);
+            int result = (int) cairo_surface_set_user_data.invoke(handle(), key.handle(), userData, MemorySegment.NULL);
             status = Status.of(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -929,14 +905,25 @@ public sealed class Surface extends Proxy implements AutoCloseable
      * Return user data previously attached to the surface using the specified key.
      * If no user data has been attached with the given key this function returns
      * {@code null}.
-     * 
-     * @param key the UserDataKey the user data was attached to
+     *
+     * @param  key the UserDataKey the user data was attached to
      * @return the user data previously attached or {@code null}
-     * @since 1.0
+     * @since 1.4
      */
-    public Object getUserData(UserDataKey key) {
-        return key == null ? null : userDataStore.get(key);
+    public MemorySegment getUserData(UserDataKey key) {
+        if (key == null) {
+            return null;
+        }
+        try {
+            MemorySegment result = (MemorySegment) cairo_surface_get_user_data.invoke(handle(), key.handle());
+            return MemorySegment.NULL.equals(result) ? null : result;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    private static final MethodHandle cairo_surface_get_user_data = Interop.downcallHandle("cairo_surface_get_user_data",
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Get the CairoSurface GType

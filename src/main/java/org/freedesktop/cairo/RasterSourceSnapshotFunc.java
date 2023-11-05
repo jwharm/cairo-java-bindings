@@ -19,11 +19,7 @@
 
 package org.freedesktop.cairo;
 
-import java.lang.foreign.FunctionDescriptor;
-import java.lang.foreign.Linker;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 
@@ -72,19 +68,19 @@ public interface RasterSourceSnapshotFunc {
 
     /**
      * Generates an upcall stub, a C function pointer that will call
-     * {@link #upcall(MemorySegment, MemorySegment)}.
-     * 
-     * @param scope the scope in which the upcall stub will be allocated
+     * {@link #upcall}.
+     *
+     * @param arena the arena in which the upcall stub will be allocated
      * @return the function pointer of the upcall stub
      * @since 1.12
      */
-    default MemorySegment toCallback(SegmentScope scope) {
+    default MemorySegment toCallback(Arena arena) {
         try {
             FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                     ValueLayout.ADDRESS);
             MethodHandle handle = MethodHandles.lookup().findVirtual(RasterSourceSnapshotFunc.class, "upcall",
                     fdesc.toMethodType());
-            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
+            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

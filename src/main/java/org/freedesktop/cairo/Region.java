@@ -129,7 +129,7 @@ public class Region extends Proxy {
     public static Region create(RectangleInt[] rects) {
         Region region;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment rectsPtr = MemorySegment.NULL;
                 if (rects != null) {
                     rectsPtr = arena.allocateArray(ValueLayout.ADDRESS, rects.length);
@@ -201,14 +201,12 @@ public class Region extends Proxy {
     /**
      * Gets the bounding rectangle of region as a {@link RectangleInt}
      * 
-     * @return rectangle into which the extents are stored
+     * @param extents rectangle into which to store the extents
      * @since 1.10
      */
-    public RectangleInt getExtents() {
+    public void getExtents(RectangleInt extents) {
         try {
-            RectangleInt extents = RectangleInt.create(0, 0, 0, 0);
             cairo_region_get_extents.invoke(handle(), extents.handle());
-            return extents;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -237,15 +235,13 @@ public class Region extends Proxy {
     /**
      * Returns the {@code nth} rectangle from this region.
      * 
-     * @param nth a number indicating which rectangle should be returned
-     * @return the rectangle
+     * @param nth       a number indicating which rectangle should be returned
+     * @param rectangle a RectangleInt
      * @since 1.10
      */
-    public RectangleInt getRectangle(int nth) {
+    public void getRectangle(int nth, RectangleInt rectangle) {
         try {
-            RectangleInt rectangle = RectangleInt.create(0, 0, 0, 0);
             cairo_region_get_rectangle.invoke(handle(), nth, rectangle.handle());
-            return rectangle;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

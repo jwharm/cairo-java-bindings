@@ -91,7 +91,7 @@ public final class ToyFontFace extends FontFace {
      */
     public static ToyFontFace create(String family, FontSlant slant, FontWeight weight) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment familyPtr = Interop.allocateNativeString(family, arena);
                 MemorySegment result = (MemorySegment) cairo_toy_font_face_create.invoke(familyPtr, slant.getValue(),
                         weight.getValue());
@@ -116,7 +116,7 @@ public final class ToyFontFace extends FontFace {
     public String getFamily() {
         try {
             MemorySegment result = (MemorySegment) cairo_toy_font_face_get_family.invoke(handle());
-            return result.getUtf8String(0);
+            return result.reinterpret(Integer.MAX_VALUE).getUtf8String(0);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -124,7 +124,7 @@ public final class ToyFontFace extends FontFace {
 
     private static final MethodHandle cairo_toy_font_face_get_family = Interop.downcallHandle(
             "cairo_toy_font_face_get_family",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Gets the slant of a toy font.

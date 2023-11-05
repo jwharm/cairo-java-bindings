@@ -27,7 +27,6 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
@@ -54,9 +53,6 @@ public class ScaledFont extends Proxy {
         Cairo.ensureInitialized();
     }
 
-    // Keeps user data keys and values
-    private final UserDataStore userDataStore;
-
     // Keep a reference to natively allocated resources that are passed to the
     // ScaledFont during its lifetime.
 
@@ -74,7 +70,6 @@ public class ScaledFont extends Proxy {
     public ScaledFont(MemorySegment address) {
         super(address);
         MemoryCleaner.setFreeFunc(handle(), "cairo_scaled_font_destroy");
-        userDataStore = new UserDataStore(address.scope());
     }
 
     /**
@@ -169,15 +164,12 @@ public class ScaledFont extends Proxy {
     /**
      * Gets the metrics for a ScaledFont.
      * 
-     * @return the retrieved extents
+     * @param extents a FontExtents in which to store the retrieved extents
      * @since 1.0
      */
-    public FontExtents extents() {
+    public void extents(FontExtents extents) {
         try {
-            FontExtents extents = new FontExtents(
-                    SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(FontExtents.getMemoryLayout()));
             cairo_scaled_font_extents.invoke(handle(), extents.handle());
-            return extents;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -203,20 +195,17 @@ public class ScaledFont extends Proxy {
      * {@code yAdvance()} values.
      * 
      * @param string a string of text
-     * @return the retrieved extents
+     * @param extents a TextExtents in which to store the retrieved extents.
      * @since 1.2
      */
-    public TextExtents textExtents(String string) {
+    public void textExtents(String string, TextExtents extents) {
         if (string == null) {
-            return null;
+            return;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
-                TextExtents extents = new TextExtents(
-                        SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(TextExtents.getMemoryLayout()));
                 cairo_scaled_font_text_extents.invoke(handle(), utf8, extents.handle());
-                return extents;
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -240,18 +229,15 @@ public class ScaledFont extends Proxy {
      * ({@code extents.width()} and {@code extents.height()}).
      * 
      * @param glyphs an array of glyph IDs with X and Y offsets.
-     * @return the retrieved extents
+     * @param extents a TextExtents in which to store the retrieved extents.
      * @since 1.0
      */
-    public TextExtents glyphExtents(Glyphs glyphs) {
+    public void glyphExtents(Glyphs glyphs, TextExtents extents) {
         if (glyphs == null) {
-            return null;
+            return;
         }
         try {
-            TextExtents extents = new TextExtents(
-                    SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(TextExtents.getMemoryLayout()));
             cairo_scaled_font_glyph_extents.invoke(handle(), glyphs.getGlyphsPointer(), glyphs.getNumGlyphs(), extents.handle());
-            return extents;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -308,14 +294,19 @@ public class ScaledFont extends Proxy {
         if (string == null) {
             return null;
         }
+
+        // Define shorthands for void* and int* memory layouts
+        final ValueLayout VOID_POINTER = ValueLayout.ADDRESS.withTargetLayout(ValueLayout.ADDRESS);
+        final ValueLayout INT_POINTER = ValueLayout.ADDRESS.withTargetLayout(ValueLayout.JAVA_INT);
+
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment stringPtr = Interop.allocateNativeString(string, arena);
-                MemorySegment glyphsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
-                MemorySegment numGlyphsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
-                MemorySegment clustersPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
-                MemorySegment numClustersPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
-                MemorySegment clusterFlagsPtr = arena.allocate(ValueLayout.ADDRESS.asUnbounded());
+                MemorySegment glyphsPtr = arena.allocate(VOID_POINTER);
+                MemorySegment numGlyphsPtr = arena.allocate(INT_POINTER);
+                MemorySegment clustersPtr = arena.allocate(VOID_POINTER);
+                MemorySegment numClustersPtr = arena.allocate(INT_POINTER);
+                MemorySegment clusterFlagsPtr = arena.allocate(INT_POINTER);
 
                 int result = (int) cairo_scaled_font_text_to_glyphs.invoke(handle(), x, y, stringPtr, string.length(),
                         glyphsPtr, numGlyphsPtr, clustersPtr, numClustersPtr, clusterFlagsPtr);
@@ -349,9 +340,8 @@ public class ScaledFont extends Proxy {
             "cairo_scaled_font_text_to_glyphs",
             FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE,
                     ValueLayout.JAVA_DOUBLE, ValueLayout.ADDRESS, ValueLayout.JAVA_INT,
-                    ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded(),
-                    ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS.asUnbounded(),
-                    ValueLayout.ADDRESS.asUnbounded()));
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     private static final MethodHandle cairo_glyph_free = Interop.downcallHandle(
             "cairo_glyph_free", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
@@ -408,16 +398,15 @@ public class ScaledFont extends Proxy {
             "cairo_scaled_font_get_font_options", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
-     * Returns the font matrix with which the ScaledFont was created.
-     * 
-     * @return the matrix
+     * Stores the font matrix with which the ScaledFont was created into
+     * {@code fontMatrix}.
+     *
+     * @param fontMatrix return value for the matrix
      * @since 1.2
      */
-    public Matrix getFontMatrix() {
+    public void getFontMatrix(Matrix fontMatrix) {
         try {
-            Matrix fontMatrix = Matrix.create();
             cairo_scaled_font_get_font_matrix.invoke(handle(), fontMatrix.handle());
-            return fontMatrix;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -432,14 +421,12 @@ public class ScaledFont extends Proxy {
      * {@link #create(FontFace, Matrix, Matrix, FontOptions)}. So, the matrix this
      * function returns always has 0,0 as x0,y0.
      * 
-     * @return the CTM
+     * @param ctm return value for the CTM
      * @since 1.2
      */
-    public Matrix getCTM() {
+    public void getCTM(Matrix ctm) {
         try {
-            Matrix ctm = Matrix.create();
             cairo_scaled_font_get_ctm.invoke(handle(), ctm.handle());
-            return ctm;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -453,14 +440,12 @@ public class ScaledFont extends Proxy {
      * the font matrix and the ctm associated with the scaled font, and hence is the
      * matrix mapping from font space to device space.
      * 
-     * @return the matrix
+     * @param scaleMatrix return value for the matrix
      * @since 1.8
      */
-    public Matrix getScaleMatrix() {
+    public void getScaleMatrix(Matrix scaleMatrix) {
         try {
-            Matrix scaleMatrix = Matrix.create();
             cairo_scaled_font_get_scale_matrix.invoke(handle(), scaleMatrix.handle());
-            return scaleMatrix;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -490,43 +475,20 @@ public class ScaledFont extends Proxy {
             "cairo_scaled_font_get_type", FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
     /**
-     * Attach user data to the scaled font. This method will generate and return a
-     * {@link UserDataKey}. To update the user data for the same key, call
-     * {@link #setUserData(UserDataKey, Object)}. To remove user data from a scaled
-     * font, call this function with {@code null} for {@code userData}.
-     * 
-     * @param userData the user data to attach to the scaled font. {@code userData}
-     *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
-     * @return the key that the user data is attached to
-     * @since 1.4
-     */
-    public UserDataKey setUserData(Object userData) {
-        UserDataKey key = UserDataKey.create(this);
-        return setUserData(key, userData);
-    }
-
-    /**
      * Attach user data to the scaled font. To remove user data from a scaled font,
      * call this function with the key that was used to set it and {@code null} for
      * {@code userData}.
-     * 
+     *
      * @param key      the key to attach the user data to
-     * @param userData the user data to attach to the scaled font. {@code userData}
-     *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
+     * @param userData the user data to attach to the scaled font
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}
      * @since 1.4
      */
-    public UserDataKey setUserData(UserDataKey key, Object userData) {
+    public UserDataKey setUserData(UserDataKey key, MemorySegment userData) {
         Status status;
-        userDataStore.set(key, userData);
         try {
-            int result = (int) cairo_scaled_font_set_user_data.invoke(
-                    handle(), key.handle(), userDataStore.dataSegment(userData), MemorySegment.NULL);
+            int result = (int) cairo_scaled_font_set_user_data.invoke(handle(), key.handle(), userData, MemorySegment.NULL);
             status = Status.of(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -537,22 +499,33 @@ public class ScaledFont extends Proxy {
         return key;
     }
 
-    private static final MethodHandle cairo_scaled_font_set_user_data = Interop.downcallHandle(
-            "cairo_scaled_font_set_user_data", FunctionDescriptor.of(ValueLayout.JAVA_INT, 
-                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+    private static final MethodHandle cairo_scaled_font_set_user_data = Interop.downcallHandle("cairo_scaled_font_set_user_data",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS));
 
     /**
      * Return user data previously attached to the scaled font using the specified
      * key. If no user data has been attached with the given key this function
      * returns {@code null}.
-     * 
+     *
      * @param key the UserDataKey the user data was attached to
      * @return the user data previously attached or {@code null}
      * @since 1.4
      */
-    public Object getUserData(UserDataKey key) {
-        return key == null ? null : userDataStore.get(key);
+    public MemorySegment getUserData(UserDataKey key) {
+        if (key == null) {
+            return null;
+        }
+        try {
+            MemorySegment result = (MemorySegment) cairo_scaled_font_get_user_data.invoke(handle(), key.handle());
+            return MemorySegment.NULL.equals(result) ? null : result;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    private static final MethodHandle cairo_scaled_font_get_user_data = Interop.downcallHandle("cairo_scaled_font_get_user_data",
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Get the CairoScaledFont GType

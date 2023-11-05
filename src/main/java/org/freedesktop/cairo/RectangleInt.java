@@ -101,15 +101,16 @@ public class RectangleInt extends Proxy {
 
     /**
      * Create a rectangle with integer coordinates.
-     * 
+     *
+     * @param arena  the arena in which memory for the RectangleInt is allocated
      * @param x      X coordinate of the left side of the rectangle
      * @param y      Y coordinate of the the top side of the rectangle
      * @param width  width of the rectangle
      * @param height height of the rectangle
      * @return the newly created rectangle
      */
-    public static RectangleInt create(int x, int y, int width, int height) {
-        RectangleInt rect = new RectangleInt(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
+    public static RectangleInt create(Arena arena, int x, int y, int width, int height) {
+        RectangleInt rect = new RectangleInt(arena.allocate(getMemoryLayout()));
         X.set(rect.handle(), x);
         Y.set(rect.handle(), y);
         WIDTH.set(rect.handle(), width);
@@ -124,7 +125,8 @@ public class RectangleInt extends Proxy {
      */
     @Override
     public String toString() {
-        return String.format("RectangleInt address=%d x=%d y=%d width=%d height=%d", handle().address(), x(), y(), width(), height());
+        return String.format("RectangleInt address=%d x=%d y=%d width=%d height=%d",
+                handle().address(), x(), y(), width(), height());
     }
 
     /**

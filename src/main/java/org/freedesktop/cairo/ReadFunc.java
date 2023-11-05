@@ -24,7 +24,6 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -69,34 +68,32 @@ public interface ReadFunc {
         if (length <= 0) {
             return Status.SUCCESS.getValue();
         }
-        try (Arena arena = Arena.openConfined()) {
-            try {
-                byte[] bytes = read(length);
-                if (bytes == null || bytes.length == 0) {
-                    return Status.READ_ERROR.getValue();
-                }
-                MemorySegment.ofAddress(data.address(), length).asByteBuffer().put(bytes);
-                return Status.SUCCESS.getValue();
-            } catch (IOException ioe) {
+        try {
+            byte[] bytes = read(length);
+            if (bytes == null || bytes.length == 0) {
                 return Status.READ_ERROR.getValue();
             }
+            data.reinterpret(length).asByteBuffer().put(bytes);
+            return Status.SUCCESS.getValue();
+        } catch (IOException ioe) {
+            return Status.READ_ERROR.getValue();
         }
     }
 
     /**
      * Generates an upcall stub, a C function pointer that will call
-     * {@link #upcall(MemorySegment, MemorySegment, int)}.
-     * 
-     * @param scope the scope in which the upcall stub will be allocated
+     * {@link #upcall}.
+     *
+     * @param arena the arena in which the upcall stub will be allocated
      * @return the function pointer of the upcall stub
      * @since 1.0
      */
-    default MemorySegment toCallback(SegmentScope scope) {
+    default MemorySegment toCallback(Arena arena) {
         try {
             FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                     ValueLayout.ADDRESS, ValueLayout.JAVA_INT);
             MethodHandle handle = MethodHandles.lookup().findVirtual(ReadFunc.class, "upcall", fdesc.toMethodType());
-            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
+            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

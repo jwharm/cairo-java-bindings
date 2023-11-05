@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.jwharm.cairobindings"
-version = "1.18.0"
+version = "1.18.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -15,7 +15,7 @@ repositories {
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(20)
+        languageVersion = JavaLanguageVersion.of(21)
     }
     withSourcesJar()
     withJavadocJar()
@@ -37,7 +37,7 @@ tasks.named('compileJava') {
 
 tasks.named('javadoc') {
     options.addBooleanOption("-enable-preview", true)
-    options.addStringOption("-release", "20")
+    options.addStringOption("-release", "21")
 }
 
 tasks.named('compileTestJava') {

@@ -125,15 +125,15 @@ public final class RecordingSurface extends Surface {
      *         and the height of the ink bounding box
      * @since 1.10
      */
-    public Rectangle inkExtents() {
+    public Rect inkExtents() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment ptrs = arena.allocateArray(ValueLayout.JAVA_DOUBLE, 4);
                 long size = ValueLayout.JAVA_DOUBLE.byteSize();
                 cairo_recording_surface_ink_extents.invoke(handle(), ptrs, ptrs.asSlice(size), ptrs.asSlice(2 * size),
                         ptrs.asSlice(3 * size));
                 double[] values = ptrs.toArray(ValueLayout.JAVA_DOUBLE);
-                return Rectangle.create(values[0], values[1], values[2], values[3]);
+                return new Rect(values[0], values[1], values[2], values[3]);
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -147,23 +147,21 @@ public final class RecordingSurface extends Surface {
     /**
      * Get the extents of the recording-surface.
      * 
-     * @return a rectangle with the extents
+     * @param extents the Rectangle to be assigned the extents
      * @throws IllegalStateException if the surface is not bounded, or in an error
      *                               state
      * @since 1.12
      */
-    public Rectangle getExtents() throws IllegalStateException {
+    public void getExtents(Rectangle extents) throws IllegalStateException {
         int result;
-        Rectangle rectangle = Rectangle.create(0, 0, 0, 0);
         try {
-            result = (int) cairo_recording_surface_get_extents.invoke(handle(), rectangle.handle());
+            result = (int) cairo_recording_surface_get_extents.invoke(handle(), extents.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
         if (result == 0) {
             throw new IllegalStateException();
         }
-        return rectangle;
     }
 
     private static final MethodHandle cairo_recording_surface_get_extents = Interop.downcallHandle(

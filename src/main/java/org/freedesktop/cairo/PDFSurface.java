@@ -19,6 +19,7 @@
 
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.ArenaCloseAction;
 import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.MemoryCleaner;
 
@@ -26,9 +27,9 @@ import java.io.OutputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.ref.Cleaner;
 
 /**
  * The PDF surface is used to render cairo graphics to Adobe PDF files and is a
@@ -109,14 +110,6 @@ public final class PDFSurface extends Surface {
         Cairo.ensureInitialized();
     }
 
-    /*
-     * Initialized by {@link #create(OutputStream, int, int)} to keep a reference to
-     * the memory segment for the upcall stub alive during the lifetime of the
-     * PDFSurface instance.
-     */
-    @SuppressWarnings("unused")
-    private MemorySegment callbackAllocation;
-
     /**
      * The root outline item in cairo_pdf_surface_add_outline().
      * 
@@ -153,7 +146,7 @@ public final class PDFSurface extends Surface {
     public static PDFSurface create(String filename, int widthInPoints, int heightInPoints) {
         PDFSurface surface;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_pdf_surface_create.invoke(filenamePtr, widthInPoints,
                         heightInPoints);
@@ -189,11 +182,12 @@ public final class PDFSurface extends Surface {
      */
     public static PDFSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
         PDFSurface surface;
+        Arena arena = Arena.ofConfined();
         try {
             MemorySegment writeFuncPtr;
             if (stream != null) {
                 WriteFunc writeFunc = stream::write;
-                writeFuncPtr = writeFunc.toCallback(SegmentScope.auto());
+                writeFuncPtr = writeFunc.toCallback(arena);
             } else {
                 writeFuncPtr = MemorySegment.NULL;
             }
@@ -202,7 +196,7 @@ public final class PDFSurface extends Surface {
             surface = new PDFSurface(result);
             MemoryCleaner.takeOwnership(surface.handle());
             if (stream != null) {
-                surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
+                ArenaCloseAction.CLEANER.register(surface, new ArenaCloseAction(arena));
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -289,7 +283,7 @@ public final class PDFSurface extends Surface {
      */
     public int addOutline(int parentId, String string, String linkAttribs, PDFOutlineFlags flags) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 MemorySegment linkAttribsPtr = linkAttribs == null ? MemorySegment.NULL
                         : arena.allocateUtf8String(linkAttribs);
@@ -326,7 +320,7 @@ public final class PDFSurface extends Surface {
      */
     public PDFSurface setMetadata(PDFMetadata metadata, String string) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_pdf_surface_set_metadata.invoke(handle(), metadata.getValue(), utf8);
                 return this;
@@ -357,7 +351,7 @@ public final class PDFSurface extends Surface {
      */
     public PDFSurface setCustomMetadata(String name, String value) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment namePtr = Interop.allocateNativeString(name, arena);
                 MemorySegment valuePtr = Interop.allocateNativeString(value, arena);
                 cairo_pdf_surface_set_custom_metadata.invoke(handle(), namePtr, valuePtr);
@@ -381,7 +375,7 @@ public final class PDFSurface extends Surface {
      */
     public PDFSurface setPageLabel(String string) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_pdf_surface_set_page_label.invoke(handle(), utf8);
                 return this;

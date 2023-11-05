@@ -95,7 +95,7 @@ public class RadialGradient extends Gradient {
      */
     public Circle[] getRadialCircles() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment ptrs = arena.allocateArray(ValueLayout.JAVA_DOUBLE, 6);
                 long size = ValueLayout.JAVA_DOUBLE.byteSize();
                 cairo_pattern_get_radial_circles.invoke(handle(), ptrs, ptrs.asSlice(size), ptrs.asSlice(2 * size),

@@ -21,10 +21,9 @@ package org.freedesktop.cairo;
 
 import io.github.jwharm.cairobindings.Proxy;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.VarHandle;
 
@@ -65,10 +64,13 @@ public class FontExtents extends Proxy {
     private static final VarHandle MAX_Y_ADVANCE = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("max_y_advance"));
 
     /**
-     * Allocate a new {@code cairo_font_extents_t}
+     * Allocate a new, uninitialized {@code cairo_font_extents_t}
+     *
+     * @param arena the arena in which the FontExtents will be allocated
+     * @return a newly allocated, uninitialized FontExtents
      */
-    static FontExtents create() {
-        return new FontExtents(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
+    public static FontExtents create(Arena arena) {
+        return new FontExtents(arena.allocate(getMemoryLayout()));
     }
 
     /**

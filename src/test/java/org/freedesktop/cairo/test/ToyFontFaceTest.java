@@ -6,7 +6,6 @@ import org.freedesktop.cairo.FontSlant;
 import org.freedesktop.cairo.FontWeight;
 import org.freedesktop.cairo.Status;
 import org.freedesktop.cairo.ToyFontFace;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class ToyFontFaceTest {

@@ -7,42 +7,40 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
 
+import java.lang.foreign.Arena;
+
 class ScaledFontTest {
 
-    private ScaledFont create() {
+    private ScaledFont create(Arena arena) {
         return ScaledFont.create(ToyFontFace.create("Arial", FontSlant.NORMAL, FontWeight.NORMAL),
-                Matrix.createIdentity(), Matrix.createIdentity(), FontOptions.create());
+                Matrix.create(arena).initIdentity(), Matrix.create(arena).initIdentity(), FontOptions.create());
     }
     
     @Test
     void testCreate() {
-        ScaledFont sf = create();
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 
     @Test
     void testExtents() {
-        ScaledFont sf = create();
-        FontExtents e = sf.extents();
-        assertNotNull(e);
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            FontExtents e = FontExtents.create(arena);
+            sf.extents(e);
+            assertNotNull(e);
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 
     @Test
     void testTextExtents() {
-        ScaledFont sf = create();
-        TextExtents extents = sf.textExtents("test");
-        // I'm not sure if I can hard-code the expected height and width, so
-        // we will only test if the extents are wider than they are high.
-        assertTrue(extents.width() > extents.height());
-        assertEquals(Status.SUCCESS, sf.status());
-    }
-
-    @Test
-    void testGlyphExtents() {
-        ScaledFont sf = create();
-        try (Glyphs glyphs = sf.textToGlyphs(0, 0, "test")) {
-            TextExtents extents = sf.glyphExtents(glyphs);
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            TextExtents extents = TextExtents.create(arena);
+            sf.textExtents("test", extents);
             // I'm not sure if I can hard-code the expected height and width, so
             // we will only test if the extents are wider than they are high.
             assertTrue(extents.width() > extents.height());
@@ -51,60 +49,93 @@ class ScaledFontTest {
     }
 
     @Test
+    void testGlyphExtents() {
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            try (Glyphs glyphs = sf.textToGlyphs(0, 0, "test")) {
+                TextExtents extents = TextExtents.create(arena);
+                sf.glyphExtents(glyphs, extents);
+                // I'm not sure if I can hard-code the expected height and width, so
+                // we will only test if the extents are wider than they are high.
+                assertTrue(extents.width() > extents.height());
+                assertEquals(Status.SUCCESS, sf.status());
+            }
+        }
+    }
+
+    @Test
     void testTextToGlyphs() {
-        ScaledFont sf = create();
-        try (Glyphs glyphs = sf.textToGlyphs(0, 0, "test")) {
-            assertEquals(4, glyphs.getNumGlyphs());
-            assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            try (Glyphs glyphs = sf.textToGlyphs(0, 0, "test")) {
+                assertEquals(4, glyphs.getNumGlyphs());
+                assertEquals(Status.SUCCESS, sf.status());
+            }
         }
     }
 
     @Test
     void testGetFontFace() {
-        ScaledFont sf = create();
-        FontFace f = sf.getFontFace();
-        assertEquals(FontType.TOY, f.getFontType());
-        assertEquals(Status.SUCCESS, f.status());
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            FontFace f = sf.getFontFace();
+            assertEquals(FontType.TOY, f.getFontType());
+            assertEquals(Status.SUCCESS, f.status());
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 
     @Test
     void testGetFontOptions() {
-        ScaledFont sf = create();
-        FontOptions options = FontOptions.create();
-        sf.getFontOptions(options);
-        assertEquals(Status.SUCCESS, options.status());
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            FontOptions options = FontOptions.create();
+            sf.getFontOptions(options);
+            assertEquals(Status.SUCCESS, options.status());
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 
     @Test
     void testGetFontMatrix() {
-        ScaledFont sf = create();
-        Matrix m = sf.getFontMatrix();
-        assertNotNull(m);
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            Matrix m = Matrix.create(arena);
+            sf.getFontMatrix(m);
+            assertNotNull(m);
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 
     @Test
     void testGetCTM() {
-        ScaledFont sf = create();
-        Matrix ctm = sf.getCTM();
-        assertNotNull(ctm);
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            Matrix ctm = Matrix.create(arena);
+            sf.getCTM(ctm);
+            assertNotNull(ctm);
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 
     @Test
     void testGetScaleMatrix() {
-        ScaledFont sf = create();
-        Matrix m = sf.getScaleMatrix();
-        assertNotNull(m);
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            Matrix m = Matrix.create(arena);
+            sf.getScaleMatrix(m);
+            assertNotNull(m);
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 
     @Test
     void testGetFontType() {
-        ScaledFont sf = create();
-        FontType t = sf.getFontType();
-        assertEquals(Status.SUCCESS, sf.status());
+        try (Arena arena = Arena.ofConfined()) {
+            ScaledFont sf = create(arena);
+            FontType t = sf.getFontType();
+            assertNotNull(t);
+            assertEquals(Status.SUCCESS, sf.status());
+        }
     }
 }

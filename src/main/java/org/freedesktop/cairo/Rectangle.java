@@ -96,20 +96,21 @@ public class Rectangle extends Proxy {
      *                instance
      */
     public Rectangle(MemorySegment address) {
-        super(Interop.reinterpret(address, getMemoryLayout()));
+        super(address.reinterpret(getMemoryLayout().byteSize()));
     }
 
     /**
      * A data structure for holding a rectangle.
-     * 
+     *
+     * @param arena  the arena in which memory for the Rectangle is allocated
      * @param x      X coordinate of the left side of the rectangle
      * @param y      Y coordinate of the top side of the rectangle
      * @param width  width of the rectangle
      * @param height height of the rectangle
      * @return the newly created rectangle
      */
-    public static Rectangle create(double x, double y, double width, double height) {
-        Rectangle rect = new Rectangle(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
+    public static Rectangle create(Arena arena, double x, double y, double width, double height) {
+        Rectangle rect = new Rectangle(arena.allocate(getMemoryLayout()));
         X.set(rect.handle(), x);
         Y.set(rect.handle(), y);
         WIDTH.set(rect.handle(), width);
@@ -124,7 +125,8 @@ public class Rectangle extends Proxy {
      */
     @Override
     public String toString() {
-        return String.format("Rectangle address=%d x=%f y=%f width=%f height=%f", handle().address(), x(), y(), width(), height());
+        return String.format("Rectangle address=%d x=%f y=%f width=%f height=%f",
+                handle().address(), x(), y(), width(), height());
     }
 
     /**

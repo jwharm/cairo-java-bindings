@@ -19,6 +19,7 @@
 
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.ArenaCloseAction;
 import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.MemoryCleaner;
 
@@ -26,9 +27,9 @@ import java.io.OutputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.ref.Cleaner;
 
 /**
  * The PostScript surface is used to render cairo graphics to Adobe PostScript
@@ -71,14 +72,6 @@ public final class PSSurface extends Surface {
         Cairo.ensureInitialized();
     }
 
-    /*
-     * Initialized by {@link #create(OutputStream, int, int)} to keep a reference to
-     * the memory segment for the upcall stub alive during the lifetime of the
-     * PSSurface instance.
-     */
-    @SuppressWarnings("unused")
-    private MemorySegment callbackAllocation;
-
     /**
      * Constructor used internally to instantiate a java PSSurface object for a
      * native {@code cairo_surface_t} instance
@@ -113,7 +106,7 @@ public final class PSSurface extends Surface {
     public static PSSurface create(String filename, int widthInPoints, int heightInPoints) {
         PSSurface surface;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_ps_surface_create.invoke(filenamePtr, widthInPoints,
                         heightInPoints);
@@ -154,11 +147,12 @@ public final class PSSurface extends Surface {
      */
     public static PSSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
         PSSurface surface;
+        Arena arena = Arena.ofConfined();
         try {
             MemorySegment writeFuncPtr;
             if (stream != null) {
                 WriteFunc writeFunc = stream::write;
-                writeFuncPtr = writeFunc.toCallback(SegmentScope.auto());
+                writeFuncPtr = writeFunc.toCallback(arena);
             } else {
                 writeFuncPtr = MemorySegment.NULL;
             }
@@ -167,7 +161,7 @@ public final class PSSurface extends Surface {
             surface = new PSSurface(result);
             MemoryCleaner.takeOwnership(surface.handle());
             if (stream != null) {
-                surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
+                ArenaCloseAction.CLEANER.register(surface, new ArenaCloseAction(arena));
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -418,7 +412,7 @@ public final class PSSurface extends Surface {
      */
     public PSSurface dscComment(String comment) throws IllegalArgumentException {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment commentPtr = Interop.allocateNativeString(comment, arena);
                 cairo_ps_surface_dsc_comment.invoke(handle(), commentPtr);
             }

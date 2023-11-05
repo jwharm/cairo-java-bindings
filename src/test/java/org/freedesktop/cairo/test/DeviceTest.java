@@ -4,6 +4,7 @@ import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.lang.foreign.Arena;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,12 +57,14 @@ class DeviceTest {
 
     @Test
     void testUserData() {
-        try (Device d = Script.create(tempDir.resolve("test.script").toString())) {
-            Rectangle input = Rectangle.create(0, 0, 10, 10);
-            UserDataKey key = d.setUserData(input);
-            Rectangle output = (Rectangle) d.getUserData(key);
+        try (Arena arena = Arena.ofConfined();
+             Device device = Script.create(tempDir.resolve("test.script").toString())) {
+            Rectangle input = Rectangle.create(arena, 0, 0, 10, 10);
+            UserDataKey key = UserDataKey.create(arena);
+            device.setUserData(key, input.handle());
+            Rectangle output = new Rectangle(device.getUserData(key));
             assertEquals(input, output);
-            assertEquals(d.status(), Status.SUCCESS);
+            assertEquals(device.status(), Status.SUCCESS);
         }
     }
 }

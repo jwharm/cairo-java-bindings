@@ -21,17 +21,11 @@ package org.freedesktop.cairo;
 
 import io.github.jwharm.cairobindings.Proxy;
 
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.*;
 
 /**
  * UserDataKey is used for attaching user data to cairo data structures.
- * <p>
- * The lifetime of a UserDataKey is connected to the lifetime of the Proxy object 
- * that is passed in the {@link #create(Proxy)} method.
- * 
+ *
  * @since 1.0
  */
 public final class UserDataKey extends Proxy {
@@ -55,11 +49,10 @@ public final class UserDataKey extends Proxy {
     /**
      * Create a new UserDataKey
      * 
-     * @param proxy the ProxyInstace object whose memory scope (lifetime) will be
-     *              associated with the returned UserDataKey
+     * @param arena the arena in which the returned UserDataKey will be allocated
      * @return the newly created UserDataKey
      */
-    static UserDataKey create(Proxy proxy) {
-        return new UserDataKey(SegmentAllocator.nativeAllocator(proxy.handle().scope()).allocate(getMemoryLayout()));
+    public static UserDataKey create(Arena arena) {
+        return new UserDataKey(arena.allocate(getMemoryLayout()));
     }
 }

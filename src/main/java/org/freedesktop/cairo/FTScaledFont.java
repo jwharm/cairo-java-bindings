@@ -19,7 +19,6 @@
 
 package org.freedesktop.cairo;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -74,18 +73,16 @@ public class FTScaledFont extends ScaledFont {
     public static FTScaledFont create(FTFontFace fontFace, Matrix fontMatrix, Matrix ctm, FontOptions options) {
         FTScaledFont font;
         try {
-            try (Arena arena = Arena.openConfined()) {
-                MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
-                        fontFace == null ? MemorySegment.NULL : fontFace.handle(),
-                        fontMatrix == null ? MemorySegment.NULL : fontMatrix.handle(),
-                        ctm == null ? MemorySegment.NULL : ctm.handle(),
-                        options == null ? MemorySegment.NULL : options.handle());
-                font = new FTScaledFont(result);
-                MemoryCleaner.takeOwnership(font.handle());
-                font.fontFace = fontFace;
-                font.fontMatrix = fontMatrix;
-                font.ctm = ctm;
-            }
+            MemorySegment result = (MemorySegment) cairo_scaled_font_create.invoke(
+                    fontFace == null ? MemorySegment.NULL : fontFace.handle(),
+                    fontMatrix == null ? MemorySegment.NULL : fontMatrix.handle(),
+                    ctm == null ? MemorySegment.NULL : ctm.handle(),
+                    options == null ? MemorySegment.NULL : options.handle());
+            font = new FTScaledFont(result);
+            MemoryCleaner.takeOwnership(font.handle());
+            font.fontFace = fontFace;
+            font.fontMatrix = fontMatrix;
+            font.ctm = ctm;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

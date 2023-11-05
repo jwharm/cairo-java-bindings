@@ -21,11 +21,7 @@ package org.freedesktop.cairo;
 
 import io.github.jwharm.cairobindings.Proxy;
 
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.*;
 import java.lang.invoke.VarHandle;
 
 /**
@@ -66,10 +62,13 @@ public class TextExtents extends Proxy {
     private static final VarHandle Y_ADVANCE = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("y_advance"));
 
     /**
-     * Allocate a new {@code cairo_text_extents_t}
+     * Allocate a new, uninitialized {@code cairo_text_extents_t}
+     *
+     * @param arena the arena in which the TextExtents will be allocated
+     * @return a newly allocated, uninitialized TextExtents
      */
-    static TextExtents create() {
-        return new TextExtents(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
+    public static TextExtents create(Arena arena) {
+        return new TextExtents(arena.allocate(getMemoryLayout()));
     }
 
     /**

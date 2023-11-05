@@ -82,7 +82,7 @@ public class SurfacePattern extends Pattern {
      */
     public Surface getSurface() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment surfacePtr = arena.allocate(ValueLayout.ADDRESS);
                 cairo_pattern_get_surface.invoke(handle(), surfacePtr);
                 return new Surface(surfacePtr.get(ValueLayout.ADDRESS, 0));

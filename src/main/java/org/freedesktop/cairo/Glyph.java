@@ -100,6 +100,6 @@ public class Glyph extends Proxy {
      *                instance
      */
     public Glyph(MemorySegment address) {
-        super(Interop.reinterpret(address, getMemoryLayout()));
+        super(address.reinterpret(getMemoryLayout().byteSize()));
     }
 }

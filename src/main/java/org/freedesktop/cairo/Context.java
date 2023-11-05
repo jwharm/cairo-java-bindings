@@ -118,9 +118,6 @@ public final class Context extends Proxy {
      */
     public static final String TAG_CONTENT_REF = "cairo.content_ref";
 
-    // Keeps user data keys and values
-    private final UserDataStore userDataStore;
-    
     // Keep a reference to natively allocated resources that are passed to the
     // Context during its lifetime.
 
@@ -151,7 +148,6 @@ public final class Context extends Proxy {
     public Context(MemorySegment address) {
         super(address);
         MemoryCleaner.setFreeFunc(handle(), "cairo_destroy");
-        userDataStore = new UserDataStore(address.scope());
     }
 
     /**
@@ -670,7 +666,7 @@ public final class Context extends Proxy {
      */
     public Context setDash(double[] dash, double offset) throws IllegalArgumentException {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment dashesPtr = (dash == null || dash.length == 0) ? MemorySegment.NULL
                         : arena.allocateArray(ValueLayout.JAVA_DOUBLE, dash);
                 cairo_set_dash.invoke(handle(), dashesPtr, dash == null ? 0 : dash.length, offset);
@@ -717,7 +713,7 @@ public final class Context extends Proxy {
      */
     public double[] getDash() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment dashesPtr = arena.allocate(ValueLayout.JAVA_DOUBLE.byteSize() * getDashCount());
                 MemorySegment offsetPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_get_dash.invoke(handle(), dashesPtr, offsetPtr);
@@ -738,7 +734,7 @@ public final class Context extends Proxy {
      */
     public double getDashOffset() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment dashesPtr = arena.allocate(ValueLayout.JAVA_DOUBLE.byteSize() * getDashCount());
                 MemorySegment offsetPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_get_dash.invoke(handle(), dashesPtr, offsetPtr);
@@ -1151,15 +1147,15 @@ public final class Context extends Proxy {
      * @return the resulting extents
      * @since 1.4
      */
-    public Rectangle clipExtents() {
+    public Rect clipExtents() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment x1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment x2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_clip_extents.invoke(handle(), x1Ptr, y1Ptr, x2Ptr, y2Ptr);
-                return Rectangle.create(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
+                return new Rect(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
                         x2Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y2Ptr.get(ValueLayout.JAVA_DOUBLE, 0));
             }
         } catch (Throwable e) {
@@ -1246,7 +1242,7 @@ public final class Context extends Proxy {
     }
 
     private static final MethodHandle cairo_copy_clip_rectangle_list = Interop.downcallHandle(
-            "cairo_copy_clip_rectangle_list", FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS));
+            "cairo_copy_clip_rectangle_list", FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * A drawing operator that fills the current path according to the current fill
@@ -1313,15 +1309,15 @@ public final class Context extends Proxy {
      * @see #fillPreserve()
      * @since 1.0
      */
-    public Rectangle fillExtents() {
+    public Rect fillExtents() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment x1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment x2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_fill_extents.invoke(handle(), x1Ptr, y1Ptr, x2Ptr, y2Ptr);
-                return Rectangle.create(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
+                return new Rect(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
                         x2Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y2Ptr.get(ValueLayout.JAVA_DOUBLE, 0));
             }
         } catch (Throwable e) {
@@ -1541,15 +1537,15 @@ public final class Context extends Proxy {
      * @see #setDash(double[], double)
      * @since 1.0
      */
-    public Rectangle strokeExtents() {
+    public Rect strokeExtents() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment x1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment x2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_stroke_extents.invoke(handle(), x1Ptr, y1Ptr, x2Ptr, y2Ptr);
-                return Rectangle.create(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
+                return new Rect(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
                         x2Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y2Ptr.get(ValueLayout.JAVA_DOUBLE, 0));
             }
         } catch (Throwable e) {
@@ -1715,7 +1711,7 @@ public final class Context extends Proxy {
     }
 
     private static final MethodHandle cairo_copy_path = Interop.downcallHandle("cairo_copy_path",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Gets a flattened copy of the current path and returns it to the user as a
@@ -1747,7 +1743,7 @@ public final class Context extends Proxy {
     }
 
     private static final MethodHandle cairo_copy_path_flat = Interop.downcallHandle("cairo_copy_path_flat",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Append the path onto the current path. The path may be either the return
@@ -1823,7 +1819,7 @@ public final class Context extends Proxy {
      */
     public Point getCurrentPoint() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_get_current_point.invoke(handle(), xPtr, yPtr);
@@ -2170,7 +2166,7 @@ public final class Context extends Proxy {
      */
     public Context textPath(String string) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_text_path.invoke(handle(), utf8);
                 return this;
@@ -2306,15 +2302,15 @@ public final class Context extends Proxy {
      *         resulting extents
      * @since 1.6
      */
-    public Rectangle pathExtents() {
+    public Rect pathExtents() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment x1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment x2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 cairo_path_extents.invoke(handle(), x1Ptr, y1Ptr, x2Ptr, y2Ptr);
-                return Rectangle.create(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
+                return new Rect(x1Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y1Ptr.get(ValueLayout.JAVA_DOUBLE, 0),
                         x2Ptr.get(ValueLayout.JAVA_DOUBLE, 0), y2Ptr.get(ValueLayout.JAVA_DOUBLE, 0));
             }
         } catch (Throwable e) {
@@ -2442,20 +2438,18 @@ public final class Context extends Proxy {
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
-     * Stores the current transformation matrix (CTM) into the returned matrix.
+     * Stores the current transformation matrix (CTM) into {@code matrix}.
      * <p>
      * The CTM is a two-dimensional affine transformation that maps all coordinates
      * and other drawing instruments from the user space into the surface's
      * canonical coordinate system, also known as the device space.
      * 
-     * @return a matrix with the current transformation matrix
+     * @param matrix return value for the matrix
      * @since 1.0
      */
-    public Matrix getMatrix() {
+    public void getMatrix(Matrix matrix) {
         try {
-            Matrix matrix = Matrix.create();
             cairo_get_matrix.invoke(handle(), matrix.handle());
-            return matrix;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2498,7 +2492,7 @@ public final class Context extends Proxy {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 xPtr.set(ValueLayout.JAVA_DOUBLE, 0, point.x());
@@ -2528,7 +2522,7 @@ public final class Context extends Proxy {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 xPtr.set(ValueLayout.JAVA_DOUBLE, 0, point.x());
@@ -2558,7 +2552,7 @@ public final class Context extends Proxy {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 xPtr.set(ValueLayout.JAVA_DOUBLE, 0, point.x());
@@ -2589,7 +2583,7 @@ public final class Context extends Proxy {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 xPtr.set(ValueLayout.JAVA_DOUBLE, 0, point.x());
@@ -2658,7 +2652,7 @@ public final class Context extends Proxy {
      */
     public Context selectFontFace(String family, FontSlant slant, FontWeight weight) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(family, arena);
                 cairo_select_font_face.invoke(handle(), utf8, slant.getValue(), weight.getValue());
                 return this;
@@ -2725,16 +2719,15 @@ public final class Context extends Proxy {
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
-     * Returns the current font matrix. See {@link #setFontMatrix(Matrix)}
-     * 
-     * @return the matrix
+     * Stores the current font matrix into {@code matrix}. See
+     * {@link #setFontMatrix}
+     *
+     * @param matrix return value for the matrix
      * @since 1.0
      */
-    public Matrix getFontMatrix() {
+    public void getFontMatrix(Matrix matrix) {
         try {
-            Matrix fontMatrix = Matrix.create();
             cairo_get_font_matrix.invoke(handle(), fontMatrix.handle());
-            return fontMatrix;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2838,7 +2831,7 @@ public final class Context extends Proxy {
      * Replaces the current font face, font matrix, and font options in the
      * {@link Context} with those of the {@link ScaledFont}. Except for some
      * translation, the current CTM of the Context should be the same as that of the
-     * ScaledFont, which can be accessed using {@link ScaledFont#getCTM()}.
+     * ScaledFont, which can be accessed using {@link ScaledFont#getCTM}.
      * 
      * @param scaledFont a ScaledFont
      * @return the context
@@ -2911,7 +2904,7 @@ public final class Context extends Proxy {
      */
     public Context showText(String string) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_show_text.invoke(handle(), utf8);
                 return this;
@@ -2974,7 +2967,7 @@ public final class Context extends Proxy {
      */
     public Context showTextGlyphs(String string, Glyphs glyphs) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment stringPtr = Interop.allocateNativeString(string, arena);
                 cairo_show_text_glyphs.invoke(handle(),
                         stringPtr, string == null ? 0 : string.length(),
@@ -2996,14 +2989,12 @@ public final class Context extends Proxy {
     /**
      * Gets the font extents for the currently selected font.
      * 
-     * @return the font extents
+     * @param extents a FontExtents object into which the results will be stored.
      * @since 1.0
      */
-    public FontExtents fontExtents() {
+    public void fontExtents(FontExtents extents) {
         try {
-            FontExtents extents = FontExtents.create();
             cairo_font_extents.invoke(handle(), extents.handle());
-            return extents;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -3026,17 +3017,15 @@ public final class Context extends Proxy {
      * size of the rectangle, though they will affect the {@code xAdvance} and
      * {@code yAdvance} values.
      * 
-     * @param string a string of text, or {@code null}
-     * @return the text extents
+     * @param string  a string of text, or {@code null}
+     * @param extents a TextExtents object into which the results will be stored
      * @since 1.0
      */
-    public TextExtents textExtents(String string) {
+    public void textExtents(String string, TextExtents extents) {
         try {
-            try (Arena arena = Arena.openConfined()) {
-                TextExtents extents = TextExtents.create();
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 cairo_text_extents.invoke(handle(), utf8, extents.handle());
-                return extents;
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -3057,17 +3046,15 @@ public final class Context extends Proxy {
      * ({@code extents.width} and {@code extents.height}).
      * 
      * @param glyphs an array of Glyph objects
-     * @return the glyph extents
+     * @param extents a TextExtents object into which the results will be stored
      * @since 1.0
      */
-    public TextExtents glyphExtents(Glyphs glyphs) {
+    public void glyphExtents(Glyphs glyphs, TextExtents extents) {
         if (glyphs == null) {
-            return null;
+            return;
         }
         try {
-            TextExtents extents = TextExtents.create();
             cairo_glyph_extents.invoke(handle(), glyphs.getGlyphsPointer(), glyphs.getNumGlyphs(), extents.handle());
-            return extents;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -3108,7 +3095,7 @@ public final class Context extends Proxy {
      */
     public Context tagBegin(String tagName, String attributes) throws IllegalArgumentException {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment tagNamePtr = Interop.allocateNativeString(tagName, arena);
                 MemorySegment attributesPtr = Interop.allocateNativeString(attributes, arena);
                 cairo_tag_begin.invoke(handle(), tagNamePtr, attributesPtr);
@@ -3137,7 +3124,7 @@ public final class Context extends Proxy {
      */
     public Context tagEnd(String tagName) throws IllegalArgumentException {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment tagNamePtr = Interop.allocateNativeString(tagName, arena);
                 cairo_tag_end.invoke(handle(), tagNamePtr);
             }
@@ -3154,43 +3141,20 @@ public final class Context extends Proxy {
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
-     * Attach user data to the context. This method will generate and return a
-     * {@link UserDataKey}. To update the user data for the same key, call
-     * {@link #setUserData(UserDataKey, Object)}. To remove user data from a
-     * context, call this function with {@code null} for {@code userData}.
-     * 
-     * @param userData the user data to attach to the context. {@code userData} can
-     *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
-     * @return the key that the user data is attached to
-     * @since 1.4
-     */
-    public UserDataKey setUserData(Object userData) {
-        UserDataKey key = UserDataKey.create(this);
-        return setUserData(key, userData);
-    }
-
-    /**
      * Attach user data to the context. To remove user data from a context, call
      * this function with the key that was used to set it and {@code null} for
      * {@code userData}.
-     * 
-     * @param key      the key to attach the user data to
-     * @param userData the user data to attach to the context. {@code userData} can
-     *                 be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
+     *
+     * @param  key      the key to attach the user data to
+     * @param  userData the user data to attach to the context
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}
      * @since 1.4
      */
-    public UserDataKey setUserData(UserDataKey key, Object userData) {
+    public UserDataKey setUserData(UserDataKey key, MemorySegment userData) {
         Status status;
-        userDataStore.set(key, userData);
         try {
-            int result = (int) cairo_set_user_data.invoke(handle(), key.handle(), userDataStore.dataSegment(userData),
-                    MemorySegment.NULL);
+            int result = (int) cairo_set_user_data.invoke(handle(), key.handle(), userData, MemorySegment.NULL);
             status = Status.of(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -3210,13 +3174,24 @@ public final class Context extends Proxy {
      * If no user data has been attached with the given key this function returns
      * {@code null}.
      * 
-     * @param key the UserDataKey the user data was attached to
+     * @param  key the UserDataKey the user data was attached to
      * @return the user data previously attached or {@code null}
      * @since 1.4
      */
-    public Object getUserData(UserDataKey key) {
-        return key == null ? null : userDataStore.get(key);
+    public MemorySegment getUserData(UserDataKey key) {
+        if (key == null) {
+            return null;
+        }
+        try {
+            MemorySegment result = (MemorySegment) cairo_get_user_data.invoke(handle(), key.handle());
+            return MemorySegment.NULL.equals(result) ? null : result;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    private static final MethodHandle cairo_get_user_data = Interop.downcallHandle("cairo_get_user_data",
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Get the CairoContext GType

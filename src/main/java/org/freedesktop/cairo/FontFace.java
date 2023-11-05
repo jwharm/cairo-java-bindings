@@ -58,9 +58,6 @@ public sealed class FontFace extends Proxy permits ToyFontFace, FTFontFace, User
         Cairo.ensureInitialized();
     }
 
-    // Keeps user data keys and values
-    private final UserDataStore userDataStore;
-
     /**
      * Constructor used internally to instantiate a java FontFace object for a
      * native {@code cairo_font_face_t} instance
@@ -71,7 +68,6 @@ public sealed class FontFace extends Proxy permits ToyFontFace, FTFontFace, User
     public FontFace(MemorySegment address) {
         super(address);
         MemoryCleaner.setFreeFunc(handle(), "cairo_font_face_destroy");
-        userDataStore = new UserDataStore(address.scope());
     }
 
     /**
@@ -140,43 +136,20 @@ public sealed class FontFace extends Proxy permits ToyFontFace, FTFontFace, User
             FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
-     * Attach user data to the font face. This method will generate and return a
-     * {@link UserDataKey}. To update the user data for the same key, call
-     * {@link #setUserData(UserDataKey, Object)}. To remove user data from a font
-     * face, call this function with {@code null} for {@code userData}.
-     * 
-     * @param userData the user data to attach to the font face. {@code userData}
-     *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
-     * @return the key that the user data is attached to
-     * @since 1.4
-     */
-    public UserDataKey setUserData(Object userData) {
-        UserDataKey key = UserDataKey.create(this);
-        return setUserData(key, userData);
-    }
-
-    /**
      * Attach user data to the font face. To remove user data from a font face, call
      * this function with the key that was used to set it and {@code null} for
      * {@code userData}.
-     * 
-     * @param key      the key to attach the user data to
-     * @param userData the user data to attach to the font face. {@code userData}
-     *                 can be any Java object, but if it is a primitive type, a
-     *                 {@link MemorySegment} or a {@link Proxy} instance, it will be
-     *                 stored as cairo user data in native memory as well.
+     *
+     * @param  key      the key to attach the user data to
+     * @param  userData the user data to attach to the font face
      * @return the key
      * @throws NullPointerException if {@code key} is {@code null}
      * @since 1.4
      */
-    public UserDataKey setUserData(UserDataKey key, Object userData) {
+    public UserDataKey setUserData(UserDataKey key, MemorySegment userData) {
         Status status;
-        userDataStore.set(key, userData);
         try {
-            int result = (int) cairo_font_face_set_user_data.invoke(handle(), key.handle(),
-                    userDataStore.dataSegment(userData), MemorySegment.NULL);
+            int result = (int) cairo_font_face_set_user_data.invoke(handle(), key.handle(), userData, MemorySegment.NULL);
             status = Status.of(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -195,14 +168,25 @@ public sealed class FontFace extends Proxy permits ToyFontFace, FTFontFace, User
      * Return user data previously attached to the font face using the specified
      * key. If no user data has been attached with the given key this function
      * returns {@code null}.
-     * 
+     *
      * @param key the UserDataKey the user data was attached to
      * @return the user data previously attached or {@code null}
      * @since 1.4
      */
-    public Object getUserData(UserDataKey key) {
-        return key == null ? null : userDataStore.get(key);
+    public MemorySegment getUserData(UserDataKey key) {
+        if (key == null) {
+            return null;
+        }
+        try {
+            MemorySegment result = (MemorySegment) cairo_font_face_get_user_data.invoke(handle(), key.handle());
+            return MemorySegment.NULL.equals(result) ? null : result;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    private static final MethodHandle cairo_font_face_get_user_data = Interop.downcallHandle("cairo_get_user_data",
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Get the CairoFontFace GType

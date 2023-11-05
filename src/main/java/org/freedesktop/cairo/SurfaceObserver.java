@@ -22,10 +22,12 @@ package org.freedesktop.cairo;
 import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.MemoryCleaner;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.ref.Cleaner;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +41,12 @@ public final class SurfaceObserver extends Surface {
     static {
         Cairo.ensureInitialized();
     }
+
+    // Cleaner used to close the arena
+    private static final Cleaner CLEANER = Cleaner.create();
+
+    // Arena used to allocate the upcall stubs for the callback functions
+    private final Arena arena = Arena.ofShared();
 
     // Keep a reference to the callback functions that are passed to the
     // Observer during its lifetime.
@@ -54,6 +62,11 @@ public final class SurfaceObserver extends Surface {
      */
     public SurfaceObserver(MemorySegment address) {
         super(address);
+
+        // Setup a Cleaner to close the Arena and release the allocated memory for
+        // the callback functions
+        CleanupAction cleanup = new CleanupAction(arena);
+        CLEANER.register(this, cleanup);
     }
 
     /**
@@ -95,7 +108,7 @@ public final class SurfaceObserver extends Surface {
     public SurfaceObserver addFillCallback(SurfaceObserverCallback func) {
         try {
             int ignored = (int) cairo_surface_observer_add_fill_callback.invoke(handle(),
-                    func == null ? MemorySegment.NULL : func.toCallback(handle().scope()), MemorySegment.NULL);
+                    func == null ? MemorySegment.NULL : func.toCallback(arena), MemorySegment.NULL);
             callbacks.add(func);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -117,7 +130,7 @@ public final class SurfaceObserver extends Surface {
     public SurfaceObserver addFinishCallback(SurfaceObserverCallback func) {
         try {
             int ignored = (int) cairo_surface_observer_add_finish_callback.invoke(handle(),
-                    func == null ? MemorySegment.NULL : func.toCallback(handle().scope()), MemorySegment.NULL);
+                    func == null ? MemorySegment.NULL : func.toCallback(arena), MemorySegment.NULL);
             callbacks.add(func);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -139,7 +152,7 @@ public final class SurfaceObserver extends Surface {
     public SurfaceObserver addFlushCallback(SurfaceObserverCallback func) {
         try {
             int ignored = (int) cairo_surface_observer_add_flush_callback.invoke(handle(),
-                    func == null ? MemorySegment.NULL : func.toCallback(handle().scope()), MemorySegment.NULL);
+                    func == null ? MemorySegment.NULL : func.toCallback(arena), MemorySegment.NULL);
             callbacks.add(func);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -161,7 +174,7 @@ public final class SurfaceObserver extends Surface {
     public SurfaceObserver addGlyphsCallback(SurfaceObserverCallback func) {
         try {
             int ignored = (int) cairo_surface_observer_add_glyphs_callback.invoke(handle(),
-                    func == null ? MemorySegment.NULL : func.toCallback(handle().scope()), MemorySegment.NULL);
+                    func == null ? MemorySegment.NULL : func.toCallback(arena), MemorySegment.NULL);
             callbacks.add(func);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -183,7 +196,7 @@ public final class SurfaceObserver extends Surface {
     public SurfaceObserver addMaskCallback(SurfaceObserverCallback func) {
         try {
             int ignored = (int) cairo_surface_observer_add_mask_callback.invoke(handle(),
-                    func == null ? MemorySegment.NULL : func.toCallback(handle().scope()), MemorySegment.NULL);
+                    func == null ? MemorySegment.NULL : func.toCallback(arena), MemorySegment.NULL);
             callbacks.add(func);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -205,7 +218,7 @@ public final class SurfaceObserver extends Surface {
     public SurfaceObserver addPaintCallback(SurfaceObserverCallback func) {
         try {
             int ignored = (int) cairo_surface_observer_add_paint_callback.invoke(handle(),
-                    func == null ? MemorySegment.NULL : func.toCallback(handle().scope()), MemorySegment.NULL);
+                    func == null ? MemorySegment.NULL : func.toCallback(arena), MemorySegment.NULL);
             callbacks.add(func);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -227,7 +240,7 @@ public final class SurfaceObserver extends Surface {
     public SurfaceObserver addStrokeCallback(SurfaceObserverCallback func) {
         try {
             int ignored = (int) cairo_surface_observer_add_stroke_callback.invoke(handle(),
-                    func == null ? MemorySegment.NULL : func.toCallback(handle().scope()), MemorySegment.NULL);
+                    func == null ? MemorySegment.NULL : func.toCallback(arena), MemorySegment.NULL);
             callbacks.add(func);
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -265,7 +278,7 @@ public final class SurfaceObserver extends Surface {
     public void print(WriteFunc writeFunc) {
         try {
             int ignored = (int) cairo_surface_observer_print.invoke(handle(),
-                    writeFunc == null ? MemorySegment.NULL : writeFunc.toCallback(handle().scope()), MemorySegment.NULL);
+                    writeFunc == null ? MemorySegment.NULL : writeFunc.toCallback(arena), MemorySegment.NULL);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -274,4 +287,11 @@ public final class SurfaceObserver extends Surface {
     private static final MethodHandle cairo_surface_observer_print = Interop.downcallHandle(
             "cairo_surface_observer_print",
             FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    // Static class to separate the cleanup logic from the object being cleaned
+    private record CleanupAction(Arena arena) implements Runnable {
+        @Override public void run() {
+            arena.close();
+        }
+    }
 }

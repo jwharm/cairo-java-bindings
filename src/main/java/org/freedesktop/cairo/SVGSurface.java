@@ -19,6 +19,7 @@
 
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.ArenaCloseAction;
 import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.MemoryCleaner;
 
@@ -26,7 +27,6 @@ import java.io.OutputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
@@ -42,14 +42,6 @@ public final class SVGSurface extends Surface {
     static {
         Cairo.ensureInitialized();
     }
-
-    /*
-     * Initialized by {@link #create(OutputStream, int, int)} to keep a reference to
-     * the memory segment for the upcall stub alive during the lifetime of the
-     * SVGSurface instance.
-     */
-    @SuppressWarnings("unused")
-    private MemorySegment callbackAllocation;
 
     /**
      * Constructor used internally to instantiate a java SVGSurface object for a
@@ -99,7 +91,7 @@ public final class SVGSurface extends Surface {
     public static SVGSurface create(String filename, int widthInPoints, int heightInPoints) {
         SVGSurface surface;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_svg_surface_create.invoke(filenamePtr, widthInPoints,
                         heightInPoints);
@@ -135,11 +127,12 @@ public final class SVGSurface extends Surface {
      */
     public static SVGSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
         SVGSurface surface;
+        Arena arena = Arena.ofConfined();
         try {
             MemorySegment writeFuncPtr;
             if (stream != null) {
                 WriteFunc writeFunc = stream::write;
-                writeFuncPtr = writeFunc.toCallback(SegmentScope.auto());
+                writeFuncPtr = writeFunc.toCallback(arena);
             } else {
                 writeFuncPtr = MemorySegment.NULL;
             }
@@ -148,7 +141,7 @@ public final class SVGSurface extends Surface {
             surface = new SVGSurface(result);
             MemoryCleaner.takeOwnership(surface.handle());
             if (stream != null) {
-                surface.callbackAllocation = writeFuncPtr; // Keep the memory segment of the upcall stub alive
+                ArenaCloseAction.CLEANER.register(surface, new ArenaCloseAction(arena));
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);

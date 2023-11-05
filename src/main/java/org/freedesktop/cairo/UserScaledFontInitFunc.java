@@ -84,19 +84,19 @@ public interface UserScaledFontInitFunc {
 
     /**
      * Generates an upcall stub, a C function pointer that will call
-     * {@link #upcall(MemorySegment, MemorySegment, MemorySegment)}.
+     * {@link #upcall}.
      *
-     * @param scope the scope in which the upcall stub will be allocated
+     * @param arena the arena in which the upcall stub will be allocated
      * @return the function pointer of the upcall stub
      * @since 1.8
      */
-    default MemorySegment toCallback(SegmentScope scope) {
+    default MemorySegment toCallback(Arena arena) {
         try {
             FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS);
             MethodHandle handle = MethodHandles.lookup().findVirtual(
                     UserScaledFontInitFunc.class, "upcall", fdesc.toMethodType());
-            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
+            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

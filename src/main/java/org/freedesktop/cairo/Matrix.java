@@ -26,10 +26,9 @@ import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemoryLayout;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.VarHandle;
 
 /**
  * Generic matrix operations.
@@ -46,7 +45,7 @@ import java.lang.invoke.MethodHandle;
  * 
  * The current transformation matrix of a {@link Context}, represented as a
  * Matrix, defines the transformation from user-space coordinates to
- * device-space coordinates. See {@link Context#getMatrix()} and
+ * device-space coordinates. See {@link Context#getMatrix} and
  * {@link Context#setMatrix(Matrix)}.
  * 
  * @since 1.0
@@ -68,41 +67,75 @@ public class Matrix extends Proxy {
             .withName("cairo_matrix_t");
     }
 
+    private static final VarHandle XX = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("xx"));
+    private static final VarHandle YX = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("yx"));
+    private static final VarHandle XY = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("xy"));
+    private static final VarHandle YY = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("yy"));
+    private static final VarHandle X0 = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("x0"));
+    private static final VarHandle Y0 = getMemoryLayout().varHandle(MemoryLayout.PathElement.groupElement("y0"));
+
     /**
-     * Allocate a new {@code caio_matrix_t}
+     * Get the xx value of the Matrix
+     *
+     * @return the xx value
      */
-    static Matrix create() {
-        return new Matrix(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
+    public double xx() {
+        return (double) XX.get(handle());
     }
 
     /**
-     * Sets the matrix to be the affine transformation given by {@code xx},
-     * {@code yx}, {@code xy}, {@code yy}, {@code x0}, {@code y0}. The
-     * transformation is given by:
-     * 
-     * <pre>
-     * xNew = xx * x + xy * y + x0;
-     * yNew = yx * x + yy * y + y0;
-     * </pre>
-     * 
-     * @param xx xx component of the affine transformation
-     * @param yx yx component of the affine transformation
-     * @param xy xy component of the affine transformation
-     * @param yy yy component of the affine transformation
-     * @param x0 X translation component of the affine transformation
-     * @param y0 Y translation component of the affine transformation
-     * @return the resulting Matrix
-     * @see Matrix#init(double, double, double, double, double, double)
-     * @since 1.0
+     * Get the yx value of the Matrix
+     *
+     * @return the yx value
      */
-    public static Matrix create(double xx, double yx, double xy, double yy, double x0, double y0) {
-        try {
-            Matrix matrix = create();
-            cairo_matrix_init.invoke(matrix.handle(), xx, yx, xy, yy, x0, y0);
-            return matrix;
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+    public double yx() {
+        return (double) YX.get(handle());
+    }
+
+    /**
+     * Get the xy value of the Matrix
+     *
+     * @return the xy value
+     */
+    public double xy() {
+        return (double) XY.get(handle());
+    }
+
+    /**
+     * Get the yy value of the Matrix
+     *
+     * @return the yy value
+     */
+    public double yy() {
+        return (double) YY.get(handle());
+    }
+
+    /**
+     * Get the x0 value of the Matrix
+     *
+     * @return the x0 value
+     */
+    public double x0() {
+        return (double) X0.get(handle());
+    }
+
+    /**
+     * Get the y0 value of the Matrix
+     *
+     * @return the y0 value
+     */
+    public double y0() {
+        return (double) Y0.get(handle());
+    }
+
+    /**
+     * Allocate a new, uninitialized {@code caio_matrix_t}
+     *
+     * @param arena the arena in which the Matrix will be allocated
+     * @return the newly allocated, uninitialized Matrix object
+     */
+    public static Matrix create(Arena arena) {
+        return new Matrix(arena.allocate(getMemoryLayout()));
     }
 
     /**
@@ -139,15 +172,14 @@ public class Matrix extends Proxy {
 
     /**
      * Modifies the matrix to be an identity transformation.
-     * 
-     * @return the resulting Matrix
+     *
+     * @return the matrix
      * @since 1.0
      */
-    public static Matrix createIdentity() {
+    public Matrix initIdentity() {
         try {
-            Matrix matrix = create();
-            cairo_matrix_init_identity.invoke(matrix.handle());
-            return matrix;
+            cairo_matrix_init_identity.invoke(handle());
+            return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -162,14 +194,13 @@ public class Matrix extends Proxy {
      * 
      * @param tx amount to translate in the X direction
      * @param ty amount to translate in the Y direction
-     * @return the resulting Matrix
+     * @return the matrix
      * @since 1.0
      */
-    public static Matrix createTranslate(double tx, double ty) {
+    public Matrix initTranslate(double tx, double ty) {
         try {
-            Matrix matrix = create();
-            cairo_matrix_init_translate.invoke(matrix.handle(), tx, ty);
-            return matrix;
+            cairo_matrix_init_translate.invoke(handle(), tx, ty);
+            return this;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -178,52 +209,6 @@ public class Matrix extends Proxy {
     private static final MethodHandle cairo_matrix_init_translate = Interop.downcallHandle(
             "cairo_matrix_init_translate",
             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
-
-    /**
-     * Initializes the matrix to a transformation that scales by {@code sx} and
-     * {@code sy} in the X and Y dimensions, respectively.
-     * 
-     * @param sx scale factor in the X direction
-     * @param sy scale factor in the Y direction
-     * @return the resulting Matrix
-     * @since 1.0
-     */
-    public static Matrix createScale(double sx, double sy) {
-        try {
-            Matrix matrix = create();
-            cairo_matrix_init_scale.invoke(matrix.handle(), sx, sy);
-            return matrix;
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static final MethodHandle cairo_matrix_init_scale = Interop.downcallHandle("cairo_matrix_init_scale",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
-
-    /**
-     * Initializes the matrix to a transformation that rotates by {@code radians}.
-     * 
-     * @param radians angle of rotation, in radians. The direction of rotation is
-     *                defined such that positive angles rotate in the direction from
-     *                the positive X axis toward the positive Y axis. With the
-     *                default axis orientation of cairo, positive angles rotate in a
-     *                clockwise direction.
-     * @return the resulting Matrix
-     * @since 1.0
-     */
-    public static Matrix createRotate(double radians) {
-        try {
-            Matrix matrix = create();
-            cairo_matrix_init_rotate.invoke(matrix.handle(), radians);
-            return matrix;
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static final MethodHandle cairo_matrix_init_rotate = Interop.downcallHandle("cairo_matrix_init_rotate",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE));
 
     /**
      * Applies a translation by {@code tx, ty} to the transformation in the matrix.
@@ -333,22 +318,22 @@ public class Matrix extends Proxy {
     /**
      * Multiplies the affine transformations in this matrix and the provided matrix
      * together and stores the result in the resulting matrix. The effect of the
-     * resulting transformation is to first apply the transformation in this matrix
-     * to the coordinates and then apply the transformation in the provided matrix
-     * to the coordinates.
+     * resulting transformation is to first apply the transformation in {@code a}
+     * to the coordinates and then apply the transformation in {@code b} to the
+     * coordinates.
      * <p>
-     * It is allowable for the resulting matrix to be identical to either this
-     * matrix or the provided matrix.
+     * It is allowable for the resulting matrix to be identical to either {@code a}
+     * or {@code b}.
      * 
-     * @param other a matrix
-     * @return the resulting matrix
+     * @param  a a matrix
+     * @param  b a matrix
      * @since 1.0
      */
-    public Matrix multiply(Matrix other) {
+    public void multiply(Matrix a, Matrix b) {
         try {
-            Matrix result = create();
-            cairo_matrix_multiply.invoke(result.handle(), this.handle(), other == null ? MemorySegment.NULL : other.handle());
-            return result;
+            cairo_matrix_multiply.invoke(this.handle(),
+                    a == null ? MemorySegment.NULL : a.handle(),
+                    b == null ? MemorySegment.NULL : b.handle());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -377,11 +362,9 @@ public class Matrix extends Proxy {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
-                MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
-                MemorySegment dyPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
-                dxPtr.set(ValueLayout.JAVA_DOUBLE, 0, distanceVector.x());
-                dyPtr.set(ValueLayout.JAVA_DOUBLE, 0, distanceVector.y());
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, distanceVector.x());
+                MemorySegment dyPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, distanceVector.y());
                 cairo_matrix_transform_distance.invoke(handle(), dxPtr, dyPtr);
                 return new Point(dxPtr.get(ValueLayout.JAVA_DOUBLE, 0), dyPtr.get(ValueLayout.JAVA_DOUBLE, 0));
             }
@@ -406,11 +389,9 @@ public class Matrix extends Proxy {
             return null;
         }
         try {
-            try (Arena arena = Arena.openConfined()) {
-                MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
-                MemorySegment dyPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
-                dxPtr.set(ValueLayout.JAVA_DOUBLE, 0, point.x());
-                dyPtr.set(ValueLayout.JAVA_DOUBLE, 0, point.y());
+            try (Arena arena = Arena.ofConfined()) {
+                MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, point.x());
+                MemorySegment dyPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, point.y());
                 cairo_matrix_transform_point.invoke(handle(), dxPtr, dyPtr);
                 return new Point(dxPtr.get(ValueLayout.JAVA_DOUBLE, 0), dyPtr.get(ValueLayout.JAVA_DOUBLE, 0));
             }
@@ -432,5 +413,16 @@ public class Matrix extends Proxy {
      */
     public Matrix(MemorySegment address) {
         super(address);
+    }
+
+    /**
+     * String representation of this Matrix
+     *
+     * @return a String representation of this Matrix
+     */
+    @Override
+    public String toString() {
+        return String.format("Matrix address=%d xx=%f yx=%f xy=%f yy=%f x0=%f y0=%f",
+                handle().address(), xx(), yx(), xy(), yy(), x0(), y0());
     }
 }

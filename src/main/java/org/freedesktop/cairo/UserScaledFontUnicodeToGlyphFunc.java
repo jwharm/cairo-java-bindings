@@ -19,8 +19,6 @@
 
 package org.freedesktop.cairo;
 
-import io.github.jwharm.cairobindings.Interop;
-
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -86,7 +84,7 @@ public interface UserScaledFontUnicodeToGlyphFunc {
     default int upcall(MemorySegment scaledFont, long unicode, MemorySegment glyphIndex) {
         try {
             long result = unicodeToGlyph(new UserScaledFont(scaledFont), unicode);
-            Interop.reinterpret(glyphIndex, ValueLayout.JAVA_LONG).set(ValueLayout.JAVA_LONG, 0, result);
+            glyphIndex.reinterpret(ValueLayout.JAVA_LONG.byteSize()).set(ValueLayout.JAVA_LONG, 0, result);
             return Status.SUCCESS.getValue();
         } catch (UnsupportedOperationException uoe) {
             return Status.USER_FONT_NOT_IMPLEMENTED.getValue();
@@ -97,19 +95,19 @@ public interface UserScaledFontUnicodeToGlyphFunc {
 
     /**
      * Generates an upcall stub, a C function pointer that will call
-     * {@link #upcall(MemorySegment, long, MemorySegment)}.
+     * {@link #upcall}.
      *
-     * @param scope the scope in which the upcall stub will be allocated
+     * @param arena the arena in which the upcall stub will be allocated
      * @return the function pointer of the upcall stub
      * @since 1.8
      */
-    default MemorySegment toCallback(SegmentScope scope) {
+    default MemorySegment toCallback(Arena arena) {
         try {
             FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT,
                     ValueLayout.ADDRESS, ValueLayout.JAVA_LONG, ValueLayout.ADDRESS);
             MethodHandle handle = MethodHandles.lookup().findVirtual(
                     UserScaledFontUnicodeToGlyphFunc.class, "upcall", fdesc.toMethodType());
-            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
+            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

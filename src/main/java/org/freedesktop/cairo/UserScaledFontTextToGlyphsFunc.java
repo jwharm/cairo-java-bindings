@@ -127,15 +127,15 @@ public interface UserScaledFontTextToGlyphsFunc {
                        MemorySegment numClustersPtr, MemorySegment clusterFlagsPtr) {
         // Read the string
         byte[] utf8Bytes = new byte[utf8Len];
-        Interop.reinterpret(utf8, utf8Len).asByteBuffer().get(utf8Bytes);
+        utf8.reinterpret(utf8Len).asByteBuffer().get(utf8Bytes);
 
         // Read the memory segments
         int numGlyphs = numGlyphsPtr.equals(MemorySegment.NULL) ? 0
-                : Interop.reinterpret(numGlyphsPtr, ValueLayout.JAVA_INT).get(ValueLayout.JAVA_INT, 0);
+                : numGlyphsPtr.reinterpret(ValueLayout.JAVA_INT.byteSize()).get(ValueLayout.JAVA_INT, 0);
         int numClusters = numClustersPtr.equals(MemorySegment.NULL) ? 0
-                : Interop.reinterpret(numClustersPtr, ValueLayout.JAVA_INT).get(ValueLayout.JAVA_INT, 0);
+                : numClustersPtr.reinterpret(ValueLayout.JAVA_INT.byteSize()).get(ValueLayout.JAVA_INT, 0);
         TextClusterFlags clusterFlags = clusterFlagsPtr.equals(MemorySegment.NULL) ? null
-                : TextClusterFlags.of(Interop.reinterpret(clusterFlagsPtr, ValueLayout.JAVA_INT).get(ValueLayout.JAVA_INT, 0));
+                : TextClusterFlags.of(clusterFlagsPtr.reinterpret(ValueLayout.JAVA_INT.byteSize()).get(ValueLayout.JAVA_INT, 0));
 
         // Run the callback
         try {
@@ -144,11 +144,11 @@ public interface UserScaledFontTextToGlyphsFunc {
 
             // Write the results back into the memory segments
             if (! numGlyphsPtr.equals(MemorySegment.NULL))
-                Interop.reinterpret(numGlyphsPtr, ValueLayout.JAVA_INT).set(ValueLayout.JAVA_INT, 0, glyphs.getNumGlyphs());
+                numGlyphsPtr.reinterpret(ValueLayout.JAVA_INT.byteSize()).set(ValueLayout.JAVA_INT, 0, glyphs.getNumGlyphs());
             if (! numClustersPtr.equals(MemorySegment.NULL))
-                Interop.reinterpret(numClustersPtr, ValueLayout.JAVA_INT).set(ValueLayout.JAVA_INT, 0, glyphs.getNumClusters());
+                numClustersPtr.reinterpret(ValueLayout.JAVA_INT.byteSize()).set(ValueLayout.JAVA_INT, 0, glyphs.getNumClusters());
             if (! clusterFlagsPtr.equals(MemorySegment.NULL))
-                Interop.reinterpret(clusterFlagsPtr, ValueLayout.JAVA_INT).set(ValueLayout.JAVA_INT, 0, glyphs.getClusterFlags().getValue());
+                clusterFlagsPtr.reinterpret(ValueLayout.JAVA_INT.byteSize()).set(ValueLayout.JAVA_INT, 0, glyphs.getClusterFlags().getValue());
 
             return Status.SUCCESS.getValue();
         } catch (UnsupportedOperationException uoe) {
@@ -160,21 +160,20 @@ public interface UserScaledFontTextToGlyphsFunc {
 
     /**
      * Generates an upcall stub, a C function pointer that will call
-     * {@link #upcall(MemorySegment, MemorySegment, int, MemorySegment,
-     * MemorySegment, MemorySegment, MemorySegment, MemorySegment)}.
+     * {@link #upcall}.
      *
-     * @param scope the scope in which the upcall stub will be allocated
+     * @param arena the arena in which the upcall stub will be allocated
      * @return the function pointer of the upcall stub
      * @since 1.8
      */
-    default MemorySegment toCallback(SegmentScope scope) {
+    default MemorySegment toCallback(Arena arena) {
         try {
             FunctionDescriptor fdesc = FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS,
                     ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.ADDRESS,
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS);
             MethodHandle handle = MethodHandles.lookup().findVirtual(
                     UserScaledFontTextToGlyphsFunc.class, "upcall", fdesc.toMethodType());
-            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, scope);
+            return Linker.nativeLinker().upcallStub(handle.bindTo(this), fdesc, arena);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }

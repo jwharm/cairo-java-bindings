@@ -2,7 +2,9 @@ package org.freedesktop.cairo.test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.foreign.Arena;
 
+import io.github.jwharm.cairobindings.Interop;
 import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
 
@@ -194,8 +196,9 @@ class SurfaceTest {
 
     @Test
     void testMapToImage() {
-        try (Surface s1 = ImageSurface.create(Format.ARGB32, 120, 120);
-             ImageSurface s2 = s1.mapToImage(RectangleInt.create(0, 0, 120, 120))) {
+        try (Arena arena = Arena.ofConfined();
+             Surface s1 = ImageSurface.create(Format.ARGB32, 120, 120);
+             ImageSurface s2 = s1.mapToImage(RectangleInt.create(arena, 0, 0, 120, 120))) {
             s1.unmapImage(s2);
             assertEquals(Status.SUCCESS, s1.status());
             assertEquals(Status.SUCCESS, s2.status());
@@ -204,10 +207,17 @@ class SurfaceTest {
 
     @Test
     void testUserData() {
-        try (Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
+        try (Arena arena = Arena.ofConfined();
+             Surface s = ImageSurface.create(Format.ARGB32, 120, 120)) {
             String input = "test";
-            UserDataKey key = s.setUserData(input);
-            String output = (String) s.getUserData(key);
+            var segmentIn = Interop.allocateNativeString(input, arena);
+
+            UserDataKey key = UserDataKey.create(arena);
+            s.setUserData(key, segmentIn);
+
+            var segmentOut = s.getUserData(key).reinterpret(Integer.MAX_VALUE);
+            String output = segmentOut.getUtf8String(0);
+
             assertEquals(input, output);
             assertEquals(Status.SUCCESS, s.status());
         }

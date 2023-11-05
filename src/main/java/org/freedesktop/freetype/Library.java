@@ -21,13 +21,10 @@ package org.freedesktop.freetype;
 
 import io.github.jwharm.cairobindings.Proxy;
 import io.github.jwharm.cairobindings.Interop;
-import io.github.jwharm.cairobindings.MemoryCleaner;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
@@ -43,6 +40,9 @@ public class Library extends Proxy {
         FreeType2.ensureInitialized();
     }
 
+    // The Arena in which the handle to the Library object was allocated.
+    private Arena allocator = null;
+
     /**
      * Constructor used internally to instantiate a java Library object for a native
      * {@code FT_Library} instance
@@ -51,36 +51,29 @@ public class Library extends Proxy {
      */
     public Library(MemorySegment address) {
         super(address);
-        MemoryCleaner.setFreeFunc(handle(), "FT_Done_FreeType");
-    }
-
-    /**
-     * Invokes the cleanup action that is normally invoked during garbage collection.
-     * If the instance is "owned" by the user, the {@code destroy()} function is run
-     * to dispose the native instance.
-     */
-    public void destroy() {
-        MemoryCleaner.free(handle());
     }
 
     /**
      * Initialize a new FreeType library object.
-     * 
+     * <p>
+     * The resulting Library instance must be cleaned up manually with a call to
+     * {@link #doneFreeType()}.
+     *
      * @return a new library object
      * @throws UnsupportedOperationException when {@code FT_Init_FreeType} returns a
      *                                       non-zero error code
      */
     public static Library initFreeType() throws UnsupportedOperationException {
         try {
-            MemorySegment pointer = SegmentAllocator.nativeAllocator(SegmentScope.auto())
-                    .allocate(ValueLayout.ADDRESS.asUnbounded());
+            Arena allocator = Arena.ofConfined();
+            MemorySegment pointer = allocator.allocate(ValueLayout.ADDRESS.withTargetLayout(ValueLayout.ADDRESS));
             int result = (int) FT_Init_FreeType.invoke(pointer);
             if (result != 0) {
                 throw new UnsupportedOperationException(
                         "Error " + result + " occurred during FreeType library initialization");
             }
             Library library = new Library(pointer.get(ValueLayout.ADDRESS, 0));
-            MemoryCleaner.takeOwnership(library.handle());
+            library.allocator = allocator;
             return library;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -98,7 +91,7 @@ public class Library extends Proxy {
      */
     public String version() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment amajor = arena.allocate(ValueLayout.JAVA_INT);
                 MemorySegment aminor = arena.allocate(ValueLayout.JAVA_INT);
                 MemorySegment apatch = arena.allocate(ValueLayout.JAVA_INT);
@@ -116,4 +109,23 @@ public class Library extends Proxy {
     private static final MethodHandle FT_Library_Version = Interop.downcallHandle(
             "FT_Library_Version", FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, 
                     ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+
+    /**
+     * Destroy a given FreeType library object and all of its children, including
+     * resources, drivers, faces, sizes, etc.
+     */
+    public void doneFreeType() {
+        try {
+            int ignored = (int) FT_Done_FreeType.invoke(handle());
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+        if (allocator != null) {
+            allocator.close();
+            allocator = null;
+        }
+    }
+
+    private static final MethodHandle FT_Done_FreeType = Interop.downcallHandle("FT_Done_FreeType",
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 }

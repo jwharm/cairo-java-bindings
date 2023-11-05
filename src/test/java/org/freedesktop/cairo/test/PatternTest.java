@@ -6,6 +6,8 @@ import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.lang.foreign.Arena;
+
 class PatternTest {
 
     @Test
@@ -34,11 +36,15 @@ class PatternTest {
 
     @Test
     void testMatrix() {
-        Gradient pattern = LinearGradient.create(0, 0, 10, 10);
-        pattern.setMatrix(Matrix.createScale(2, 2));
-        Matrix m = Matrix.create(0, 0, 0, 0, 0, 0);
-        pattern.getMatrix(m);
-        assertEquals(Status.SUCCESS, pattern.status());
+        try (Arena arena = Arena.ofConfined()) {
+            Gradient pattern = LinearGradient.create(0, 0, 10, 10);
+            Matrix scale = Matrix.create(arena).initIdentity();
+            scale.scale(2, 2);
+            pattern.setMatrix(scale);
+            Matrix m = Matrix.create(arena).init(0, 0, 0, 0, 0, 0);
+            pattern.getMatrix(m);
+            assertEquals(Status.SUCCESS, pattern.status());
+        }
     }
 
     @Test

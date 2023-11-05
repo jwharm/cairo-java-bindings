@@ -22,10 +22,12 @@ package org.freedesktop.cairo;
 import io.github.jwharm.cairobindings.Interop;
 import io.github.jwharm.cairobindings.MemoryCleaner;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.ref.Cleaner;
 
 /**
  * A user pattern providing raster data.
@@ -49,6 +51,12 @@ public class RasterSource extends Pattern {
     static {
         Cairo.ensureInitialized();
     }
+
+    // Cleaner used to close the arena
+    private static final Cleaner CLEANER = Cleaner.create();
+
+    // Arena used to allocate the upcall stubs for the callback functions
+    private final Arena arena = Arena.ofShared();
 
     // Callback functions
     private RasterSourceAcquireFunc acquire = null;
@@ -107,8 +115,8 @@ public class RasterSource extends Pattern {
     public void setAcquire(RasterSourceAcquireFunc acquire, RasterSourceReleaseFunc release) {
         try {
             cairo_raster_source_pattern_set_acquire.invoke(handle(),
-                    acquire == null ? MemorySegment.NULL : acquire.toCallback(handle().scope()),
-                            release == null ? MemorySegment.NULL : release.toCallback(handle().scope()));
+                    acquire == null ? MemorySegment.NULL : acquire.toCallback(arena),
+                            release == null ? MemorySegment.NULL : release.toCallback(arena));
             this.acquire = acquire;
             this.release = release;
         } catch (Throwable e) {
@@ -151,7 +159,7 @@ public class RasterSource extends Pattern {
     public void setSnapshot(RasterSourceSnapshotFunc snapshot) {
         try {
             cairo_raster_source_pattern_set_snapshot.invoke(handle(),
-                    snapshot == null ? MemorySegment.NULL : snapshot.toCallback(handle().scope()));
+                    snapshot == null ? MemorySegment.NULL : snapshot.toCallback(arena));
             this.snapshot = snapshot;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -182,7 +190,7 @@ public class RasterSource extends Pattern {
     public void setCopy(RasterSourceCopyFunc copy) {
         try {
             cairo_raster_source_pattern_set_copy.invoke(handle(),
-                    copy == null ? MemorySegment.NULL : copy.toCallback(handle().scope()));
+                    copy == null ? MemorySegment.NULL : copy.toCallback(arena));
             this.copy = copy;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -212,7 +220,7 @@ public class RasterSource extends Pattern {
     public void setFinish(RasterSourceFinishFunc finish) {
         try {
             cairo_raster_source_pattern_set_finish.invoke(handle(),
-                    finish == null ? MemorySegment.NULL : finish.toCallback(handle().scope()));
+                    finish == null ? MemorySegment.NULL : finish.toCallback(arena));
             this.finish = finish;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -234,14 +242,25 @@ public class RasterSource extends Pattern {
     }
 
     /**
-     * Constructor used internally to instantiate a java RasterSourcePattern object
-     * for a native {@code cairo_pattern_t} instance
-     * 
+     * Constructor used internally to instantiate a java RasterSource object for a
+     * native {@code cairo_pattern_t} instance
+     *
      * @param address the memory address of the native {@code cairo_pattern_t}
      *                instance
      */
     public RasterSource(MemorySegment address) {
         super(address);
+
+        // Setup a Cleaner to close the Arena and release the allocated memory for
+        // the callback functions
+        CleanupAction cleanup = new CleanupAction(arena);
+        CLEANER.register(this, cleanup);
     }
 
+    // Static class to separate the cleanup logic from the object being cleaned
+    private record CleanupAction(Arena arena) implements Runnable {
+        @Override public void run() {
+            arena.close();
+        }
+    }
 }

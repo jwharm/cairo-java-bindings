@@ -122,7 +122,7 @@ public abstract class Gradient extends Pattern {
      */
     public int getColorStopCount() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment countPtr = arena.allocate(ValueLayout.JAVA_INT);
                 cairo_pattern_get_color_stop_count.invoke(handle(), countPtr);
                 return countPtr.get(ValueLayout.JAVA_INT, 0);
@@ -153,7 +153,7 @@ public abstract class Gradient extends Pattern {
     public double[] getColorStopRGBA(int index) throws IndexOutOfBoundsException {
         double[] values;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment ptrs = arena.allocateArray(ValueLayout.JAVA_DOUBLE, 5);
                 long size = ValueLayout.JAVA_DOUBLE.byteSize();
                 int result = (int) cairo_pattern_get_color_stop_rgba.invoke(handle(), index, ptrs, ptrs.asSlice(size),

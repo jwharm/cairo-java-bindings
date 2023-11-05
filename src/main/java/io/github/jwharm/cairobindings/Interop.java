@@ -39,33 +39,6 @@ public final class Interop {
     private Interop() {}
 
     /**
-     * Reinterpret a zero-length MemorySegment to the size of
-     * {@code layout}
-     *
-     * @param address the address with {@code layout} memory layout
-     * @param layout the actual memory layout
-     * @return a MemorySegment with the size of {@code layout}
-     */
-    public static MemorySegment reinterpret(MemorySegment address, MemoryLayout layout) {
-        if (address.byteSize() == layout.byteSize())
-            return address;
-        return MemorySegment.ofAddress(address.address(), layout.byteSize());
-    }
-
-    /**
-     * Reinterpret a zero-length MemorySegment to the requested size
-     *
-     * @param address the address of a memory segment with the requested size
-     * @param size the requested size
-     * @return the memory segment with the requested size
-     */
-    public static MemorySegment reinterpret(MemorySegment address, long size) {
-        if (address.byteSize() == size)
-            return address;
-        return MemorySegment.ofAddress(address.address(), size);
-    }
-
-    /**
      * Creates a method handle that is used to call the native function with
      * the provided name and function descriptor. The method handle is cached
      * and reused in subsequent lookups.

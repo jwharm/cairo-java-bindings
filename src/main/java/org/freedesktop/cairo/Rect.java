@@ -20,11 +20,19 @@
 package org.freedesktop.cairo;
 
 /**
- * A Point defined by its x and y coordinates.
+ * A rectangle.
+ * <p>
+ * This is one of several helper classes in Java (see also {@link RGBA} and
+ * {@link Point}), that do not exist in the native cairo API. The difference between
+ * {@code Rect} and {@link Rectangle} is that the latter class is part of the native
+ * cairo API and stores its values in native memory, while {@code Rect} instances
+ * only exist in the JVM.
  *
- * @param x the X coordinate of the point
- * @param y the Y coordinate of the point
- * @since 1.16
+ * @param x      X coordinate of the left side of the rectangle
+ * @param y      Y coordinate of the top side of the rectangle
+ * @param width  width of the rectangle
+ * @param height height of the rectangle
+ * @since 1.18.1
  */
-public record Point(double x, double y) {
+public record Rect(double x, double y, double width, double height) {
 }

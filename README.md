@@ -1,7 +1,7 @@
 # Cairo Java bindings
 Java language bindings for the [cairo](https://www.cairographics.org) graphics library using the 
-JEP-434 Panama FFI. The bindings are based on **cairo 1.18.0** and work with **JDK 20** (with preview 
-features enabled). 
+JEP-442 Panama FFI. The bindings are based on **cairo 1.18.0** and work with **JDK 21** (with preview 
+features enabled).
 
 I created these language bindings primarily as a companion to the GObject-Introspection-based Java 
 language bindings for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi). 
@@ -20,16 +20,24 @@ available as Java enums. The proxy classes inherit when applicable: `RadialGradi
 functions and parameters follow Java (camel case) naming practices, so 
 `cairo_move_to(*cr, x, y)` becomes `cr.moveTo(x, y)`. Out-parameters in the C API 
 are mapped to return values in Java. Multiple out parameters (like coordinates) are mapped to a 
-`Point`, `Circle` or `Rectangle` return type in Java.
+`Point`, `Circle`, `Rect` or `RGBA` return type in Java.
 
 ### Resource allocation and disposal
 
-Resources are allocated and deallocated automatically, so there is no need to manually dispose 
-cairo resources in Java. However, please be aware that the disposal of proxy objects (like Context, 
-surfaces, matrices and patterns) is initiated by the Java garbage collector, which does not know 
-about the native resources, and might wait an indefinite amount of time before the objects are 
-effectively disposed. Therefore, manual calls to `destroy()` are still possible in case the 
-normal cleanup during GC is not sufficient to prevent resource exhaustion.
+Most resources are allocated and deallocated automatically, so there is no need to manually dispose 
+cairo resources in Java as would be the case in C with the various `cairo_..._destroy()` functions.
+However, please be aware that the disposal of these objects (like Context) is initiated by the Java 
+garbage collector, which does not know about the native resources, and might wait an indefinite 
+amount of time before the objects are effectively disposed. Therefore, manual calls to `destroy()` 
+are still possible in case the automatic cleanup during GC is not sufficient to prevent resource 
+exhaustion.
+
+Some data types (like Matrix and TextExtents) must be allocated by the client; the `create()` 
+methods for these classes have an `Arena` parameter. Consult the JDK documentation to choose the 
+optimal type of Arena for your use case.
+
+The `Surface` and `Device` classes implement `AutoCloseable` and are preferably used in 
+try-with-resources blocks. (The `close()` method calls the C `cairo_..._finish()` function.)
 
 ### Error handling
 
@@ -52,20 +60,9 @@ Some other features that the language bindings offer:
   path operation. They can be iterated and processed with record patterns (JEP 440). See the 
   `Path` class javadoc for example code.
 
-* The `cairo_set_user_data()` and `cairo_get_user_data()` functions (to attach 
-  custom data to a cairo struct) are available in Java, with a twist. You can call 
-  `setUserData()` to attach any Java object instance, and `getUserData()` to get it 
-  back. Objects that can be marshaled to a native memory segment (primitive types, memory segments, 
-  and other `Proxy` objects) will be attached to the native cairo struct. Other types will only 
-  be attached to the Java object and will not be passed to cairo itself.
-
 * I/O operations in cairo that are designed to work with streams accept Java `InputStream` and 
   `OutputStream` parameters.
   
-* The `Surface` and `Device` classes implement `AutoCloseable` and can be used in 
-  try-with-resources blocks. (The `close()` method calls the C `cairo_..._finish()` 
-  function.)
-
 * The cairo Script surface has been split into a `Script` class that inherits from 
   `Device`, and a `ScriptSurface` class that inherits from `Surface`.
 
@@ -97,8 +94,8 @@ dependencies {
 ```
 
 Furthermore, you obviously need to have the cairo library version 1.18 installed on your system, 
-or else the Java bindings have nothing to bind to. You also need to install JDK 20 (not JDK 19 or 
-earlier, nor JDK 21 or later), because the Panama FFI is slightly different between JDK versions.
+or else the Java bindings have nothing to bind to. You also need to install JDK 21 (not JDK 20 or 
+earlier, nor JDK 22 or later, because the Panama FFI is slightly different between JDK versions).
 
 Now, you can start developing with cairo in Java. Have fun! This is a simple example to get started, 
 ported from [the first sample on this page](https://www.cairographics.org/samples/):
@@ -111,35 +108,36 @@ public class CairoExample {
 
     public static void main(String[] args) throws IOException {
         // Create surface
-        var surface = ImageSurface.create(Format.ARGB32, 300, 300);
+        try (var surface = ImageSurface.create(Format.ARGB32, 300, 300)) {
 
-        // Create drawing context
-        var cr = Context.create(surface);
+            // Create drawing context
+            var cr = Context.create(surface);
 
-        double x = 128.0;
-        double y = 128.0;
-        double radius = 100.0;
-        double angle1 = 45.0  * (Math.PI/180.0); // angles are specified
-        double angle2 = 180.0 * (Math.PI/180.0); // in radians
+            double x = 128.0;
+            double y = 128.0;
+            double radius = 100.0;
+            double angle1 = 45.0 * (Math.PI / 180.0);  // angles are specified
+            double angle2 = 180.0 * (Math.PI / 180.0); // in radians
 
-        // Draw shapes
-        cr.setLineWidth(10.0)
-          .arc(x, y, radius, angle1, angle2)
-          .stroke();
+            // Draw shapes
+            cr.setLineWidth(10.0)
+              .arc(x, y, radius, angle1, angle2)
+              .stroke();
 
-        cr.setSourceRGBA(1.0, 0.2, 0.2, 0.6)
-          .setLineWidth(6.0)
-          .arc(x, y, 10.0, 0.0, 2 * Math.PI)
-          .fill();
+            cr.setSourceRGBA(1.0, 0.2, 0.2, 0.6)
+              .setLineWidth(6.0)
+              .arc(x, y, 10.0, 0.0, 2 * Math.PI)
+              .fill();
 
-        cr.arc(x, y, radius, angle1, angle1)
-          .lineTo(x, y)
-          .arc(x, y, radius, angle2, angle2)
-          .lineTo(x, y)
-          .stroke();
+            cr.arc(x, y, radius, angle1, angle1)
+              .lineTo(x, y)
+              .arc(x, y, radius, angle2, angle2)
+              .lineTo(x, y)
+              .stroke();
 
-        // Write image to png file
-        surface.writeToPNG("example.png");
+            // Write image to png file
+            surface.writeToPNG("example.png");
+        }
     }
 }
 ```
@@ -150,4 +148,4 @@ access, you can optionally add `--enable-native-access=org.freedesktop.cairo`.
 
 ## Building and Contributing
 
-Please contribute PRs or log issues on [Github](https://github.com/jwharm/cairo-java-bindings).
+Please contribute PRs or log issues on [GitHub](https://github.com/jwharm/cairo-java-bindings).

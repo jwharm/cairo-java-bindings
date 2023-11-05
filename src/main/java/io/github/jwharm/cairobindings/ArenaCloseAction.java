@@ -16,15 +16,24 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
+package io.github.jwharm.cairobindings;
 
-package org.freedesktop.cairo;
+import java.lang.foreign.Arena;
+import java.lang.ref.Cleaner;
 
 /**
- * A Point defined by its x and y coordinates.
+ * Helper class to separate the cleanup logic from the object being cleaned
  *
- * @param x the X coordinate of the point
- * @param y the Y coordinate of the point
- * @since 1.16
+ * @param arena the Arena that will be closed
+ * @since 1.18.1
  */
-public record Point(double x, double y) {
+public record ArenaCloseAction(Arena arena) implements Runnable {
+
+    // Cleaner used to close the arena
+    public static final Cleaner CLEANER = Cleaner.create();
+
+    @Override
+    public void run() {
+        arena.close();
+    }
 }

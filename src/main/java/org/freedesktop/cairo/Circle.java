@@ -25,6 +25,7 @@ package org.freedesktop.cairo;
  * @param x x coordinate of the center
  * @param y y coordinate of the center
  * @param radius radius of the circle
+ * @since 1.16
  */
 public record Circle(double x, double y, double radius) {
 }

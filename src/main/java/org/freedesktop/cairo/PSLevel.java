@@ -81,13 +81,12 @@ public enum PSLevel {
      */
     public static PSLevel[] getLevels() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment levelsPtr = arena.allocate(ValueLayout.ADDRESS);
                 MemorySegment numLevelsPtr = arena.allocate(ValueLayout.JAVA_INT);
                 cairo_ps_get_levels.invoke(levelsPtr, numLevelsPtr);
                 int numLevels = numLevelsPtr.get(ValueLayout.JAVA_INT, 0);
-                int[] levelInts = MemorySegment.ofAddress(levelsPtr.address(), numLevels, arena.scope())
-                        .toArray(ValueLayout.JAVA_INT);
+                int[] levelInts = levelsPtr.reinterpret(ValueLayout.JAVA_INT.byteSize() * numLevels).toArray(ValueLayout.JAVA_INT);
                 PSLevel[] levels = new PSLevel[numLevels];
                 for (int i = 0; i < levelInts.length; i++) {
                     levels[i] = PSLevel.of(levelInts[i]);
@@ -117,12 +116,12 @@ public enum PSLevel {
             if (MemorySegment.NULL.equals(result)) {
                 return null;
             }
-            return result.getUtf8String(0);
+            return result.reinterpret(Integer.MAX_VALUE).getUtf8String(0);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     private static final MethodHandle cairo_ps_level_to_string = Interop.downcallHandle("cairo_ps_level_to_string",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 }

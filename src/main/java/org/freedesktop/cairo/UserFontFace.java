@@ -21,10 +21,12 @@ package org.freedesktop.cairo;
 
 import io.github.jwharm.cairobindings.Interop;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
+import java.lang.ref.Cleaner;
 
 /**
  * Font support with font data provided by the user.
@@ -42,6 +44,14 @@ public final class UserFontFace extends FontFace {
         Cairo.ensureInitialized();
     }
 
+    // Cleaner used to close the arena
+    private static final Cleaner CLEANER = Cleaner.create();
+
+    // Arena used to allocate the upcall stubs for the callback functions
+    private final Arena arena = Arena.ofShared();
+
+    // Keep a reference to the callback functions that are passed to the
+    // UserScaledFont during its lifetime.
     private UserScaledFontInitFunc initFunc = null;
     private UserScaledFontRenderGlyphFunc renderGlyphFunc = null;
     private UserScaledFontRenderGlyphFunc renderColorGlyphFunc = null;
@@ -57,6 +67,11 @@ public final class UserFontFace extends FontFace {
      */
     public UserFontFace(MemorySegment address) {
         super(address);
+
+        // Setup a Cleaner to close the Arena and release the allocated memory for
+        // the callback functions
+        CleanupAction cleanup = new CleanupAction(arena);
+        CLEANER.register(this, cleanup);
     }
 
     /**
@@ -99,7 +114,7 @@ public final class UserFontFace extends FontFace {
     public void setInitFunc(UserScaledFontInitFunc initFunc) throws IllegalStateException {
         try {
             cairo_user_font_face_set_init_func.invoke(handle(),
-                    initFunc == null ? MemorySegment.NULL : initFunc.toCallback(handle().scope()));
+                    initFunc == null ? MemorySegment.NULL : initFunc.toCallback(arena));
             this.initFunc = initFunc;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -151,7 +166,7 @@ public final class UserFontFace extends FontFace {
     public void setRenderGlyphFunc(UserScaledFontRenderGlyphFunc renderGlyphFunc) throws IllegalStateException {
         try {
             cairo_user_font_face_set_render_glyph_func.invoke(handle(),
-                    renderGlyphFunc == null ? MemorySegment.NULL : renderGlyphFunc.toCallback(handle().scope()));
+                    renderGlyphFunc == null ? MemorySegment.NULL : renderGlyphFunc.toCallback(arena));
             this.renderGlyphFunc = renderGlyphFunc;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -203,7 +218,7 @@ public final class UserFontFace extends FontFace {
     public void setRenderColorGlyphFunc(UserScaledFontRenderGlyphFunc renderGlyphFunc) throws IllegalStateException {
         try {
             cairo_user_font_face_set_render_color_glyph_func.invoke(handle(),
-                    renderGlyphFunc == null ? MemorySegment.NULL : renderGlyphFunc.toCallback(handle().scope()));
+                    renderGlyphFunc == null ? MemorySegment.NULL : renderGlyphFunc.toCallback(arena));
             this.renderColorGlyphFunc = renderGlyphFunc;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -244,7 +259,7 @@ public final class UserFontFace extends FontFace {
     public void setUnicodeToGlyphFunc(UserScaledFontUnicodeToGlyphFunc unicodeToGlyphFunc) throws IllegalStateException {
         try {
             cairo_user_font_face_set_unicode_to_glyph_func.invoke(handle(),
-                    unicodeToGlyphFunc == null ? MemorySegment.NULL : unicodeToGlyphFunc.toCallback(handle().scope()));
+                    unicodeToGlyphFunc == null ? MemorySegment.NULL : unicodeToGlyphFunc.toCallback(arena));
             this.unicodeToGlyphFunc = unicodeToGlyphFunc;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -285,7 +300,7 @@ public final class UserFontFace extends FontFace {
     public void setTextToGlyphsFunc(UserScaledFontTextToGlyphsFunc textToGlyphsFunc) throws IllegalStateException {
         try {
             cairo_user_font_face_set_text_to_glyphs_func.invoke(handle(),
-                    textToGlyphsFunc == null ? MemorySegment.NULL : textToGlyphsFunc.toCallback(handle().scope()));
+                    textToGlyphsFunc == null ? MemorySegment.NULL : textToGlyphsFunc.toCallback(arena));
             this.textToGlyphsFunc = textToGlyphsFunc;
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -308,5 +323,12 @@ public final class UserFontFace extends FontFace {
      */
     public UserScaledFontTextToGlyphsFunc getTextToGlyphsFunc() {
         return this.textToGlyphsFunc;
+    }
+
+    // Static class to separate the cleanup logic from the object being cleaned
+    private record CleanupAction(Arena arena) implements Runnable {
+        @Override public void run() {
+            arena.close();
+        }
     }
 }

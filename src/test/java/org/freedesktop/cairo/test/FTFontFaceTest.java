@@ -1,7 +1,5 @@
-package org.freedesktop.cairo.test;
+ package org.freedesktop.cairo.test;
 
-import static org.freedesktop.cairo.FTSynthesize.BOLD;
-import static org.freedesktop.cairo.FTSynthesize.OBLIQUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.freedesktop.cairo.FTFontFace;
@@ -19,7 +17,7 @@ import java.io.File;
 class FTFontFaceTest {
 
     private static String TTF_FILE;
-    
+
     @BeforeAll
     static void setup() {
         // These files are going to be in different locations depending on your system.
@@ -36,23 +34,27 @@ class FTFontFaceTest {
             case "macos" -> TTF_FILE = "/Library/Fonts/Arial Unicode.ttf";
         }
     }
-    
+
     @Test
     void testCreate() {
         Library ftLib = Library.initFreeType();
-        Face ftFace = new Face(ftLib, TTF_FILE, 0);
+        Face ftFace = Face.newFace(ftLib, TTF_FILE, 0);
         FTFontFace face = FTFontFace.create(ftFace, 0);
         assertEquals(Status.SUCCESS, face.status());
+        ftFace.doneFace();
+        ftLib.doneFreeType();
     }
 
     @Test
     void testSynthesize() {
         Library ftLib = Library.initFreeType();
-        Face ftFace = new Face(ftLib, TTF_FILE, 0);
+        Face ftFace = Face.newFace(ftLib, TTF_FILE, 0);
         FTFontFace face = FTFontFace.create(ftFace, 0);
         face.setSynthesize(FTSynthesize.BOLD.or(FTSynthesize.OBLIQUE));
         face.unsetSynthesize(FTSynthesize.BOLD);
         assertEquals(FTSynthesize.OBLIQUE, face.getSynthesize());
         assertEquals(Status.SUCCESS, face.status());
+        ftFace.doneFace();
+        ftLib.doneFreeType();
     }
 }

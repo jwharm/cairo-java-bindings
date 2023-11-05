@@ -1,6 +1,9 @@
 package org.freedesktop.cairo.test;
 
 import java.io.IOException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 
 import org.freedesktop.cairo.*;
 import org.junit.jupiter.api.Test;
@@ -355,7 +358,7 @@ class ContextTest {
         Context cr = createContext();
         cr.moveTo(20d, 10d);
         cr.lineTo(30d, 40d);
-        Rectangle r = cr.strokeExtents();
+        Rect r = cr.strokeExtents();
         assertTrue(r.x() > 19d && r.x() < 20d);
         assertTrue(r.y() > 9d && r.y() < 10d);
         assertTrue(r.width() > 30d && r.width() < 31d);
@@ -514,18 +517,20 @@ class ContextTest {
 
     @Test
     void testGlyphPath() {
-        Context cr = createContext();
-        ScaledFont font = ScaledFont.create(ToyFontFace.create("Arial", FontSlant.NORMAL, FontWeight.NORMAL),
-                Matrix.createIdentity(), Matrix.createIdentity(), FontOptions.create());
-        Glyphs glyphs = font.textToGlyphs(0, 0, "test");
-        assertEquals(4, glyphs.getNumGlyphs());
-        var path = cr.glyphPath(glyphs).copyPath();
-        assertNotNull(path);
-        // I'm not sure how many path elements there are in the glyphs; for me it reports 103,
-        // but I'm not sure if that will be the same on all systems and platforms. So let's
-        // just check if there are more than 10
-        assertTrue(getPathLength(path) > 10);
-        assertEquals(Status.SUCCESS, cr.status());
+        try (Arena arena = Arena.ofConfined()) {
+            Context cr = createContext();
+            ScaledFont font = ScaledFont.create(ToyFontFace.create("Arial", FontSlant.NORMAL, FontWeight.NORMAL),
+                    Matrix.create(arena).initIdentity(), Matrix.create(arena).initIdentity(), FontOptions.create());
+            Glyphs glyphs = font.textToGlyphs(0, 0, "test");
+            assertEquals(4, glyphs.getNumGlyphs());
+            var path = cr.glyphPath(glyphs).copyPath();
+            assertNotNull(path);
+            // I'm not sure how many path elements there are in the glyphs; for me it reports 103,
+            // but I'm not sure if that will be the same on all systems and platforms. So let's
+            // just check if there are more than 10
+            assertTrue(getPathLength(path) > 10);
+            assertEquals(Status.SUCCESS, cr.status());
+        }
     }
 
     @Test
@@ -563,7 +568,7 @@ class ContextTest {
     void testPathExtents() {
         Context cr = createContext();
         cr.rectangle(10, 20, 30, 40);
-        Rectangle rect = cr.pathExtents();
+        Rect rect = cr.pathExtents();
         assertEquals(10, rect.x());
         assertEquals(20, rect.y());
         assertEquals(40, rect.width());
@@ -594,17 +599,29 @@ class ContextTest {
 
     @Test
     void testTransform() {
-        Context cr = createContext();
-        cr.transform(Matrix.createIdentity());
-        assertEquals(Status.SUCCESS, cr.status());
+        try (Arena arena = Arena.ofConfined()) {
+            Context cr = createContext();
+            cr.transform(Matrix.create(arena).initIdentity());
+            assertEquals(Status.SUCCESS, cr.status());
+        }
     }
 
     @Test
     void testMatrix() {
-        Context cr = createContext();
-        cr.setMatrix(Matrix.createIdentity());
-        cr.getMatrix();
-        assertEquals(Status.SUCCESS, cr.status());
+        try (Arena arena = Arena.ofConfined()) {
+            Context cr = createContext();
+            Matrix m1 = Matrix.create(arena).initTranslate(2.5, 3.0);
+            Matrix m2 = Matrix.create(arena);
+            cr.setMatrix(m1);
+            cr.getMatrix(m2);
+            assertEquals(m1.xx(), m2.xx());
+            assertEquals(m1.yx(), m2.yx());
+            assertEquals(m1.xy(), m2.xy());
+            assertEquals(m1.yy(), m2.yy());
+            assertEquals(m1.x0(), m2.x0());
+            assertEquals(m1.y0(), m2.y0());
+            assertEquals(Status.SUCCESS, cr.status());
+        }
     }
 
     @Test
@@ -645,11 +662,21 @@ class ContextTest {
 
     @Test
     void testUserData() {
-        Context cr = createContext();
-        int input = 12345;
-        UserDataKey key = cr.setUserData(input);
-        int output = (int) cr.getUserData(key);
-        assertEquals(input, output);
-        assertEquals(cr.status(), Status.SUCCESS);
+        try (Arena arena = Arena.ofConfined()) {
+            var segmentIn = arena.allocate(ValueLayout.JAVA_INT);
+            Context cr = createContext();
+
+            int input = 12345;
+            segmentIn.set(ValueLayout.JAVA_INT, 0, input);
+
+            UserDataKey key = UserDataKey.create(arena);
+            cr.setUserData(key, segmentIn);
+
+            var segmentOut = cr.getUserData(key).reinterpret(ValueLayout.JAVA_INT.byteSize());
+            int output = segmentOut.get(ValueLayout.JAVA_INT, 0);
+
+            assertEquals(input, output);
+            assertEquals(cr.status(), Status.SUCCESS);
+        }
     }
 }

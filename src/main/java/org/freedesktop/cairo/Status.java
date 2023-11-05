@@ -365,14 +365,14 @@ public enum Status {
             if (MemorySegment.NULL.equals(result)) {
                 return null;
             }
-            return result.getUtf8String(0);
+            return result.reinterpret(Integer.MAX_VALUE).getUtf8String(0);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
     private static final MethodHandle cairo_status_to_string = Interop.downcallHandle("cairo_status_to_string",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
     /**
      * Returns the enum constant for the given ordinal (its position in the enum

@@ -391,7 +391,7 @@ public class FontOptions extends Proxy {
             if (MemorySegment.NULL.equals(result)) {
                 return null;
             }
-            return result.getUtf8String(0);
+            return result.reinterpret(Integer.MAX_VALUE).getUtf8String(0);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -399,7 +399,7 @@ public class FontOptions extends Proxy {
 
     private static final MethodHandle cairo_font_options_get_variations = Interop.downcallHandle(
             "cairo_font_options_get_variations",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Sets the OpenType font variations for the font options object. Font
@@ -420,7 +420,7 @@ public class FontOptions extends Proxy {
      */
     public void setVariations(String variations) {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(variations, arena);
                 cairo_font_options_set_variations.invoke(handle(), utf8);
             }
@@ -549,7 +549,7 @@ public class FontOptions extends Proxy {
         Status status;
         RGBA rgba;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment x1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment y1Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment x2Ptr = arena.allocate(ValueLayout.JAVA_DOUBLE);

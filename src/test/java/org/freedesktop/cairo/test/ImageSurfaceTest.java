@@ -1,9 +1,8 @@
 package org.freedesktop.cairo.test;
 
 import java.io.*;
+import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -53,10 +52,12 @@ class ImageSurfaceTest {
 
     @Test
     void testCreateMemorySegmentFormatIntIntInt() {
-        int stride = ImageSurface.formatStrideForWidth(Format.ARGB32, 120);
-        MemorySegment data = SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(120L * 120 * stride);
-        try (ImageSurface s = ImageSurface.create(data, Format.ARGB32, 120, 120, stride)) {
-            assertEquals(Status.SUCCESS, s.status());
+        try (Arena arena = Arena.ofConfined()) {
+            int stride = ImageSurface.formatStrideForWidth(Format.ARGB32, 120);
+            MemorySegment data = arena.allocate(120L * 120 * stride);
+            try (ImageSurface s = ImageSurface.create(data, Format.ARGB32, 120, 120, stride)) {
+                assertEquals(Status.SUCCESS, s.status());
+            }
         }
     }
 

@@ -205,7 +205,7 @@ public final class ImageSurface extends Surface {
     public static ImageSurface createFromPNG(String filename) throws IOException {
         ImageSurface surface;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 MemorySegment result = (MemorySegment) cairo_image_surface_create_from_png.invoke(filenamePtr);
                 surface = new ImageSurface(result);
@@ -244,10 +244,10 @@ public final class ImageSurface extends Surface {
         }
         ImageSurface surface;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 ReadFunc readFunc = stream::readNBytes;
                 MemorySegment result = (MemorySegment) cairo_image_surface_create_from_png_stream
-                        .invoke(readFunc.toCallback(arena.scope()), MemorySegment.NULL);
+                        .invoke(readFunc.toCallback(arena), MemorySegment.NULL);
                 surface = new ImageSurface(result);
                 MemoryCleaner.takeOwnership(surface.handle());
             }
@@ -281,9 +281,9 @@ public final class ImageSurface extends Surface {
      * @since 1.0
      */
     public void writeToPNG(String filename) throws IOException {
-        Status status = null;
+        Status status;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment filenamePtr = Interop.allocateNativeString(filename, arena);
                 int result = (int) cairo_surface_write_to_png.invoke(handle(), filenamePtr);
                 status = Status.of(result);
@@ -319,10 +319,10 @@ public final class ImageSurface extends Surface {
         }
         Status status;
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 WriteFunc writeFunc = stream::write;
                 int result = (int) cairo_surface_write_to_png_stream.invoke(handle(),
-                        writeFunc.toCallback(arena.scope()), MemorySegment.NULL);
+                        writeFunc.toCallback(arena), MemorySegment.NULL);
                 status = Status.of(result);
             }
         } catch (Throwable e) {

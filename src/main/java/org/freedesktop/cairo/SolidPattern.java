@@ -113,7 +113,7 @@ public class SolidPattern extends Pattern {
      */
     public double[] getRGBA() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment ptrs = arena.allocateArray(ValueLayout.JAVA_DOUBLE, 4);
                 long size = ValueLayout.JAVA_DOUBLE.byteSize();
                 cairo_pattern_get_rgba.invoke(handle(), ptrs, ptrs.asSlice(size), ptrs.asSlice(2 * size),

@@ -461,7 +461,7 @@ public class Mesh extends Pattern {
      */
     public int getPatchCount() {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment count = arena.allocate(ValueLayout.JAVA_INT);
                 cairo_mesh_pattern_get_patch_count.invoke(handle(), count);
                 return count.get(ValueLayout.JAVA_INT, 0);
@@ -505,7 +505,7 @@ public class Mesh extends Pattern {
 
     private static final MethodHandle cairo_mesh_pattern_get_path = Interop.downcallHandle(
             "cairo_mesh_pattern_get_path",
-            FunctionDescriptor.of(ValueLayout.ADDRESS.asUnbounded(), ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
 
     /**
      * Gets the control point {@code pointNum} of patch {@code patchNum} for a mesh
@@ -527,7 +527,7 @@ public class Mesh extends Pattern {
      */
     public Point getControlPoint(int patchNum, int pointNum) throws IndexOutOfBoundsException {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment xPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment yPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 int result = (int) cairo_mesh_pattern_get_control_point.invoke(handle(), patchNum, pointNum, xPtr,
@@ -566,7 +566,7 @@ public class Mesh extends Pattern {
      */
     public double[] getCornerColorRGBA(int patchNum, int cornerNum) throws IndexOutOfBoundsException {
         try {
-            try (Arena arena = Arena.openConfined()) {
+            try (Arena arena = Arena.ofConfined()) {
                 MemorySegment redPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment greenPtr = arena.allocate(ValueLayout.JAVA_DOUBLE);
                 MemorySegment bluePtr = arena.allocate(ValueLayout.JAVA_DOUBLE);

@@ -22,11 +22,7 @@ package org.freedesktop.cairo;
 import io.github.jwharm.cairobindings.Proxy;
 import io.github.jwharm.cairobindings.MemoryCleaner;
 
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemorySegment;
-import java.lang.foreign.SegmentAllocator;
-import java.lang.foreign.SegmentScope;
-import java.lang.foreign.ValueLayout;
+import java.lang.foreign.*;
 import java.lang.invoke.VarHandle;
 import java.util.List;
 
@@ -49,10 +45,10 @@ public class RectangleList extends Proxy {
     static MemoryLayout getMemoryLayout() {
         return MemoryLayout.structLayout(
                 ValueLayout.JAVA_INT.withName("status"), 
-                MemoryLayout.paddingLayout(32),
+                MemoryLayout.paddingLayout(4),
                 ValueLayout.ADDRESS.withName("rectangles"), 
                 ValueLayout.JAVA_INT.withName("num_rectangles"), 
-                MemoryLayout.paddingLayout(32))
+                MemoryLayout.paddingLayout(4))
                 .withName("cairo_rectangle_list_t");
     }
 
@@ -77,10 +73,9 @@ public class RectangleList extends Proxy {
      * @return the list of rectangles
      */
     public List<Rectangle> rectangles() {
-        MemorySegment address = (MemorySegment) RECTANGLES.get(handle());
         int length = (int) NUM_RECTANGLES.get(handle());
         long segmentSize = Rectangle.getMemoryLayout().byteSize() * length;
-        MemorySegment array = MemorySegment.ofAddress(address.address(), segmentSize, handle().scope());
+        MemorySegment array = ((MemorySegment) RECTANGLES.get(handle())).reinterpret(segmentSize);
         return array.elements(Rectangle.getMemoryLayout()).map(Rectangle::new).toList();
     }
 
@@ -92,7 +87,7 @@ public class RectangleList extends Proxy {
      *                {@code cairo_rectangle_list_t} instance
      */
     public RectangleList(MemorySegment address) {
-        super(address);
+        super(address.reinterpret(getMemoryLayout().byteSize()));
         MemoryCleaner.setFreeFunc(handle(), "cairo_rectangle_list_destroy");
     }
 
@@ -107,24 +102,22 @@ public class RectangleList extends Proxy {
 
     /**
      * A data structure for holding a dynamically allocated array of rectangles.
-     * 
-     * @param  status     Error status of the rectangle list
-     * @param  rectangles List containing the rectangles
+     *
+     * @param  arena      the arena in which memory for the Rectangle is allocated
+     * @param  status     error status of the rectangle list
+     * @param  rectangles list containing the rectangles
      * @return the newly created RectangleList
      */
-    public static RectangleList create(Status status, List<Rectangle> rectangles) {
-        RectangleList rectangleList = new RectangleList(SegmentAllocator.nativeAllocator(SegmentScope.auto()).allocate(getMemoryLayout()));
+    public static RectangleList create(Arena arena, Status status, List<Rectangle> rectangles) {
+        RectangleList rectangleList = new RectangleList(arena.allocate(getMemoryLayout()));
         STATUS.set(rectangleList.handle(), status.getValue());
         NUM_RECTANGLES.set(rectangleList.handle(), rectangles == null ? 0 : rectangles.size());
         if (rectangles == null || rectangles.isEmpty()) {
             return rectangleList;
         }
-        MemorySegment array = SegmentAllocator.nativeAllocator(rectangleList.handle().scope())
-                .allocateArray(Rectangle.getMemoryLayout(), rectangles.size());
+        MemorySegment array = arena.allocateArray(Rectangle.getMemoryLayout(), rectangles.size());
         for (int i = 0; i < rectangles.size(); i++) {
-            MemorySegment rectangle = rectangles.get(i).handle();
-            MemorySegment src = MemorySegment.ofAddress(rectangle.address(), Rectangle.getMemoryLayout().byteSize(),
-                    rectangle.scope());
+            MemorySegment src = rectangles.get(i).handle().reinterpret(Rectangle.getMemoryLayout().byteSize(), arena, null);
             MemorySegment dst = array.asSlice(i * Rectangle.getMemoryLayout().byteSize());
             dst.copyFrom(src);
         }
