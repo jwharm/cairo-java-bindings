@@ -26,7 +26,7 @@ java {
 }
 
 dependencies {
-    gobjectImplementation "io.github.jwharm.javagi:glib:0.7.2"
+    gobjectImplementation "io.github.jwharm.javagi:glib:0.8.0"
     testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
