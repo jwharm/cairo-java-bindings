@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2024 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -345,14 +345,20 @@ public final class ImageSurface extends Surface {
      * modification. A call to {@link Surface#flush()} is required before accessing
      * the pixel data to ensure that all pending drawing operations are finished. A
      * call to {@link Surface#markDirty()} is required after the data is modified.
-     * 
-     * @return a pointer to the image data of this surface or NULL if surface is not
+     * <p>
+     * The size of the returned memory segment is equal to height * stride.
+     *
+     * @return a pointer to the image data of this surface or null if surface is not
      *         an image surface, or if {@link Surface#finish()} has been called.
      * @since 1.2
      */
     public MemorySegment getData() {
         try {
-            return (MemorySegment) cairo_image_surface_get_data.invoke(handle());
+            MemorySegment result = (MemorySegment) cairo_image_surface_get_data.invoke(handle());
+            if (MemorySegment.NULL.equals(result)) {
+                return null;
+            }
+            return result.reinterpret((long) getHeight() * getStride());
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
