@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2024 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -392,6 +392,9 @@ public class Device extends Proxy implements AutoCloseable {
      * Return user data previously attached to the device using the specified key.
      * If no user data has been attached with the given key this function returns
      * {@code null}.
+     * <p>
+     * The returned memory segment has zero length. It can be resized with
+     * {@link MemorySegment#reinterpret(long)}.
      *
      * @param  key the UserDataKey the user data was attached to
      * @return the user data previously attached or {@code null}

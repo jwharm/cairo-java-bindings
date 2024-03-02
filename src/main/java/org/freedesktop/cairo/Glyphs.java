@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2024 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -66,6 +66,10 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Get a pointer to the glyphs array
+     * <p>
+     * The returned memory segment has zero length. It can be resized with
+     * {@link MemorySegment#reinterpret(long)}.
+     *
      * @return a zero-length MemorySegment pointing to the glyphs array
      */
     public MemorySegment getGlyphsPointer() {
@@ -74,6 +78,7 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Set a pointer to the glyphs array
+     *
      * @param glyphsPointer a MemorySegment pointing to the glyphs array
      */
     public void setGlyphsPointer(MemorySegment glyphsPointer) {
@@ -85,6 +90,7 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Get the number of glyphs in the array
+     *
      * @return the number of glyphs
      */
     public int getNumGlyphs() {
@@ -93,6 +99,7 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Set the number of glyphs in the array
+     *
      * @param numGlyphs the number of glyphs
      */
     public void setNumGlyphs(int numGlyphs) {
@@ -101,6 +108,10 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Get a pointer to the clusters array
+     * <p>
+     * The returned memory segment has zero length. It can be resized with
+     * {@link MemorySegment#reinterpret(long)}.
+     *
      * @return a zero-length MemorySegment pointing to the clusters array
      */
     public MemorySegment getClustersPointer() {
@@ -109,6 +120,10 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Set a pointer to the clusters array
+     * <p>
+     * The returned memory segment has zero length. It can be resized with
+     * {@link MemorySegment#reinterpret(long)}.
+     *
      * @param clustersPointer the MemorySegment pointing to the clusters array
      */
     public void setClustersPointer(MemorySegment clustersPointer) {
@@ -120,6 +135,7 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Get the number of text clusters in the cluster array
+     *
      * @return the number of text clusters
      */
     public int getNumClusters() {
@@ -128,6 +144,7 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Set the number of text clusters in the cluster array
+     *
      * @param numClusters the number of text clusters
      */
     public void setNumClusters(int numClusters) {
@@ -136,6 +153,7 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Get the text cluster flags
+     *
      * @return the text cluster flags
      */
     public TextClusterFlags getClusterFlags() {
@@ -144,6 +162,7 @@ public class Glyphs implements AutoCloseable {
 
     /**
      * Set the text cluster flags
+     *
      * @param clusterFlags the text cluster flags
      */
     public void setClusterFlags(TextClusterFlags clusterFlags) {
