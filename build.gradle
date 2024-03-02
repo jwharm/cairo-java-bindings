@@ -26,25 +26,25 @@ java {
 }
 
 dependencies {
-    gobjectImplementation "io.github.jwharm.javagi:glib:0.8.0"
+    gobjectImplementation "io.github.jwharm.javagi:glib:0.9.0"
     testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
-tasks.named('compileJava') {
+tasks.named('compileJava', JavaCompile) {
     options.compilerArgs += "--enable-preview"
 }
 
-tasks.named('javadoc') {
+tasks.named('javadoc', Javadoc) {
     options.addBooleanOption("-enable-preview", true)
     options.addStringOption("-release", "21")
 }
 
-tasks.named('compileTestJava') {
+tasks.named('compileTestJava', JavaCompile) {
     options.compilerArgs += '--enable-preview'
 }
 
-tasks.named('test') {
+tasks.named('test', Test) {
     // Configure library path for MacOS (Homebrew) and set MacOS-specific JVM parameter
     if (Os.isFamily(Os.FAMILY_MAC)) {
         jvmArgs += '-Djava.library.path=/opt/homebrew/lib'
