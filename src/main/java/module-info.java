@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2024 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -19,8 +19,8 @@
 
 /**
  * This module contains Java language bindings for the <a href="https://www.cairographics.org">cairo</a>
- * graphics library using the JEP-434 Panama FFI. The bindings are based on <strong>cairo 1.16</strong>
- * and work with <strong>JDK 20</strong> (with preview features enabled).
+ * graphics library using the JEP-442 Panama FFI. The bindings are based on <strong>cairo 1.18</strong>
+ * and work with <strong>JDK 21</strong> (with preview features enabled).
  */
 module org.freedesktop.cairo {
     requires static org.gnome.glib; // Optional dependency on java-gi when cairo-gobject is used
