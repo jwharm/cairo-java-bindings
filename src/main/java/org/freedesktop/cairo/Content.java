@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2024 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -26,12 +26,12 @@ import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 
 /**
- * cairo_content_t is used to describe the content that a surface will contain,
+ * Content is used to describe the content that a surface will contain,
  * whether color information, alpha information (translucence vs. opacity), or
  * both.
  * <p>
- * Note: The large values here are designed to keep cairo_content_t values
- * distinct from cairo_format_t values so that the implementation can detect the
+ * Note: The large values here are designed to keep Content values
+ * distinct from Format values so that the implementation can detect the
  * error if users confuse the two types.
  * 
  * @since 1.0
