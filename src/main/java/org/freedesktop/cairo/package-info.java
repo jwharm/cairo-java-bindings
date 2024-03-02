@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2024 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -19,13 +19,14 @@
 
 /**
  * This package contains Java language bindings for the <a href="https://www.cairographics.org">cairo</a>
- * graphics library using the JEP-434 Panama FFI. The bindings are based on <strong>cairo 1.16</strong>
- * and work with <strong>JDK 20</strong> (with preview features enabled).
+ * graphics library using the JEP-442 Panama FFI. The bindings are based on <strong>cairo 1.18</strong>
+ * and work with <strong>JDK 21</strong> (with preview features enabled).
  * <p>
  * These language bindings were primarily created as a companion to the GObject-based language
  * bindings for Gtk and GStreamer generated with
  * <a href="https://github.com/jwharm/java-gi">Java-GI</a>, but they can also be used independently.
- * There are no external dependencies.
+ * The dependency on {@code io.github.jwharm.javagi:glib} is optional. There are no other external
+ * dependencies.
  * <h2>Overview</h2>
  * <h3>Java API</h3>
  * In general, the Java bindings match the cairo C API, but with a Java "coding style". C structs like
@@ -82,22 +83,5 @@
  * <li>The functions for reading and comparing cairo version information are available in Java as static
  *     methods in the {@link Cairo} class.
  * </ul>
- * <h2>API Documentation</h2>
- * All API documentation is available as Javadoc, and has been reworked to use Javadoc syntax and
- * cross-reference between Java classes and methods. You can lookup the Javadoc online, or download
- * the javadoc or sources jar to use in your IDE.
- * <h2>License</h2>
- * The bindings are available to be redistributed and/or modified under the terms of  the GNU Lesser
- * General Public License (LGPL) version 2.1 (which is also one of the licenses of cairo itself.)
- * <h2>Status</h2>
- * This software is still a work in progress:
- * <ul>
- * <li>Platform-specific surface types and font implementations are not (yet) available in the bindings.
- * <li>Test coverage is not complete yet.
- * <li>The bindings should work on all platforms that support JDK 20 and cairo, but have mostly been
- *     tested on Linux for now.
- * </ul>
- * <p>
- * PRs and issue reports are welcome.
  */
 package org.freedesktop.cairo;
