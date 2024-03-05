@@ -143,7 +143,7 @@ public class CairoExample {
 ```
 
 When compiling and running the application, make sure to enable preview features with 
-`--enable-preview` and set the Java version to 20. To suppress warnings about unsafe native 
+`--enable-preview` and set the Java version to 21. To suppress warnings about unsafe native 
 access, you can optionally add `--enable-native-access=org.freedesktop.cairo`.
 
 ## Building and Contributing
