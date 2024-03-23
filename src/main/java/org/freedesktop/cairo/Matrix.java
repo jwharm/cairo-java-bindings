@@ -363,8 +363,8 @@ public class Matrix extends Proxy {
         }
         try {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, distanceVector.x());
-                MemorySegment dyPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, distanceVector.y());
+                MemorySegment dxPtr = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, distanceVector.x());
+                MemorySegment dyPtr = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, distanceVector.y());
                 cairo_matrix_transform_distance.invoke(handle(), dxPtr, dyPtr);
                 return new Point(dxPtr.get(ValueLayout.JAVA_DOUBLE, 0), dyPtr.get(ValueLayout.JAVA_DOUBLE, 0));
             }
@@ -390,8 +390,8 @@ public class Matrix extends Proxy {
         }
         try {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment dxPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, point.x());
-                MemorySegment dyPtr = arena.allocate(ValueLayout.JAVA_DOUBLE, point.y());
+                MemorySegment dxPtr = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, point.x());
+                MemorySegment dyPtr = arena.allocateFrom(ValueLayout.JAVA_DOUBLE, point.y());
                 cairo_matrix_transform_point.invoke(handle(), dxPtr, dyPtr);
                 return new Point(dxPtr.get(ValueLayout.JAVA_DOUBLE, 0), dyPtr.get(ValueLayout.JAVA_DOUBLE, 0));
             }

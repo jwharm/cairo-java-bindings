@@ -91,7 +91,7 @@ public class LinearGradient extends Gradient {
     public Point[] getLinearPoints() {
         try {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment ptrs = arena.allocateArray(ValueLayout.JAVA_DOUBLE, 4);
+                MemorySegment ptrs = arena.allocate(ValueLayout.JAVA_DOUBLE, 4);
                 long size = ValueLayout.JAVA_DOUBLE.byteSize();
                 cairo_pattern_get_linear_points.invoke(handle(), ptrs, ptrs.asSlice(size), ptrs.asSlice(2 * size),
                         ptrs.asSlice(3 * size));

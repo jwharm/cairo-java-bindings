@@ -132,7 +132,7 @@ public class Region extends Proxy {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment rectsPtr = MemorySegment.NULL;
                 if (rects != null) {
-                    rectsPtr = arena.allocateArray(ValueLayout.ADDRESS, rects.length);
+                    rectsPtr = arena.allocate(ValueLayout.ADDRESS, rects.length);
                     for (int i = 0; i < rects.length; i++) {
                         rectsPtr.setAtIndex(ValueLayout.ADDRESS, i,
                                 rects[i] == null ? MemorySegment.NULL : rects[i].handle());

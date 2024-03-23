@@ -286,7 +286,7 @@ public final class PDFSurface extends Surface {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 MemorySegment linkAttribsPtr = linkAttribs == null ? MemorySegment.NULL
-                        : arena.allocateUtf8String(linkAttribs);
+                        : arena.allocateFrom(linkAttribs);
                 return (int) cairo_pdf_surface_add_outline.invoke(handle(), parentId, utf8, linkAttribsPtr,
                         flags.getValue());
             }

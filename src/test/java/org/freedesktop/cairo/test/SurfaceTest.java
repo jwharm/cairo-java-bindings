@@ -216,7 +216,7 @@ class SurfaceTest {
             s.setUserData(key, segmentIn);
 
             var segmentOut = s.getUserData(key).reinterpret(Integer.MAX_VALUE);
-            String output = segmentOut.getUtf8String(0);
+            String output = segmentOut.getString(0);
 
             assertEquals(input, output);
             assertEquals(Status.SUCCESS, s.status());

@@ -10,38 +10,22 @@ group = "io.github.jwharm.cairobindings"
 version = "1.18.2"
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(22)
     }
     withSourcesJar()
     withJavadocJar()
-    // Optional dependency on java-gi when cairo-gobject is used
-    registerFeature('gobject') {
-        usingSourceSet(sourceSets.main)
-    }
 }
 
 dependencies {
-    gobjectImplementation "io.github.jwharm.javagi:glib:0.9.0"
+    compileOnly "io.github.jwharm.javagi:glib:0.10.0"
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-}
-
-tasks.named('compileJava', JavaCompile) {
-    options.compilerArgs += "--enable-preview"
-}
-
-tasks.named('javadoc', Javadoc) {
-    options.addBooleanOption("-enable-preview", true)
-    options.addStringOption("-release", "21")
-}
-
-tasks.named('compileTestJava', JavaCompile) {
-    options.compilerArgs += '--enable-preview'
 }
 
 tasks.named('test', Test) {
@@ -62,7 +46,6 @@ tasks.named('test', Test) {
     }
 
     useJUnitPlatform()
-    jvmArgs += "--enable-preview"
     jvmArgs += "--enable-native-access=ALL-UNNAMED"
 }
 

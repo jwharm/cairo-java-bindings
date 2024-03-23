@@ -668,7 +668,7 @@ public final class Context extends Proxy {
         try {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment dashesPtr = (dash == null || dash.length == 0) ? MemorySegment.NULL
-                        : arena.allocateArray(ValueLayout.JAVA_DOUBLE, dash);
+                        : arena.allocateFrom(ValueLayout.JAVA_DOUBLE, dash);
                 cairo_set_dash.invoke(handle(), dashesPtr, dash == null ? 0 : dash.length, offset);
             }
         } catch (Throwable e) {

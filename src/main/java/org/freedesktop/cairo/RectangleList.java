@@ -115,7 +115,7 @@ public class RectangleList extends Proxy {
         if (rectangles == null || rectangles.isEmpty()) {
             return rectangleList;
         }
-        MemorySegment array = arena.allocateArray(Rectangle.getMemoryLayout(), rectangles.size());
+        MemorySegment array = arena.allocate(Rectangle.getMemoryLayout(), rectangles.size());
         for (int i = 0; i < rectangles.size(); i++) {
             MemorySegment src = rectangles.get(i).handle().reinterpret(Rectangle.getMemoryLayout().byteSize(), arena, null);
             MemorySegment dst = array.asSlice(i * Rectangle.getMemoryLayout().byteSize());

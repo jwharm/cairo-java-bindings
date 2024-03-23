@@ -60,6 +60,6 @@ public final class Interop {
      * @return the allocated MemorySegment
      */
     public static MemorySegment allocateNativeString(String string, SegmentAllocator allocator) {
-        return string == null ? MemorySegment.NULL : allocator.allocateUtf8String(string);
+        return string == null ? MemorySegment.NULL : allocator.allocateFrom(string);
     }
 }

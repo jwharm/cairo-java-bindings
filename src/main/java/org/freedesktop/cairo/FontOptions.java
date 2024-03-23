@@ -391,7 +391,7 @@ public class FontOptions extends Proxy {
             if (MemorySegment.NULL.equals(result)) {
                 return null;
             }
-            return result.reinterpret(Integer.MAX_VALUE).getUtf8String(0);
+            return result.reinterpret(Integer.MAX_VALUE).getString(0);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

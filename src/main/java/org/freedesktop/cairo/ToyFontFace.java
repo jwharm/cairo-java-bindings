@@ -116,7 +116,7 @@ public final class ToyFontFace extends FontFace {
     public String getFamily() {
         try {
             MemorySegment result = (MemorySegment) cairo_toy_font_face_get_family.invoke(handle());
-            return result.reinterpret(Integer.MAX_VALUE).getUtf8String(0);
+            return result.reinterpret(Integer.MAX_VALUE).getString(0);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

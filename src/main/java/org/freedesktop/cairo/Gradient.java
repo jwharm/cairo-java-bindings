@@ -154,7 +154,7 @@ public abstract class Gradient extends Pattern {
         double[] values;
         try {
             try (Arena arena = Arena.ofConfined()) {
-                MemorySegment ptrs = arena.allocateArray(ValueLayout.JAVA_DOUBLE, 5);
+                MemorySegment ptrs = arena.allocate(ValueLayout.JAVA_DOUBLE, 5);
                 long size = ValueLayout.JAVA_DOUBLE.byteSize();
                 int result = (int) cairo_pattern_get_color_stop_rgba.invoke(handle(), index, ptrs, ptrs.asSlice(size),
                         ptrs.asSlice(2 * size), ptrs.asSlice(3 * size), ptrs.asSlice(4 * size));
