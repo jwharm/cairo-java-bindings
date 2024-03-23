@@ -101,7 +101,7 @@ class PathData extends Proxy {
      * @return the type
      */
     public PathDataType type() {
-        int result = (int) TYPE.get(handle());
+        int result = (int) TYPE.get(handle(), 0);
         return PathDataType.of(result);
     }
 
@@ -111,7 +111,7 @@ class PathData extends Proxy {
      * @return the length
      */
     public int length() {
-        return (int) LENGTH.get(handle());
+        return (int) LENGTH.get(handle(), 0);
     }
 
     /**
@@ -120,7 +120,7 @@ class PathData extends Proxy {
      * @return the x value
      */
     public double x() {
-        return (double) X.get(handle());
+        return (double) X.get(handle(), 0);
     }
 
     /**
@@ -129,7 +129,7 @@ class PathData extends Proxy {
      * @return the y value
      */
     public double y() {
-        return (double) Y.get(handle());
+        return (double) Y.get(handle(), 0);
     }
 
     /**

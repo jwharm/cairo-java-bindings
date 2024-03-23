@@ -58,7 +58,7 @@ public class Rectangle extends Proxy {
      * @return the x value
      */
     public double x() {
-        return (double) X.get(handle());
+        return (double) X.get(handle(), 0);
     }
 
     /**
@@ -67,7 +67,7 @@ public class Rectangle extends Proxy {
      * @return the y value
      */
     public double y() {
-        return (double) Y.get(handle());
+        return (double) Y.get(handle(), 0);
     }
 
     /**
@@ -76,7 +76,7 @@ public class Rectangle extends Proxy {
      * @return the width value
      */
     public double width() {
-        return (double) WIDTH.get(handle());
+        return (double) WIDTH.get(handle(), 0);
     }
 
     /**
@@ -85,7 +85,7 @@ public class Rectangle extends Proxy {
      * @return the height value
      */
     public double height() {
-        return (double) HEIGHT.get(handle());
+        return (double) HEIGHT.get(handle(), 0);
     }
 
     /**
@@ -111,10 +111,10 @@ public class Rectangle extends Proxy {
      */
     public static Rectangle create(Arena arena, double x, double y, double width, double height) {
         Rectangle rect = new Rectangle(arena.allocate(getMemoryLayout()));
-        X.set(rect.handle(), x);
-        Y.set(rect.handle(), y);
-        WIDTH.set(rect.handle(), width);
-        HEIGHT.set(rect.handle(), height);
+        X.set(rect.handle(), 0, x);
+        Y.set(rect.handle(), 0, y);
+        WIDTH.set(rect.handle(), 0, width);
+        HEIGHT.set(rect.handle(), 0, height);
         return rect;
     }
     

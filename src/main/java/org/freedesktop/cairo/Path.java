@@ -76,7 +76,7 @@ public class Path extends Proxy implements Iterable<PathElement> {
      * @return the current error status
      */
     public Status status() {
-        int result = (int) STATUS.get(handle());
+        int result = (int) STATUS.get(handle(), 0);
         return Status.of(result);
     }
 
@@ -88,7 +88,7 @@ public class Path extends Proxy implements Iterable<PathElement> {
      */
     private Stream<MemorySegment> data() {
         // Read the `data` pointer
-        MemorySegment dataSegment = (MemorySegment) DATA.get(handle());
+        MemorySegment dataSegment = (MemorySegment) DATA.get(handle(), 0);
         // Construct a SequenceLayout, based on the size that is specified in the
         // `num_data` field
         MemoryLayout sequenceLayout = MemoryLayout.sequenceLayout(numData(), PathData.getMemoryLayout());
@@ -104,7 +104,7 @@ public class Path extends Proxy implements Iterable<PathElement> {
      * @return the value of the {@code num_data} field
      */
     private int numData() {
-        return (int) NUM_DATA.get(handle());
+        return (int) NUM_DATA.get(handle(), 0);
     }
 
     /**

@@ -69,7 +69,7 @@ public class Glyph extends Proxy {
      * @return glyph index in the font
      */
     public long index() {
-        return (long) INDEX.get(handle());
+        return (long) INDEX.get(handle(), 0);
     }
 
     /**
@@ -79,7 +79,7 @@ public class Glyph extends Proxy {
      * @return the offset in the X direction
      */
     public double x() {
-        return (double) X.get(handle());
+        return (double) X.get(handle(), 0);
     }
 
     /**
@@ -89,7 +89,7 @@ public class Glyph extends Proxy {
      * @return the offset in the Y direction
      */
     public double y() {
-        return (double) Y.get(handle());
+        return (double) Y.get(handle(), 0);
     }
 
     /**

@@ -82,7 +82,7 @@ public class FontExtents extends Proxy {
      * @return the distance that the font extends above the baseline
      */
     public double ascent() {
-        return (double) ASCENT.get(handle());
+        return (double) ASCENT.get(handle(), 0);
     }
 
     /**
@@ -95,7 +95,7 @@ public class FontExtents extends Proxy {
      * @return the distance that the font extends below the baseline
      */
     public double descent() {
-        return (double) DESCENT.get(handle());
+        return (double) DESCENT.get(handle(), 0);
     }
 
     /**
@@ -109,7 +109,7 @@ public class FontExtents extends Proxy {
      *         consecutive lines of text with the font
      */
     public double height() {
-        return (double) HEIGHT.get(handle());
+        return (double) HEIGHT.get(handle(), 0);
     }
 
     /**
@@ -120,7 +120,7 @@ public class FontExtents extends Proxy {
      *         for any glyph in the font
      */
     public double maxXAdvance() {
-        return (double) MAX_X_ADVANCE.get(handle());
+        return (double) MAX_X_ADVANCE.get(handle(), 0);
     }
 
     /**
@@ -132,7 +132,7 @@ public class FontExtents extends Proxy {
      *         for any glyph in the font
      */
     public double maxYAdvance() {
-        return (double) MAX_Y_ADVANCE.get(handle());
+        return (double) MAX_Y_ADVANCE.get(handle(), 0);
     }
 
     /**

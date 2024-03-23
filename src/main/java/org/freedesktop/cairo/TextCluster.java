@@ -65,7 +65,7 @@ public class TextCluster extends Proxy {
      * @return the number of bytes of UTF-8 text
      */
     public int numBytes() {
-        return (int) NUM_BYTES.get(handle());
+        return (int) NUM_BYTES.get(handle(), 0);
     }
 
     /**
@@ -74,7 +74,7 @@ public class TextCluster extends Proxy {
      * @return the number of glyphs covered by cluster
      */
     public int numGlyphs() {
-        return (int) NUM_GLYPHS.get(handle());
+        return (int) NUM_GLYPHS.get(handle(), 0);
     }
 
     /**

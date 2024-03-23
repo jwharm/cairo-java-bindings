@@ -80,7 +80,7 @@ public class Matrix extends Proxy {
      * @return the xx value
      */
     public double xx() {
-        return (double) XX.get(handle());
+        return (double) XX.get(handle(), 0);
     }
 
     /**
@@ -89,7 +89,7 @@ public class Matrix extends Proxy {
      * @return the yx value
      */
     public double yx() {
-        return (double) YX.get(handle());
+        return (double) YX.get(handle(), 0);
     }
 
     /**
@@ -98,7 +98,7 @@ public class Matrix extends Proxy {
      * @return the xy value
      */
     public double xy() {
-        return (double) XY.get(handle());
+        return (double) XY.get(handle(), 0);
     }
 
     /**
@@ -107,7 +107,7 @@ public class Matrix extends Proxy {
      * @return the yy value
      */
     public double yy() {
-        return (double) YY.get(handle());
+        return (double) YY.get(handle(), 0);
     }
 
     /**
@@ -116,7 +116,7 @@ public class Matrix extends Proxy {
      * @return the x0 value
      */
     public double x0() {
-        return (double) X0.get(handle());
+        return (double) X0.get(handle(), 0);
     }
 
     /**
@@ -125,7 +125,7 @@ public class Matrix extends Proxy {
      * @return the y0 value
      */
     public double y0() {
-        return (double) Y0.get(handle());
+        return (double) Y0.get(handle(), 0);
     }
 
     /**

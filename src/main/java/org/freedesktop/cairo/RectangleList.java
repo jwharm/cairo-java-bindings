@@ -62,7 +62,7 @@ public class RectangleList extends Proxy {
      * @return the status
      */
     public Status status() {
-        int result = (int) STATUS.get(handle());
+        int result = (int) STATUS.get(handle(), 0);
         return Status.of(result);
     }
 
@@ -73,9 +73,9 @@ public class RectangleList extends Proxy {
      * @return the list of rectangles
      */
     public List<Rectangle> rectangles() {
-        int length = (int) NUM_RECTANGLES.get(handle());
+        int length = (int) NUM_RECTANGLES.get(handle(), 0);
         long segmentSize = Rectangle.getMemoryLayout().byteSize() * length;
-        MemorySegment array = ((MemorySegment) RECTANGLES.get(handle())).reinterpret(segmentSize);
+        MemorySegment array = ((MemorySegment) RECTANGLES.get(handle(), 0)).reinterpret(segmentSize);
         return array.elements(Rectangle.getMemoryLayout()).map(Rectangle::new).toList();
     }
 
@@ -110,8 +110,8 @@ public class RectangleList extends Proxy {
      */
     public static RectangleList create(Arena arena, Status status, List<Rectangle> rectangles) {
         RectangleList rectangleList = new RectangleList(arena.allocate(getMemoryLayout()));
-        STATUS.set(rectangleList.handle(), status.getValue());
-        NUM_RECTANGLES.set(rectangleList.handle(), rectangles == null ? 0 : rectangles.size());
+        STATUS.set(rectangleList.handle(), 0, status.getValue());
+        NUM_RECTANGLES.set(rectangleList.handle(), 0, rectangles == null ? 0 : rectangles.size());
         if (rectangles == null || rectangles.isEmpty()) {
             return rectangleList;
         }

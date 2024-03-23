@@ -78,7 +78,7 @@ public class TextExtents extends Proxy {
      * @return the horizontal distance from the origin to the leftmost part of the glyphs as drawn
      */
     public double xBearing() {
-        return (double) X_BEARING.get(handle());
+        return (double) X_BEARING.get(handle(), 0);
     }
 
     /**
@@ -89,7 +89,7 @@ public class TextExtents extends Proxy {
      * @return the vertical distance from the origin to the topmost part of the glyphs as drawn
      */
     public double yBearing() {
-        return (double) Y_BEARING.get(handle());
+        return (double) Y_BEARING.get(handle(), 0);
     }
 
     /**
@@ -98,7 +98,7 @@ public class TextExtents extends Proxy {
      * @return width of the glyphs as drawn
      */
     public double width() {
-        return (double) WIDTH.get(handle());
+        return (double) WIDTH.get(handle(), 0);
     }
 
     /**
@@ -107,7 +107,7 @@ public class TextExtents extends Proxy {
      * @return height of the glyphs as drawn
      */
     public double height() {
-        return (double) HEIGHT.get(handle());
+        return (double) HEIGHT.get(handle(), 0);
     }
 
     /**
@@ -115,7 +115,7 @@ public class TextExtents extends Proxy {
      * @return distance to advance in the X direction after drawing these glyphs
      */
     public double xAdvance() {
-        return (double) X_ADVANCE.get(handle());
+        return (double) X_ADVANCE.get(handle(), 0);
     }
 
     /**
@@ -126,7 +126,7 @@ public class TextExtents extends Proxy {
      * @return distance to advance in the Y direction after drawing these glyphs
      */
     public double yAdvance() {
-        return (double) Y_ADVANCE.get(handle());
+        return (double) Y_ADVANCE.get(handle(), 0);
     }
 
     /**
