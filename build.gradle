@@ -52,8 +52,6 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            suppressPomMetadataWarningsFor('gobjectApiElements')
-            suppressPomMetadataWarningsFor('gobjectRuntimeElements')
             pom {
                 name = "${groupId}:${artifactId}"
                 groupId = 'io.github.jwharm.cairobindings'
