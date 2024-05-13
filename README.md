@@ -1,12 +1,9 @@
 # Cairo Java bindings
 Java language bindings for the [cairo](https://www.cairographics.org) graphics library using the 
-JEP-442 Panama FFI. The bindings are based on **cairo 1.18.0** and work with **JDK 21** (with preview 
-features enabled).
+new JEP-454 Foreign Function & Memory API. The bindings are based on **cairo 1.18.0** and work with **JDK 22** and newer.
 
 I created these language bindings primarily as a companion to the GObject-Introspection-based Java 
-language bindings for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi). 
-The bindings can be used separately from Java-GI, but have an optional dependency on the `glib` module
-from Java-GI to expose GType declarations for cairo data types (to enable interoperability with Gtk).
+language bindings for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi), but they can also be used independently.
 
 ## Overview
 
@@ -89,13 +86,12 @@ The library is available on Maven Central. Include it in your `gradle.build` or 
 
 ```
 dependencies {
-  implementation 'io.github.jwharm.cairobindings:cairo:1.18.2'
+  implementation 'io.github.jwharm.cairobindings:cairo:1.18.3'
 }
 ```
 
 Furthermore, you obviously need to have the cairo library version 1.18 installed on your system, 
-or else the Java bindings have nothing to bind to. You also need to install JDK 21 (not JDK 20 or 
-earlier, nor JDK 22 or later, because the Panama FFI is slightly different between JDK versions).
+or else the Java bindings have nothing to bind to. You also need to use JDK 22 or newer.
 
 Now, you can start developing with cairo in Java. Have fun! This is a simple example to get started, 
 ported from [the first sample on this page](https://www.cairographics.org/samples/):
@@ -142,9 +138,8 @@ public class CairoExample {
 }
 ```
 
-When compiling and running the application, make sure to enable preview features with 
-`--enable-preview` and set the Java version to 21. To suppress warnings about unsafe native 
-access, you can optionally add `--enable-native-access=org.freedesktop.cairo`.
+When compiling and running the application, suppress warnings about unsafe native 
+access with the command-line parameter `--enable-native-access=org.freedesktop.cairo`.
 
 ## Building and Contributing
 
