@@ -25,8 +25,8 @@ import io.github.jwharm.cairobindings.Flag;
  * A set of synthesis options to control how FreeType renders the glyphs for a particular font face.
  * <p>
  * Individual synthesis features of a {@link FTFontFace} can be set using
- * {@link FTFontFace#setSynthesize(FTSynthesize)}, or disabled using {@link FTFontFace#unsetSynthesize(FTSynthesize)}.
- * The currently enabled set of synthesis options can be queried with {@link FTFontFace#getSynthesize()}.
+ * {@link FTFontFace#setSynthesize}, or disabled using {@link FTFontFace#unsetSynthesize}.
+ * The currently enabled set of synthesis options can be queried with {@link FTFontFace#getSynthesize}.
  * <p>
  * Note that when synthesizing glyphs, the font metrics returned will only be estimates.
  *
@@ -56,12 +56,19 @@ public enum FTSynthesize implements Flag {
 
     /**
      * Get the value of this FTSynthesize enum
+     *
      * @return {@link #BOLD}, {@link #OBLIQUE} or a combination of both
      */
     public int getValue() {
         return value;
     }
 
+    /**
+     * Create an FTSynthesize enum for this value
+     *
+     * @param  value the value of the enum
+     * @return a new FTSynthesize enum member
+     */
     public static FTSynthesize of(int value) {
         return value == 1 ? BOLD : OBLIQUE;
     }
