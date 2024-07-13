@@ -29,7 +29,6 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
-import java.lang.ref.Cleaner;
 import java.util.Set;
 
 import static io.github.jwharm.cairobindings.Interop.enumSetToInt;
