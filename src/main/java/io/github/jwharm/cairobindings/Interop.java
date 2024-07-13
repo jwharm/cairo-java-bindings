@@ -71,6 +71,7 @@ public final class Interop {
      *
      * @param  <T>      an enum implementing the Java-GI Enumeration interface
      * @param  cls      the class of the enum
+     * @param  make     function that will construct an enum from one flag value
      * @param  bitfield the integer containing the bitfield
      * @return an EnumSet containing the enum values as set in the bitfield
      */
