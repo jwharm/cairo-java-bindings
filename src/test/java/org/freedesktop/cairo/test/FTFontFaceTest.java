@@ -13,8 +13,9 @@ import org.junit.jupiter.api.Test;
 import io.github.jwharm.cairobindings.Platform;
 
 import java.io.File;
+import java.util.Set;
 
-class FTFontFaceTest {
+ class FTFontFaceTest {
 
     private static String TTF_FILE;
 
@@ -50,9 +51,9 @@ class FTFontFaceTest {
         Library ftLib = Library.initFreeType();
         Face ftFace = Face.newFace(ftLib, TTF_FILE, 0);
         FTFontFace face = FTFontFace.create(ftFace, 0);
-        face.setSynthesize(FTSynthesize.BOLD.or(FTSynthesize.OBLIQUE));
-        face.unsetSynthesize(FTSynthesize.BOLD);
-        assertEquals(FTSynthesize.OBLIQUE, face.getSynthesize());
+        face.setSynthesize(Set.of(FTSynthesize.BOLD, FTSynthesize.OBLIQUE));
+        face.unsetSynthesize(Set.of(FTSynthesize.BOLD));
+        assertEquals(Set.of(FTSynthesize.OBLIQUE), face.getSynthesize());
         assertEquals(Status.SUCCESS, face.status());
         ftFace.doneFace();
         ftLib.doneFreeType();

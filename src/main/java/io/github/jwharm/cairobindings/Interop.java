@@ -21,6 +21,9 @@ package io.github.jwharm.cairobindings;
 
 import java.lang.foreign.*;
 import java.lang.invoke.*;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.function.Function;
 
 /**
  * The Interop class contains functionality for interoperability with native code.
@@ -61,5 +64,44 @@ public final class Interop {
      */
     public static MemorySegment allocateNativeString(String string, SegmentAllocator allocator) {
         return string == null ? MemorySegment.NULL : allocator.allocateFrom(string);
+    }
+
+    /**
+     * Create an EnumSet of class `cls` from the provided bitfield
+     *
+     * @param  <T>      an enum implementing the Java-GI Enumeration interface
+     * @param  cls      the class of the enum
+     * @param  bitfield the integer containing the bitfield
+     * @return an EnumSet containing the enum values as set in the bitfield
+     */
+    public static <T extends Enum<T> & Flag>
+    EnumSet<T> intToEnumSet(Class<T> cls,
+                            Function<Integer, T> make,
+                            int bitfield) {
+        int n = bitfield;
+        EnumSet<T> enumSet = EnumSet.noneOf(cls);
+        int position = 0;
+        while (n != 0) {
+            if ((n & 1) == 1)
+                enumSet.add(make.apply(1 << position));
+            position++;
+            n >>= 1;
+        }
+        return enumSet;
+    }
+
+    /**
+     * Create a bitfield from the provided Set of enums
+     *
+     * @param  <T> an enum implementing the Java-GI Enumeration interface
+     * @param  set the set of enums
+     * @return the resulting bitfield
+     */
+    public static <T extends Enum<T> & Flag>
+    int enumSetToInt(Set<T> set) {
+        int bitfield = 0;
+        for (T element : set)
+            bitfield |= element.getValue();
+        return bitfield;
     }
 }

@@ -30,6 +30,9 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.ref.Cleaner;
+import java.util.Set;
+
+import static io.github.jwharm.cairobindings.Interop.enumSetToInt;
 
 /**
  * The PDF surface is used to render cairo graphics to Adobe PDF files and is a
@@ -281,14 +284,14 @@ public final class PDFSurface extends Surface {
      * @return the id for the added item.
      * @since 1.16
      */
-    public int addOutline(int parentId, String string, String linkAttribs, PDFOutlineFlags flags) {
+    public int addOutline(int parentId, String string, String linkAttribs, Set<PDFOutlineFlags> flags) {
         try {
             try (Arena arena = Arena.ofConfined()) {
                 MemorySegment utf8 = Interop.allocateNativeString(string, arena);
                 MemorySegment linkAttribsPtr = linkAttribs == null ? MemorySegment.NULL
                         : arena.allocateFrom(linkAttribs);
                 return (int) cairo_pdf_surface_add_outline.invoke(handle(), parentId, utf8, linkAttribsPtr,
-                        flags.getValue());
+                        enumSetToInt(flags));
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);

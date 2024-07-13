@@ -19,6 +19,8 @@
 
 package org.freedesktop.cairo;
 
+import io.github.jwharm.cairobindings.Flag;
+
 /**
  * {@code PDFOutlineFlags} is used by the cairo_pdf_surface_add_outline()
  * function specify the attributes of an outline item. These flags may be
@@ -26,7 +28,7 @@ package org.freedesktop.cairo;
  * 
  * @since 1.16
  */
-public enum PDFOutlineFlags {
+public enum PDFOutlineFlags implements Flag {
 
     /**
      * The outline item defaults to open in the PDF viewer

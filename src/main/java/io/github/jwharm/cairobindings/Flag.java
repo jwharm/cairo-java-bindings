@@ -20,31 +20,13 @@
 package io.github.jwharm.cairobindings;
 
 /**
- * The Platform class provides utility functions to retrieve the runtime platform
- * and check if a function is supported on the runtime platform.
+ * Base class for flag types (enumerations that can be combined into bitfields)
  */
-public final class Platform {
-
-    private static String runtimePlatform = null;
-
-    // Prevent instantiation
-    private Platform() {}
+public interface Flag {
 
     /**
-     * Determine the runtime platform
-     * @return the runtime platform: "windows", "linux" or "macos"
+     * Get the integer value for an enum member
+     * @return the integer value
      */
-    public static String getRuntimePlatform() {
-        if (runtimePlatform == null) {
-            String osName = System.getProperty("os.name").toLowerCase();
-            if (osName.contains("windows")) {
-                runtimePlatform = "windows";
-            } else if (osName.contains("linux")) {
-                runtimePlatform = "linux";
-            } else {
-                runtimePlatform = "macos";
-            }
-        }
-        return runtimePlatform;
-    }
+    int getValue();
 }

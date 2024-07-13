@@ -24,9 +24,13 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
 import java.lang.ref.Cleaner;
+import java.util.Set;
 
 import io.github.jwharm.cairobindings.Interop;
 import org.freedesktop.freetype.Face;
+
+import static io.github.jwharm.cairobindings.Interop.enumSetToInt;
+import static io.github.jwharm.cairobindings.Interop.intToEnumSet;
 
 /**
  * Provides a FontFace for FreeType.
@@ -106,10 +110,10 @@ public final class FTFontFace extends FontFace {
      * @return the current set of synthesis options.
      * @since 1.12
      */
-    public FTSynthesize getSynthesize() {
+    public Set<FTSynthesize> getSynthesize() {
         try {
             int result = (int) cairo_ft_font_face_get_synthesize.invoke(handle());
-            return new FTSynthesize(result);
+            return intToEnumSet(FTSynthesize.class, FTSynthesize::of, result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -126,9 +130,9 @@ public final class FTFontFace extends FontFace {
      * @param synthFlags the set of synthesis options to enable
      * @since 1.12
      */
-    public void setSynthesize(FTSynthesize synthFlags) {
+    public void setSynthesize(Set<FTSynthesize> synthFlags) {
         try {
-            cairo_ft_font_face_set_synthesize.invoke(handle(), synthFlags.value());
+            cairo_ft_font_face_set_synthesize.invoke(handle(), enumSetToInt(synthFlags));
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -143,9 +147,9 @@ public final class FTFontFace extends FontFace {
      * @param synthFlags the set of synthesis options to disable
      * @since 1.12
      */
-    public void unsetSynthesize(FTSynthesize synthFlags) {
+    public void unsetSynthesize(Set<FTSynthesize> synthFlags) {
         try {
-            cairo_ft_font_face_unset_synthesize.invoke(handle(), synthFlags.value());
+            cairo_ft_font_face_unset_synthesize.invoke(handle(), enumSetToInt(synthFlags));
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.freedesktop.cairo.*;
@@ -54,7 +55,7 @@ class PDFSurfaceTest {
     void testAddOutline() {
         try (PDFSurface s = PDFSurface.create((String) null, 120, 120)) {
             // This verifies the method call runs, but the result will not be successful
-            s.addOutline(PDFSurface.CAIRO_PDF_OUTLINE_ROOT, "test", "test", PDFOutlineFlags.ITALIC);
+            s.addOutline(PDFSurface.CAIRO_PDF_OUTLINE_ROOT, "test", "test", Set.of(PDFOutlineFlags.ITALIC));
         }
     }
 
