@@ -36,8 +36,8 @@ import java.lang.invoke.MethodHandle;
  * integer-aligned rectangles. They are often used on raster surfaces to track
  * areas of interest, such as change or clip areas.
  * <p>
- * It allows set-theoretical operations like cairo_region_union() and
- * cairo_region_intersect() to be performed on them.
+ * It allows set-theoretical operations like {@link Region#union} and
+ * {@link Region#intersect} to be performed on them.
  * 
  * @since 1.10
  */

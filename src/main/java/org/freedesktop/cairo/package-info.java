@@ -19,8 +19,8 @@
 
 /**
  * This package contains Java language bindings for the <a href="https://www.cairographics.org">cairo</a>
- * graphics library using the JEP-442 Panama FFI. The bindings are based on <strong>cairo 1.18</strong>
- * and work with <strong>JDK 21</strong> (with preview features enabled).
+ * graphics library using the JEP-454 Panama FFI. The bindings are based on <strong>cairo 1.18</strong>
+ * and work with <strong>JDK 22</strong> or later.
  * <p>
  * These language bindings were primarily created as a companion to the GObject-based language
  * bindings for Gtk and GStreamer generated with
