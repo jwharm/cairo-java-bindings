@@ -3033,7 +3033,7 @@ public final class Context extends Proxy {
     }
 
     private static final MethodHandle cairo_text_extents = Interop.downcallHandle("cairo_text_extents",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS));
 
     /**
      * Gets the extents for an array of glyphs. The extents describe a user-space
@@ -3061,7 +3061,8 @@ public final class Context extends Proxy {
     }
 
     private static final MethodHandle cairo_glyph_extents = Interop.downcallHandle("cairo_glyph_extents",
-            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS,
+                    ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
 
     /**
      * Marks the beginning of the tag_name structure. Call {@link #tagEnd(String)}
