@@ -29,7 +29,6 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.invoke.MethodHandle;
-import java.lang.ref.Cleaner;
 
 /**
  * The PostScript surface is used to render cairo graphics to Adobe PostScript
@@ -85,9 +84,9 @@ public final class PSSurface extends Surface {
 
     /**
      * Creates a PostScript surface of the specified size in points to be written to
-     * {@code filename}. See {@link #create(OutputStream, int, int)} for a more
-     * flexible mechanism for handling the PostScript output than simply writing it
-     * to a named file.
+     * {@code filename}. See {@link #create(OutputStream, double, double)} for a
+     * more flexible mechanism for handling the PostScript output than simply writing
+     * it to a named file.
      * <p>
      * Note that the size of individual pages of the PostScript output can vary. See
      * {@link #setSize(double, double)}.
@@ -103,7 +102,7 @@ public final class PSSurface extends Surface {
      * @return the newly created surface.
      * @since 1.2
      */
-    public static PSSurface create(String filename, int widthInPoints, int heightInPoints) {
+    public static PSSurface create(String filename, double widthInPoints, double heightInPoints) {
         PSSurface surface;
         try {
             try (Arena arena = Arena.ofConfined()) {
@@ -123,13 +122,13 @@ public final class PSSurface extends Surface {
     }
 
     private static final MethodHandle cairo_ps_surface_create = Interop.downcallHandle("cairo_ps_surface_create",
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
 
     /**
      * Creates a PostScript surface of the specified size in points to be written
      * incrementally to the OutputStream {@code stream}. See
-     * {@link #create(String, int, int)} for a more convenient way to simply direct
-     * the PostScript output to a named file.
+     * {@link #create(String, double, double)} for a more convenient way to simply
+     * direct the PostScript output to a named file.
      * <p>
      * Note that the size of individual pages of the PostScript output can vary. See
      * {@link #setSize(double, double)}.
@@ -145,7 +144,7 @@ public final class PSSurface extends Surface {
      * @return the newly created surface.
      * @since 1.2
      */
-    public static PSSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
+    public static PSSurface create(OutputStream stream, double widthInPoints, double heightInPoints) {
         PSSurface surface;
         Arena arena = Arena.ofConfined();
         try {
@@ -172,10 +171,9 @@ public final class PSSurface extends Surface {
         return surface;
     }
 
-    private static final MethodHandle cairo_ps_surface_create_for_stream = Interop
-            .downcallHandle(
-                    "cairo_ps_surface_create_for_stream", FunctionDescriptor.of(ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+    private static final MethodHandle cairo_ps_surface_create_for_stream = Interop.downcallHandle(
+            "cairo_ps_surface_create_for_stream", FunctionDescriptor.of(ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
 
     /**
      * Restricts the generated PostSript file to {@code level}. See

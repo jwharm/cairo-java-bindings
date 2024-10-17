@@ -145,7 +145,7 @@ public final class PDFSurface extends Surface {
      * @return the newly created surface
      * @since 1.2
      */
-    public static PDFSurface create(String filename, int widthInPoints, int heightInPoints) {
+    public static PDFSurface create(String filename, double widthInPoints, double heightInPoints) {
         PDFSurface surface;
         try {
             try (Arena arena = Arena.ofConfined()) {
@@ -165,7 +165,7 @@ public final class PDFSurface extends Surface {
     }
 
     private static final MethodHandle cairo_pdf_surface_create = Interop.downcallHandle("cairo_pdf_surface_create",
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
 
     /**
      * Creates a PDF surface of the specified size in points to be written
@@ -182,7 +182,7 @@ public final class PDFSurface extends Surface {
      * @return the newly created surface
      * @since 1.2
      */
-    public static PDFSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
+    public static PDFSurface create(OutputStream stream, double widthInPoints, double heightInPoints) {
         PDFSurface surface;
         Arena arena = Arena.ofConfined();
         try {
@@ -209,10 +209,9 @@ public final class PDFSurface extends Surface {
         return surface;
     }
 
-    private static final MethodHandle cairo_pdf_surface_create_for_stream = Interop
-            .downcallHandle(
-                    "cairo_pdf_surface_create_for_stream", FunctionDescriptor.of(ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+    private static final MethodHandle cairo_pdf_surface_create_for_stream = Interop.downcallHandle(
+            "cairo_pdf_surface_create_for_stream", FunctionDescriptor.of(ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
 
     /**
      * Restricts the generated PDF file to version . See

@@ -88,7 +88,7 @@ public final class SVGSurface extends Surface {
      * @return the newly created surface
      * @since 1.2
      */
-    public static SVGSurface create(String filename, int widthInPoints, int heightInPoints) {
+    public static SVGSurface create(String filename, double widthInPoints, double heightInPoints) {
         SVGSurface surface;
         try {
             try (Arena arena = Arena.ofConfined()) {
@@ -108,7 +108,7 @@ public final class SVGSurface extends Surface {
     }
 
     private static final MethodHandle cairo_svg_surface_create = Interop.downcallHandle("cairo_svg_surface_create",
-            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
 
     /**
      * Creates a SVG surface of the specified size in points to be written
@@ -125,7 +125,7 @@ public final class SVGSurface extends Surface {
      * @return the newly created surface
      * @since 1.2
      */
-    public static SVGSurface create(OutputStream stream, int widthInPoints, int heightInPoints) {
+    public static SVGSurface create(OutputStream stream, double widthInPoints, double heightInPoints) {
         SVGSurface surface;
         Arena arena = Arena.ofConfined();
         try {
@@ -152,10 +152,9 @@ public final class SVGSurface extends Surface {
         return surface;
     }
 
-    private static final MethodHandle cairo_svg_surface_create_for_stream = Interop
-            .downcallHandle(
-                    "cairo_svg_surface_create_for_stream", FunctionDescriptor.of(ValueLayout.ADDRESS,
-                            ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT, ValueLayout.JAVA_INT));
+    private static final MethodHandle cairo_svg_surface_create_for_stream = Interop.downcallHandle(
+            "cairo_svg_surface_create_for_stream", FunctionDescriptor.of(ValueLayout.ADDRESS,
+                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE, ValueLayout.JAVA_DOUBLE));
 
     /**
      * Get the unit of the SVG surface.
