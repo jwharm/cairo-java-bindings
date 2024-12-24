@@ -26,7 +26,7 @@ class FTScaledFontTest {
         switch (Platform.getRuntimePlatform()) {
             case "linux" -> {
                 // Fedora
-                TTF_FILE = "/usr/share/fonts/liberation-serif/LiberationSerif-Regular.ttf";
+                TTF_FILE = "/usr/share/fonts/liberation-serif-fonts/LiberationSerif-Regular.ttf";
                 if (! new File(TTF_FILE).exists()) {
                     // Ubuntu
                     TTF_FILE = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf";
