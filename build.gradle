@@ -7,9 +7,10 @@ plugins {
 }
 
 group = "io.github.jwharm.cairobindings"
-version = "1.18.4.1"
+version = "2.0.0"
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -22,7 +23,7 @@ java {
 }
 
 dependencies {
-    compileOnly "io.github.jwharm.javagi:glib:0.10.2"
+    compileOnly "io.github.jwharm.javagi:gobject:0.12.0"
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
