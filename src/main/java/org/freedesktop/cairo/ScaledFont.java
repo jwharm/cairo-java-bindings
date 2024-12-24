@@ -534,10 +534,10 @@ public class ScaledFont extends Proxy {
      * Get the CairoScaledFont GType
      * @return the GType
      */
-    public static org.gnome.glib.Type getType() {
+    public static org.gnome.gobject.Type getType() {
         try {
             long result = (long) cairo_gobject_scaled_font_get_type.invoke();
-            return new org.gnome.glib.Type(result);
+            return new org.gnome.gobject.Type(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

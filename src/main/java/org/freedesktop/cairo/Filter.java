@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2023-2024 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -105,10 +105,10 @@ public enum Filter {
      * Get the CairoFilter GType
      * @return the GType
      */
-    public static org.gnome.glib.Type getType() {
+    public static org.gnome.gobject.Type getType() {
         try {
             long result = (long) cairo_gobject_filter_get_type.invoke();
-            return new org.gnome.glib.Type(result);
+            return new org.gnome.gobject.Type(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

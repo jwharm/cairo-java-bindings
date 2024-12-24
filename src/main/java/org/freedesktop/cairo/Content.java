@@ -99,10 +99,10 @@ public enum Content {
      * Get the CairoContent GType
      * @return the GType
      */
-    public static org.gnome.glib.Type getType() {
+    public static org.gnome.gobject.Type getType() {
         try {
             long result = (long) cairo_gobject_content_get_type.invoke();
-            return new org.gnome.glib.Type(result);
+            return new org.gnome.gobject.Type(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

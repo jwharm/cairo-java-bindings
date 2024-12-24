@@ -23,7 +23,7 @@
  * and work with <strong>JDK 22</strong> or later.
  */
 module org.freedesktop.cairo {
-    requires static org.gnome.glib; // Optional dependency on java-gi when cairo-gobject is used
+    requires static org.gnome.gobject; // Optional dependency on java-gi when cairo-gobject is used
     exports org.freedesktop.cairo;
     exports org.freedesktop.freetype;
     exports io.github.jwharm.cairobindings;

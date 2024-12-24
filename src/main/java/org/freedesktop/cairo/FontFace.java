@@ -195,10 +195,10 @@ public sealed class FontFace extends Proxy permits ToyFontFace, FTFontFace, User
      * Get the CairoFontFace GType
      * @return the GType
      */
-    public static org.gnome.glib.Type getType() {
+    public static org.gnome.gobject.Type getType() {
         try {
             long result = (long) cairo_gobject_font_face_get_type.invoke();
-            return new org.gnome.glib.Type(result);
+            return new org.gnome.gobject.Type(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

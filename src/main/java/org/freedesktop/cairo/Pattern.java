@@ -360,10 +360,10 @@ public abstract class Pattern extends Proxy {
      * Get the CairoPattern GType
      * @return the GType
      */
-    public static org.gnome.glib.Type getType() {
+    public static org.gnome.gobject.Type getType() {
         try {
             long result = (long) cairo_gobject_pattern_get_type.invoke();
-            return new org.gnome.glib.Type(result);
+            return new org.gnome.gobject.Type(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
