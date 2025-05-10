@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2023-2025 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -30,7 +30,7 @@ import java.lang.invoke.MethodHandle;
 /**
  * Base class for (linear or radial) gradient patterns.
  */
-public abstract class Gradient extends Pattern {
+public class Gradient extends Pattern {
 
     static {
         Cairo.ensureInitialized();
