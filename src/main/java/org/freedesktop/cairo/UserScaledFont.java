@@ -77,7 +77,7 @@ public class UserScaledFont extends ScaledFont {
     public Pattern getForegroundMarker() {
         try {
             MemorySegment result = (MemorySegment) cairo_user_scaled_font_get_foreground_marker.invoke(handle());
-            return new Pattern.PatternImpl(result);
+            return new Pattern(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -122,7 +122,7 @@ public class UserScaledFont extends ScaledFont {
     public Pattern getForegroundSource() {
         try {
             MemorySegment result = (MemorySegment) cairo_user_scaled_font_get_foreground_source.invoke(handle());
-            return new Pattern.PatternImpl(result);
+            return new Pattern(result);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
