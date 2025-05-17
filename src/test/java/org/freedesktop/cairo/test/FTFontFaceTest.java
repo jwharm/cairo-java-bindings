@@ -30,6 +30,10 @@ import java.util.Set;
                     // Ubuntu
                     TTF_FILE = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf";
                 }
+                if (! new File(TTF_FILE).exists()) {
+                    // OpenSUSE
+                    TTF_FILE = "/usr/share/fonts/truetype/LiberationSerif-Regular.ttf";
+                }
             }
             case "windows" -> TTF_FILE = "C:\\Windows\\Fonts\\arial.ttf";
             case "macos" -> TTF_FILE = "/Library/Fonts/Arial Unicode.ttf";
