@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2023 Jan-Willem Harmannij
+ * Copyright (C) 2023-2025 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -23,130 +23,114 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * This class keeps a cache of all memory addresses for which a Proxy object
- * was created (except for GObject instances; those are handled in the InstanceCache).
+ * This class keeps a cache of all memory addresses for which a Proxy object was created.
  * <p>
- * When a new Proxy object is created, the reference count in the cache is increased.
- * When a Proxy object is garbage-collected, the reference count in the cache is decreased.
- * When the reference count is 0, the memory is released using the specified free-func.
+ * When a new Proxy object is created, a {@link Cleaner} is attached to it. When the Proxy
+ * object is garbage-collected, the memory is released using the specified free-func.
  * <p>
- * When ownership of a memory address is passed to native code, the cleaner will not free
- * the memory. Ownership is enabled/disabled with {@link #takeOwnership(MemorySegment)} and
+ * When ownership of a memory address belongs elsewhere, the cleaner must not free the
+ * memory. Ownership is enabled/disabled with {@link #takeOwnership(MemorySegment)} and
  * {@link #yieldOwnership(MemorySegment)}.
  */
 public final class MemoryCleaner {
 
-    private static final Map<MemorySegment, Cached> references = new HashMap<>();
     private static final Cleaner CLEANER = Cleaner.create();
+    private static final Map<MemorySegment, Cached> cache = new ConcurrentHashMap<>();
 
     // Prevent instantiation
     private MemoryCleaner() {}
 
     /**
-     * Register the memory address of this proxy to be cleaned when the proxy gets garbage-collected.
-     * @param proxy The Proxy object
+     * Register the memory address of this proxy to be cleaned when the proxy
+     * gets garbage-collected.
+     *
+     * @param proxy The proxy instance
      */
     public static void register(Proxy proxy) {
-
-        // Put the address in the cache (or increase the refcount)
-        MemorySegment address = proxy.handle();
-        synchronized (references) {
-            Cached cached = references.get(address);
-            if (cached == null) {
-                var cleanable = CLEANER.register(proxy, new StructFinalizer(address));
-                references.put(address, new Cached(false, 1, null, cleanable));
-            } else {
-                references.put(address, new Cached(false, cached.references + 1, cached.freeFunc, cached.cleanable));
-            }
-        }
+        cache.computeIfAbsent(proxy.handle(), address -> {
+            var finalizer = new StructFinalizer(address);
+            var cleanable = CLEANER.register(proxy, finalizer);
+            return new Cached(false, null, cleanable);
+        });
     }
 
     /**
      * Register a specialized cleanup function for this memory address.
+     *
      * @param address the memory address
      * @param freeFunc the specialized cleanup function to call
      */
     public static void setFreeFunc(MemorySegment address, String freeFunc) {
-        synchronized (references) {
-            Cached cached = references.get(address);
-            references.put(address, new Cached(cached.owned, cached.references, freeFunc, cached.cleanable));
-        }
+        cache.computeIfPresent(address, (_, cached) ->
+                new Cached(cached.owned, freeFunc, cached.cleanable));
     }
 
     /**
      * Take ownership of this memory address: when all proxy objects are garbage-collected,
      * the memory will automatically be released.
+     *
      * @param address the memory address
      */
     public static void takeOwnership(MemorySegment address) {
-        synchronized (references) {
-            Cached cached = references.get(address);
-            references.put(address, new Cached(true, cached.references, cached.freeFunc, cached.cleanable));
-        }
+        cache.computeIfPresent(address, (_, cached) ->
+                new Cached(true, cached.freeFunc, cached.cleanable));
     }
 
     /**
      * Yield ownership of this memory address: when all proxy objects are garbage-collected,
      * the memory will not be released.
+     *
      * @param address the memory address
      */
     public static void yieldOwnership(MemorySegment address) {
-        synchronized (references) {
-            Cached cached = references.get(address);
-            references.put(address, new Cached(false, cached.references, cached.freeFunc, cached.cleanable));
-        }
+        cache.computeIfPresent(address, (_, cached) ->
+                new Cached(false, cached.freeFunc, cached.cleanable));
     }
 
     /**
      * Run the {@link StructFinalizer} associated with this memory address, by invoking
      * {@link Cleaner.Cleanable#clean()}.
+     *
      * @param address the memory address to free
      */
     public static void free(MemorySegment address) {
-        synchronized (references) {
-            Cached cached = references.get(address);
+        var cached = cache.get(address);
+        if (cached != null) {
             cached.cleanable.clean();
         }
     }
 
     /**
      * This record type is cached for each memory address.
+     *
      * @param owned whether this address is owned (should be cleaned)
-     * @param references the numnber of references (active Proxy objects) for this address
      * @param freeFunc an (optional) specialized function that will release the native memory
+     * @param cleanable an action to free the instance
      */
-    private record Cached(boolean owned, int references, String freeFunc, Cleaner.Cleanable cleanable) {}
+    private record Cached(boolean owned, String freeFunc, Cleaner.Cleanable cleanable) {}
 
     /**
-     * This callback is run by the {@link Cleaner} when a struct or union instance has become unreachable, to free the
-     * native memory.
+     * This callback is run by the {@link Cleaner} when a struct or union instance has become
+     * unreachable, to free the native memory.
+     *
+     * @param address the memory address to free
      */
     private record StructFinalizer(MemorySegment address) implements Runnable {
 
         /**
-         * This method is run by the {@link Cleaner} when the last Proxy object for this memory address is
-         * garbage-collected.
+         * This method is run by the {@link Cleaner} when the last Proxy object for this
+         * memory address is garbage-collected.
          */
         public void run() {
-            Cached cached;
-            synchronized (references) {
-                cached = references.get(address);
-
-                // When other references exist, decrease the refcount
-                if (cached.references > 1) {
-                    references.put(address, new Cached(cached.owned, cached.references - 1, cached.freeFunc, cached.cleanable));
-                    return;
-                }
-
-                // When no other references exist, remove the address from the cache and free the memory
-                references.remove(address);
+            Cached cached = cache.remove(address);
+            if (cached == null) {
+                return;
             }
 
-            // if we don't have ownership, we must not run free()
             if (!cached.owned) {
                 return;
             }
@@ -155,14 +139,18 @@ public final class MemoryCleaner {
                 return;
             }
 
-            // Run specialized free function
+            if (!address.scope().isAlive()) {
+                return;
+            }
+
+            // run the free-function
             try {
                 Interop.downcallHandle(
                         cached.freeFunc,
                         FunctionDescriptor.ofVoid(ValueLayout.ADDRESS)
                 ).invokeExact(address);
             } catch (Throwable e) {
-                throw new AssertionError("Unexpected exception occured: ", e);
+                throw new AssertionError("Unexpected exception occurred: ", e);
             }
         }
     }
