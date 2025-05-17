@@ -22,8 +22,8 @@ java {
 }
 
 dependencies {
-    compileOnly "io.github.jwharm.javagi:glib:0.10.2"
-    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    compileOnly "io.github.jwharm.javagi:glib:0.12.2"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
