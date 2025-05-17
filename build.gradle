@@ -1,13 +1,13 @@
 import org.apache.tools.ant.taskdefs.condition.Os
+import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     id 'java-library'
-    id 'maven-publish'
-    id 'signing'
+    id 'com.vanniktech.maven.publish' version '0.32.0'
 }
 
-group = "io.github.jwharm.cairobindings"
-version = "1.18.4.2"
+group = 'io.github.jwharm.cairobindings'
+version = '1.18.4.2'
 
 repositories {
     mavenCentral()
@@ -17,14 +17,12 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(22)
     }
-    withSourcesJar()
-    withJavadocJar()
 }
 
 dependencies {
-    compileOnly "io.github.jwharm.javagi:glib:0.12.2"
-    testImplementation "org.junit.jupiter:junit-jupiter:5.12.2"
-    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+    compileOnly 'io.github.jwharm.javagi:glib:0.12.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test', Test) {
@@ -48,53 +46,32 @@ tasks.named('test', Test) {
     jvmArgs += "--enable-native-access=ALL-UNNAMED"
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            pom {
-                name = "${groupId}:${artifactId}"
-                groupId = 'io.github.jwharm.cairobindings'
-                description = 'Java language bindings for cairo'
-                url = 'https://github.com/jwharm/cairo-java-bindings/'
-                licenses {
-                    license {
-                        name = 'GNU Lesser General Public License, version 2.1'
-                        url = 'https://www.gnu.org/licenses/lgpl-2.1.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'jwharm'
-                        name = 'Jan-Willem Harmannij'
-                        email = 'jwharmannij@gmail.com'
-                        url = 'https://github.com/jwharm'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/jwharm/cairo-java-bindings.git'
-                    developerConnection = 'scm:git:ssh://github.com:jwharm/cairo-java-bindings.git'
-                    url = 'http://github.com/jwharm/cairo-java-bindings/tree/master'
-                }
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+    coordinates("io.github.jwharm.cairobindings", 'cairo', project.version.toString())
+    pom {
+        name = "io.github.jwharm.cairobindings:cairo"
+        description = 'Java language bindings for cairo'
+        url = 'https://github.com/jwharm/cairo-java-bindings/'
+        licenses {
+            license {
+                name = 'GNU Lesser General Public License, version 2.1'
+                url = 'https://www.gnu.org/licenses/lgpl-2.1.txt'
             }
         }
-    }
-
-    if (project.hasProperty('ossrhUsername') && project.hasProperty('ossrhPassword')) {
-        repositories {
-            maven {
-                name = 'OSSRH'
-                def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-                def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-                credentials {
-                    username = ossrhUsername
-                    password = ossrhPassword
-                }
+        developers {
+            developer {
+                id = 'jwharm'
+                name = 'Jan-Willem Harmannij'
+                email = 'jwharmannij@gmail.com'
+                url = 'https://github.com/jwharm'
             }
         }
-        signing {
-            sign publishing.publications.mavenJava
+        scm {
+            connection = 'scm:git:git://github.com/jwharm/cairo-java-bindings.git'
+            developerConnection = 'scm:git:ssh://github.com:jwharm/cairo-java-bindings.git'
+            url = 'http://github.com/jwharm/cairo-java-bindings/tree/master'
         }
     }
 }
