@@ -9,7 +9,6 @@ group = 'io.github.jwharm.cairobindings'
 version = '1.18.4.3'
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
