@@ -1,5 +1,5 @@
 /* cairo-java-bindings - Java language bindings for cairo
- * Copyright (C) 2024 Jan-Willem Harmannij
+ * Copyright (C) 2024-2026 Jan-Willem Harmannij
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  *
@@ -19,13 +19,13 @@
 
 /**
  * This package contains Java language bindings for the <a href="https://www.cairographics.org">cairo</a>
- * graphics library using the JEP-454 Panama FFI. The bindings are based on <strong>cairo 1.18</strong>
- * and work with <strong>JDK 22</strong> or later.
+ * graphics library using the JEP-454 Panama FFI. The bindings are based on <strong>cairo 1.18.4</strong>
+ * and work with <strong>JDK 25</strong> or later.
  * <p>
  * These language bindings were primarily created as a companion to the GObject-based language
  * bindings for Gtk and GStreamer generated with
- * <a href="https://github.com/jwharm/java-gi">Java-GI</a>, but they can also be used independently.
- * The dependency on {@code io.github.jwharm.javagi:glib} is optional. There are no other external
+ * <a href="https://java-gi.org">Java-GI</a>, but they can also be used independently.
+ * The dependency on {@code org.java-gi:glib} is optional. There are no other external
  * dependencies.
  * <h2>Overview</h2>
  * <h3>Java API</h3>

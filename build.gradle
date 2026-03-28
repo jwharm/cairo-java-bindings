@@ -1,27 +1,27 @@
 import org.apache.tools.ant.taskdefs.condition.Os
-import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     id 'java-library'
-    id 'com.vanniktech.maven.publish' version '0.32.0'
+    id 'com.vanniktech.maven.publish' version '0.36.0'
 }
 
 group = 'io.github.jwharm.cairobindings'
-version = '1.18.4.2'
+version = '1.18.4.3'
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(22)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
 dependencies {
-    compileOnly 'io.github.jwharm.javagi:glib:0.12.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    compileOnly 'org.java-gi:glib:0.15.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -47,7 +47,7 @@ tasks.named('test', Test) {
 }
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    publishToMavenCentral()
     signAllPublications()
     coordinates("io.github.jwharm.cairobindings", 'cairo', project.version.toString())
     pom {
