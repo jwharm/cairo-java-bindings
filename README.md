@@ -1,9 +1,11 @@
 # Cairo Java bindings
 Java language bindings for the [cairo](https://www.cairographics.org) graphics library using the 
-new JEP-454 Foreign Function & Memory API. The bindings are based on **cairo 1.18.0** and work with **JDK 22** and newer.
+new JEP-454 Foreign Function & Memory API. The bindings are based on **cairo 1.18.4** and work
+with **JDK 25** and newer.
 
 I created these language bindings primarily as a companion to the GObject-Introspection-based Java 
-language bindings for Gtk and GStreamer generated with [Java-GI](https://github.com/jwharm/java-gi), but they can also be used independently.
+language bindings for Gtk and GStreamer generated with [Java-GI](https://java-gi.org), but they can
+also be used independently.
 
 ## Overview
 
@@ -86,12 +88,12 @@ The library is available on Maven Central. Include it in your `gradle.build` or 
 
 ```
 dependencies {
-  implementation 'io.github.jwharm.cairobindings:cairo:1.18.4.2'
+  implementation 'io.github.jwharm.cairobindings:cairo:1.18.4.3'
 }
 ```
 
 Furthermore, you obviously need to have the cairo library version 1.18 installed on your system, 
-or else the Java bindings have nothing to bind to. You also need to use JDK 22 or newer.
+or else the Java bindings have nothing to bind to. You also need to use JDK 25 or newer.
 
 Now, you can start developing with cairo in Java. Have fun! This is a simple example to get started, 
 ported from [the first sample on this page](https://www.cairographics.org/samples/):
